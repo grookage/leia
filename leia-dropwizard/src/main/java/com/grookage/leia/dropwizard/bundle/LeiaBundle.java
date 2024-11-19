@@ -40,6 +40,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @NoArgsConstructor
 @Getter
@@ -49,13 +50,13 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
     private SchemaRepository schemaRepository;
     private SchemaRetriever schemaRetriever;
 
-    protected abstract SchemaUpdaterResolver<U> userResolver(T configuration);
+    protected abstract Supplier<SchemaUpdaterResolver<U>> userResolver(T configuration);
 
     protected abstract CacheConfig getCacheConfig(T configuration);
 
-    protected abstract SchemaRepository getSchemaRepository(T configuration);
+    protected abstract Supplier<SchemaRepository> getSchemaRepository(T configuration);
 
-    protected abstract VersionIDGenerator getVersionIDGenerator();
+    protected abstract Supplier<VersionIDGenerator> getVersionIDGenerator();
 
     protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
         return List.of();
@@ -67,12 +68,12 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
 
     @Override
     public void run(T configuration, Environment environment) {
-        final var userResolver = userResolver(configuration);
+        final var userResolver = userResolver(configuration).get();
         Preconditions.checkNotNull(userResolver, "User Resolver can't be null");
-        this.schemaRepository = getSchemaRepository(configuration);
+        this.schemaRepository = getSchemaRepository(configuration).get();
         final var schemaProcessorHub = SchemaProcessorHub.of()
                 .withSchemaRepository(schemaRepository)
-                .withVersionIDGenerator(getVersionIDGenerator())
+                .withVersionIDGenerator(getVersionIDGenerator().get())
                 .build();
         this.schemaIngestor = new SchemaIngestor<U>()
                 .withProcessorHub(schemaProcessorHub)
