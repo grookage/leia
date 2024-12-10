@@ -19,6 +19,7 @@ package com.grookage.leia.validator;
 import com.grookage.leia.common.exception.SchemaValidationException;
 import com.grookage.leia.common.exception.ValidationErrorCode;
 import com.grookage.leia.common.utils.SchemaValidationUtils;
+import com.grookage.leia.common.violation.LeiaSchemaViolation;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
@@ -27,12 +28,13 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class StaticSchemaValidator implements LeiaSchemaValidator {
@@ -50,7 +52,7 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
     }
 
     @SneakyThrows
-    private boolean validate(final SchemaKey schemaKey, Class<?> klass) {
+    private List<LeiaSchemaViolation> validate(final SchemaKey schemaKey, Class<?> klass) {
         final var details = supplier.get().stream()
                 .filter(each -> each.match(schemaKey)).findFirst().orElse(null);
         if (null == details) {
@@ -62,6 +64,7 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
     @Override
     public void start() {
         log.info("Starting the schema validator");
+        Map<SchemaKey, List<LeiaSchemaViolation>> violations = new HashMap<>();
         packageRoots.forEach(handlerPackage -> {
             final var reflections = new Reflections(handlerPackage);
             final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaDefinition.class);
@@ -73,13 +76,15 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
                         .namespace(annotation.namespace())
                         .build();
                 klassRegistry.putIfAbsent(schemaKey, annotatedClass);
-                validationRegistry.putIfAbsent(schemaKey, validate(schemaKey, annotatedClass));
+                final var schemaViolations = validate(schemaKey, annotatedClass);
+                validationRegistry.putIfAbsent(schemaKey, schemaViolations.isEmpty());
+                if (!schemaViolations.isEmpty()) {
+                    violations.putIfAbsent(schemaKey, schemaViolations);
+                }
             });
         });
-        final var invalidSchemas = validationRegistry.keySet().stream()
-                .filter(key -> !validationRegistry.get(key)).collect(Collectors.toSet());
-        if (!invalidSchemas.isEmpty()) {
-            log.error("Found invalid schemas. Please fix the following schemas to start the bundle {}", invalidSchemas);
+        if (!violations.isEmpty()) {
+            log.error("Found invalid schemas. Please fix the following schemas to start the bundle {}", violations);
             throw SchemaValidationException.error(ValidationErrorCode.INVALID_SCHEMAS);
         }
     }
@@ -92,7 +97,8 @@ public class StaticSchemaValidator implements LeiaSchemaValidator {
     @Override
     public boolean valid(SchemaKey schemaKey) {
         return validationRegistry.computeIfAbsent(schemaKey,
-                key -> getKlass(key).map(aClass -> validate(key, aClass))
+                key -> getKlass(key)
+                        .map(aClass -> validate(key, aClass).isEmpty())
                         .orElse(Boolean.FALSE));
     }
 

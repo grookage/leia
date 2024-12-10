@@ -21,6 +21,7 @@ import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.utils.MapperUtils;
 import com.grookage.leia.provider.marshal.Marshaller;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 
 import java.util.List;
 
@@ -30,9 +31,10 @@ public class LeiaClientMarshaller implements Marshaller<List<SchemaDetails>> {
         return new LeiaClientMarshaller();
     }
 
+    @SneakyThrows
     @Override
     public List<SchemaDetails> marshall(byte[] body) {
-        return MapperUtils.mapper().convertValue(body, new TypeReference<>() {
+        return MapperUtils.mapper().readValue(body, new TypeReference<>() {
         });
     }
 }
