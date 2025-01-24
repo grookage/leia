@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
+ * Copyright (c) 2024-2025. Koushik R <rkoushik.14@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.core.exception;
+package com.grookage.leia.models.exception;
 
 import lombok.Builder;
 import lombok.Getter;

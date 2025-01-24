@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024. Koushik R <rkoushik.14@gmail.com>.
+ * Copyright (c) 2024-2025. Koushik R <rkoushik.14@gmail.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 
 package com.grookage.leia.core.exception;
 
+import com.grookage.leia.models.exception.LeiaErrorCode;
 import lombok.Getter;
 
 @Getter
-public enum LeiaErrorCode {
+public enum LeiaSchemaErrorCode implements LeiaErrorCode {
 
     PROCESSOR_NOT_FOUND(400),
 
@@ -31,7 +32,7 @@ public enum LeiaErrorCode {
 
     final int status;
 
-    LeiaErrorCode(int status) {
+    LeiaSchemaErrorCode(int status) {
         this.status = status;
     }
 }

@@ -16,7 +16,7 @@
 
 package com.grookage.leia.core.ingestion.utils;
 
-import com.grookage.leia.core.exception.LeiaException;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.user.SchemaUpdater;
 import lombok.SneakyThrows;

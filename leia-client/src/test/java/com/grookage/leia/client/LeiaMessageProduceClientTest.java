@@ -17,8 +17,6 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grookage.leia.mux.processors.DefaultTargetValidator;
-import com.grookage.leia.mux.processors.TargetValidator;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.stubs.TargetSchema;
 import com.grookage.leia.client.stubs.TestSchema;
@@ -28,6 +26,8 @@ import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import com.grookage.leia.mux.processors.DefaultTargetValidator;
+import com.grookage.leia.mux.processors.TargetValidator;
 import com.grookage.leia.validator.LeiaSchemaValidator;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;

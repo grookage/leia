@@ -16,8 +16,8 @@
 
 package com.grookage.leia.dropwizard.bundle.mapper;
 
-import com.grookage.leia.core.exception.LeiaException;
 import com.grookage.leia.models.GenericResponse;
+import com.grookage.leia.models.exception.LeiaException;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

@@ -26,7 +26,7 @@ import java.util.Set;
 
 public interface SchemaRepository {
 
-    List<SchemaDetails> get(final String namespace, final String schemaName);
+    boolean createdRecordExists(String namespace, String schemaName);
 
     void create(final SchemaDetails schema);
 

@@ -16,14 +16,12 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.grookage.leia.core.exception.LeiaErrorCode;
-import com.grookage.leia.core.exception.LeiaException;
-import com.grookage.leia.core.ingestion.utils.ContextUtils;
+import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
 import com.grookage.leia.core.ingestion.utils.SchemaUtils;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
-import com.grookage.leia.models.schema.engine.SchemaState;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -48,15 +46,14 @@ public class CreateSchemaProcessor extends SchemaProcessor {
     @SneakyThrows
     public void process(SchemaContext context) {
         final var createSchemaRequest = context.getContext(CreateSchemaRequest.class)
-                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaErrorCode.VALUE_NOT_FOUND));
-        final var storedSchemas = getRepositorySupplier()
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
+        final var recordExists = getRepositorySupplier()
                 .get()
-                .get(createSchemaRequest.getNamespace(), createSchemaRequest.getSchemaName());
-        if (!storedSchemas.isEmpty() && storedSchemas.stream()
-                .anyMatch(each -> each.getSchemaState() == SchemaState.CREATED)) {
+                .createdRecordExists(createSchemaRequest.getNamespace(), createSchemaRequest.getSchemaName());
+        if (recordExists) {
             log.error("There are already stored schemas present with namespace {} and schemaName {}. Please try updating them instead",
                     createSchemaRequest.getNamespace(), createSchemaRequest.getSchemaName());
-            throw LeiaException.error(LeiaErrorCode.SCHEMA_ALREADY_EXISTS);
+            throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_ALREADY_EXISTS);
         }
         final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, getVersionSupplier());
         addHistory(context, schemaDetails);

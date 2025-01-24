@@ -24,7 +24,10 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
-import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.GetRequest;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.UpdateRequest;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
@@ -40,7 +43,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,6 +87,23 @@ public class ElasticRepository extends AbstractSchemaRepository {
     }
 
     @Override
+    public boolean createdRecordExists(String namespace, String schemaName) {
+        final var namespaceQuery = TermQuery.of(p -> p.field(NAMESPACE).value(namespace))._toQuery();
+        final var configQuery = TermQuery.of(p -> p.field(SCHEMA_NAME).value(schemaName))._toQuery();
+        final var configStateQuery = TermQuery.of(p -> p.field(SCHEMA_STATE).value(SchemaState.CREATED.name()))._toQuery();
+        final var searchQuery = BoolQuery.of(q -> q.must(List.of(namespaceQuery, configQuery, configStateQuery)))._toQuery();
+        final var searchResponse = client.search(SearchRequest.of(
+                        s -> s.query(searchQuery)
+                                .requestCache(true)
+                                .index(List.of(SCHEMA_INDEX))
+                                .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
+                                .timeout(elasticConfig.getTimeout())),
+                SchemaDetails.class
+        );
+        return !searchResponse.hits().hits().isEmpty();
+    }
+
+    @Override
     @SneakyThrows
     public void create(SchemaDetails schema) {
         final var createDocument = new IndexRequest.Builder<>().document(schema)
@@ -107,25 +126,6 @@ public class ElasticRepository extends AbstractSchemaRepository {
                 .timeout(Time.of(s -> s.time(elasticConfig.getTimeout())))
                 .build();
         client.update(updateRequest, SchemaDetails.class);
-    }
-
-    @Override
-    @SneakyThrows
-    public List<SchemaDetails> get(String namespace, String schemaName) {
-        final var searchQuery = BoolQuery.of(t -> t.must(List.of(
-                TermQuery.of(p -> p.field(NAMESPACE).value(namespace))._toQuery(),
-                TermQuery.of(q -> q.field(SCHEMA_NAME).value(schemaName))._toQuery()
-        )))._toQuery();
-        final var searchResponse = client.search(SearchRequest.of(
-                        s -> s.query(searchQuery)
-                                .requestCache(true)
-                                .index(List.of(SCHEMA_INDEX))
-                                .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
-                                .timeout(elasticConfig.getTimeout())),
-                SchemaDetails.class
-        );
-        return searchResponse.hits().hits().stream()
-                .map(Hit::source).toList();
     }
 
     @Override

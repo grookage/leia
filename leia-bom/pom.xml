@@ -56,6 +56,16 @@
             </dependency>
             <dependency>
                 <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-aerospike-dw</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
+                <artifactId>leia-aerospike</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.grookage.leia</groupId>
                 <artifactId>leia-dropwizard</artifactId>
                 <version>${project.version}</version>
             </dependency>

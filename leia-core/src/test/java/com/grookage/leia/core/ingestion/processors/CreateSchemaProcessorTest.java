@@ -16,8 +16,8 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.grookage.leia.core.exception.LeiaException;
 import com.grookage.leia.models.ResourceHelper;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
@@ -25,8 +25,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.List;
 
 class CreateSchemaProcessorTest extends SchemaProcessorTest {
 
@@ -49,7 +47,7 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
                 CreateSchemaRequest.class
         );
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
-        Mockito.when(getRepositorySupplier().get().get(Mockito.anyString(), Mockito.anyString())).thenReturn(List.of());
+        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.anyString(), Mockito.anyString())).thenReturn(false);
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
@@ -73,7 +71,7 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
         final var schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
-        Mockito.when(getRepositorySupplier().get().get(Mockito.anyString(), Mockito.anyString())).thenReturn(List.of(schemaDetails));
+        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
     }
 }

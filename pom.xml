@@ -42,6 +42,8 @@
         <module>leia-client-dropwizard</module>
         <module>leia-processor</module>
         <module>leia-http-processor</module>
+        <module>leia-aerospike</module>
+        <module>leia-aerospike-dw</module>
     </modules>
 
     <distributionManagement>

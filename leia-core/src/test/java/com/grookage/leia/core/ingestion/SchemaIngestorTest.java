@@ -16,11 +16,11 @@
 
 package com.grookage.leia.core.ingestion;
 
-import com.grookage.leia.core.exception.LeiaException;
 import com.grookage.leia.core.ingestion.hub.SchemaProcessorHub;
 import com.grookage.leia.core.ingestion.processors.SchemaProcessor;
 import com.grookage.leia.core.stubs.StubbedSchemaUpdater;
 import com.grookage.leia.models.ResourceHelper;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;

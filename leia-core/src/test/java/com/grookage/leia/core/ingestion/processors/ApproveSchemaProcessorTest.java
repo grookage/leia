@@ -16,8 +16,8 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
-import com.grookage.leia.core.exception.LeiaException;
 import com.grookage.leia.models.ResourceHelper;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
