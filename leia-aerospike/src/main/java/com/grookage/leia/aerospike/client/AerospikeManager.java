@@ -10,7 +10,7 @@ import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.Statement;
 import com.grookage.leia.aerospike.storage.AerospikeRecord;
 import com.grookage.leia.aerospike.storage.AerospikeStorageConstants;
-import com.grookage.leia.models.utils.MapperUtils;
+import com.grookage.leia.aerospike.utils.CompressionUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ public class AerospikeManager {
     @SneakyThrows
     private Collection<Bin> getBins(final AerospikeRecord aerospikeRecord) {
         final var bins = new ArrayList<Bin>();
-        bins.add(new Bin(AerospikeStorageConstants.DEFAULT_BIN, MapperUtils.mapper().writeValueAsBytes(aerospikeRecord)));
+        bins.add(new Bin(AerospikeStorageConstants.DEFAULT_BIN, CompressionUtils.compress(aerospikeRecord)));
         bins.add(new Bin(AerospikeStorageConstants.NAMESPACE_BIN, aerospikeRecord.getNamespace()));
         bins.add(new Bin(AerospikeStorageConstants.SCHEMA_STATE_BIN, aerospikeRecord.getSchemaState().name()));
         bins.add(new Bin(AerospikeStorageConstants.SCHEMA_BIN, aerospikeRecord.getSchemaName()));
@@ -82,7 +82,7 @@ public class AerospikeManager {
         if (null == storedRecord) return Optional.empty();
         final var aerospikeRecord = storedRecord.getString(AerospikeStorageConstants.DEFAULT_BIN);
         if (null == aerospikeRecord) return Optional.empty();
-        return Optional.ofNullable(MapperUtils.mapper().readValue(aerospikeRecord, AerospikeRecord.class));
+        return Optional.ofNullable(CompressionUtils.decompress(aerospikeRecord));
     }
 
     @SneakyThrows
@@ -111,9 +111,7 @@ public class AerospikeManager {
                 if (null != storageRecord) {
                     final var binRecord = storageRecord.getString(AerospikeStorageConstants.DEFAULT_BIN);
                     if (null != binRecord) {
-                        aerospikeRecords.add(
-                                MapperUtils.mapper().readValue(binRecord, AerospikeRecord.class)
-                        );
+                        aerospikeRecords.add(CompressionUtils.decompress(binRecord));
                     }
                 }
             }
