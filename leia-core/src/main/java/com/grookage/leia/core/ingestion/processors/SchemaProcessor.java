@@ -56,7 +56,7 @@ public abstract class SchemaProcessor {
     }
 
     public abstract void process(final SchemaContext schemaContext);
-    
+
     public void fire(SchemaContext context) {
         process(context);
     }

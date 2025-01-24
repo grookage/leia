@@ -39,7 +39,7 @@ class SchemaUtilsTest {
                 return "V1234";
             }
         };
-        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest,  () -> generator
+        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest, () -> generator
         );
         Assertions.assertNotNull(schemaDetails);
         Assertions.assertEquals("testNamespace", schemaDetails.getNamespace());

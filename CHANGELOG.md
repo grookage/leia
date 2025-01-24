@@ -7,14 +7,17 @@ All notable changes to this project will be documented in this file.
 - LeiaMessageProduceClient
     - Introduced a TargetValidator for dynamically validating transformation targets.
     - Both the messageProcessor and the target validator can be runtime args along with initialzied values
-- SchemaDetails : 
+- SchemaDetails :
     - Introduced JsonNode along with SchemaDetails, clients can keep custom data with their schema
       definitions if required
-    - Supporting the latest version match. In the SchemaDefinition latest version could be provided instead of the 
+    - Supporting the latest version match. In the SchemaDefinition latest version could be provided instead of the
       exact version.
 - Multiple Version Support:
-    - Support to handle multiple schema versions. Introduced histories at a SchemaDetails level to incubate the necessary
+    - Support to handle multiple schema versions. Introduced histories at a SchemaDetails level to incubate the
+      necessary
       information.
+- Aerospike Repository:
+    - Support for AS data store, along with the dw bundle
 
 ## [0.0.1-RC13]
 

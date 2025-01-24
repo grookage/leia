@@ -16,13 +16,9 @@
 
 package com.grookage.leia.aerospikedw;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.HealthStatus;
 import com.google.common.base.Preconditions;
-import com.grookage.leia.aerospike.client.AerospikeConfig;
 import com.grookage.leia.aerospike.client.AerospikeManager;
 import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
-import com.grookage.leia.elastic.config.ElasticConfig;
 import lombok.SneakyThrows;
 
 public class AerospikeHealthCheck extends LeiaHealthCheck {
@@ -41,7 +37,7 @@ public class AerospikeHealthCheck extends LeiaHealthCheck {
         if (!healthStatus) {
             return Result.unhealthy("Last status: %s", "Not Connected");
         } else {
-            return Result.healthy("Last status: %s",  "Connected");
+            return Result.healthy("Last status: %s", "Connected");
         }
     }
 }
