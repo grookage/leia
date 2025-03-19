@@ -1,14 +1,33 @@
 package com.grookage.leia.common.utils;
 
+import com.grookage.leia.common.builder.SchemaBuilder;
 import com.grookage.leia.common.exception.ValidationErrorCode;
 import com.grookage.leia.common.stubs.NestedStub;
 import com.grookage.leia.common.stubs.PIIData;
 import com.grookage.leia.common.violation.ViolationContext;
+import com.grookage.leia.models.GenericResponse;
 import com.grookage.leia.models.ResourceHelper;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.annotations.SchemaDefinition;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.BooleanAttribute;
+import com.grookage.leia.models.attributes.ByteAttribute;
+import com.grookage.leia.models.attributes.CharacterAttribute;
+import com.grookage.leia.models.attributes.DoubleAttribute;
+import com.grookage.leia.models.attributes.EnumAttribute;
+import com.grookage.leia.models.attributes.FloatAttribute;
+import com.grookage.leia.models.attributes.IntegerAttribute;
+import com.grookage.leia.models.attributes.LongAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.ShortAttribute;
+import com.grookage.leia.models.attributes.StringAttribute;
 import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.SchemaType;
 import com.grookage.leia.models.schema.SchemaValidationType;
+import com.grookage.leia.models.schema.engine.SchemaState;
+import com.grookage.leia.models.utils.SchemaUtils;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +66,9 @@ class SchemaValidationUtilsTest {
         final var byteAttribute = new ByteAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(Byte.class, byteAttribute));
 
+        final var characterAttribute = new CharacterAttribute("testAttribute", true, null);
+        Assertions.assertTrue(SchemaValidationUtils.valid(Character.class, characterAttribute));
+
         final var doubleAttribute = new DoubleAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(Double.class, doubleAttribute));
 
@@ -61,6 +83,9 @@ class SchemaValidationUtilsTest {
 
         final var longAttribute = new LongAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(Long.class, longAttribute));
+
+        final var shortAttribute = new ShortAttribute("testAttribute", true, null);
+        Assertions.assertTrue(SchemaValidationUtils.valid(Short.class, shortAttribute));
 
         final var stringAttribute = new StringAttribute("testAttribute", true, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(String.class, stringAttribute));
@@ -153,6 +178,24 @@ class SchemaValidationUtilsTest {
                 GenericArrayTestClass.class, new ViolationContext()).isEmpty());
     }
 
+    @Test
+    void testParameterizedObjectClass() {
+
+        final var createSchemaRequest = SchemaBuilder.buildSchemaRequest(ParameterizedObjectClass.class).orElse(null);
+        final var schemaDetails = SchemaDetails.builder()
+                .namespace(createSchemaRequest.getNamespace())
+                .schemaName(createSchemaRequest.getSchemaName())
+                .version("V222")
+                .schemaState(SchemaState.CREATED)
+                .schemaType(createSchemaRequest.getSchemaType())
+                .description(createSchemaRequest.getDescription())
+                .attributes(createSchemaRequest.getAttributes())
+                .validationType(createSchemaRequest.getValidationType())
+                .transformationTargets(createSchemaRequest.getTransformationTargets())
+                .build();
+        SchemaValidationUtils.valid(schemaDetails, ParameterizedObjectClass.class);
+    }
+
     @SneakyThrows
     @Test
     void testInvalidNestedStubSchema() {
@@ -233,5 +276,24 @@ class SchemaValidationUtilsTest {
     static class GenericArrayTestClass {
         List<String>[] arrayAttribute;
     }
+
+    @SchemaDefinition(
+            name = ParameterizedObjectClass.NAME,
+            namespace = ParameterizedObjectClass.NAMESPACE,
+            version = ParameterizedObjectClass.VERSION,
+            description = ParameterizedObjectClass.DESCRIPTION,
+            type = SchemaType.JSON,
+            validation = SchemaValidationType.MATCHING
+    )
+    static class ParameterizedObjectClass {
+        static final String NAME = "TEST_RECORD";
+        static final String NAMESPACE = "test";
+        static final String VERSION = "v1";
+        static final String DESCRIPTION = "Test Record";
+        GenericResponse<Pair<String, Integer>> response;
+        Pair<String, Integer> pair;
+    }
+
+
 
 }

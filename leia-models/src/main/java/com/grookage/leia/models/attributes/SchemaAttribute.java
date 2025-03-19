@@ -35,16 +35,19 @@ import java.util.Set;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = BooleanAttribute.class, name = "BOOLEAN"),
         @JsonSubTypes.Type(value = ByteAttribute.class, name = "BYTES"),
+        @JsonSubTypes.Type(value = CharacterAttribute.class, name = "CHARACTER"),
         @JsonSubTypes.Type(value = DoubleAttribute.class, name = "DOUBLE"),
         @JsonSubTypes.Type(value = EnumAttribute.class, name = "ENUM"),
         @JsonSubTypes.Type(value = FloatAttribute.class, name = "FLOAT"),
         @JsonSubTypes.Type(value = IntegerAttribute.class, name = "INTEGER"),
         @JsonSubTypes.Type(value = LongAttribute.class, name = "LONG"),
+        @JsonSubTypes.Type(value = ShortAttribute.class, name = "SHORT"),
         @JsonSubTypes.Type(value = StringAttribute.class, name = "STRING"),
         @JsonSubTypes.Type(value = DateAttribute.class, name = "DATE"),
         @JsonSubTypes.Type(value = ArrayAttribute.class, name = "ARRAY"),
         @JsonSubTypes.Type(value = MapAttribute.class, name = "MAP"),
         @JsonSubTypes.Type(value = ObjectAttribute.class, name = "OBJECT"),
+        @JsonSubTypes.Type(value = ParameterizedObjectAttribute.class, name = "PARAMETERIZED"),
 })
 public abstract class SchemaAttribute {
 

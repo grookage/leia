@@ -19,6 +19,7 @@ package com.grookage.leia.models.attributes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -36,11 +37,15 @@ public enum DataType {
 
     LONG(Long.class),
 
+    SHORT(Short.class),
+
     BOOLEAN(Boolean.class),
 
     BYTES(Byte.class),
 
-    DATE(Date.class),
+    CHARACTER(Character.class),
+
+    DATE(Object.class),
 
     ARRAY(Collection.class),
 
@@ -48,7 +53,12 @@ public enum DataType {
 
     MAP(Map.class),
 
-    ENUM(Enum.class);
+    ENUM(Enum.class),
+
+    PARAMETERIZED(Object.class),
+
+    TYPE(TypeVariable.class);
+
 
     private final Class<?> assignableClass;
 }

@@ -49,6 +49,12 @@ public class LeiaTestUtils {
             }
 
             @Override
+            public Void accept(CharacterAttribute attribute) {
+                Assertions.assertInstanceOf(CharacterAttribute.class, original, "Original is not CharacterAttribute");
+                return null;
+            }
+
+            @Override
             public Void accept(DoubleAttribute attribute) {
                 Assertions.assertInstanceOf(DoubleAttribute.class, original, "Original is not DoubleAttribute");
                 return null;
@@ -77,6 +83,12 @@ public class LeiaTestUtils {
             @Override
             public Void accept(LongAttribute attribute) {
                 Assertions.assertInstanceOf(LongAttribute.class, original, "Original is not LongAttribute");
+                return null;
+            }
+
+            @Override
+            public Void accept(ShortAttribute attribute) {
+                Assertions.assertInstanceOf(ShortAttribute.class, original, "Original is not ShortAttribute");
                 return null;
             }
 
@@ -127,6 +139,18 @@ public class LeiaTestUtils {
                 while (expectedIterator.hasNext() && originalIterator.hasNext()) {
                     assertEquals(expectedIterator.next(), originalIterator.next());
                 }
+                return null;
+            }
+
+            @Override
+            public Void accept(ParameterizedObjectAttribute attribute) {
+                // TODO::
+                return null;
+            }
+
+            @Override
+            public Void accept(TypeAttribute attribute) {
+                // TODO::
                 return null;
             }
         });

@@ -19,7 +19,13 @@ package com.grookage.leia.common.utils;
 import com.google.common.collect.Sets;
 import com.grookage.leia.common.violation.LeiaSchemaViolation;
 import com.grookage.leia.common.violation.ViolationContext;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.ParameterizedObjectAttribute;
+import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.attributes.SchemaAttributeHandler;
+import com.grookage.leia.models.attributes.TypeAttribute;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.schema.SchemaValidationVisitor;
@@ -31,6 +37,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -114,6 +121,13 @@ public class SchemaValidationUtils {
                        final SchemaAttribute attribute,
                        final Type type,
                        final ViolationContext context) {
+        if (type instanceof TypeVariable<?>) {
+            if (attribute instanceof TypeAttribute) {
+                return;
+            }
+            context.addViolation(String.format(TYPE_MISMATCH_MESSAGE, attribute.getType(), type.getTypeName()),
+                    attribute.getName());
+        }
         if (type instanceof Class<?> klass) {
             valid(validationType, attribute, klass, context);
         } else if (type instanceof ParameterizedType parameterizedType) {
@@ -187,6 +201,28 @@ public class SchemaValidationUtils {
             final var typeArguments = getTypeArguments(parameterizedType);
             valid(validationType, mapAttribute.getKeyAttribute(), typeArguments[0], context);
             valid(validationType, mapAttribute.getValueAttribute(), typeArguments[1], context);
+        } else if (attribute instanceof ParameterizedObjectAttribute parameterizedObjectAttribute) {
+            final var rawType = (Class<?>) parameterizedType.getRawType();
+            final var typeArguments = getTypeArguments(parameterizedType);
+
+            final var typeAttributes = parameterizedObjectAttribute.getTypeAttributes();
+
+            // Validate raw Attribute match
+            valid(validationType, parameterizedObjectAttribute.getRawTypeAttribute(), rawType, context);
+
+            // Validate each type parameter
+            if (typeAttributes.size() != typeArguments.length) {
+                context.addViolation(
+                        String.format("Expected %d type arguments but found %d for %s",
+                                typeAttributes.size(), typeArguments.length, rawType.getTypeName()),
+                        attribute.getName()
+                );
+                return;
+            }
+
+            for (int i = 0; i < typeAttributes.size(); i++) {
+                valid(validationType, typeAttributes.get(i), typeArguments[i], context);
+            }
         } else {
             context.addViolation(String.format(TYPE_MISMATCH_MESSAGE, attribute.getType(), parameterizedType), attribute.getName());
         }
@@ -214,6 +250,11 @@ public class SchemaValidationUtils {
             @Override
             public Boolean accept(ObjectAttribute attribute) {
                 return !klass.equals(Object.class) || !Objects.nonNull(attribute.getNestedAttributes());
+            }
+
+            @Override
+            public Boolean accept(ParameterizedObjectAttribute attribute) {
+                return !klass.equals(Object.class) || !Objects.nonNull(attribute.getTypeAttributes());
             }
         });
     }

@@ -22,6 +22,8 @@ public interface SchemaAttributeAcceptor<T> {
 
     T accept(ByteAttribute attribute);
 
+    T accept(CharacterAttribute attribute);
+
     T accept(DoubleAttribute attribute);
 
     T accept(EnumAttribute attribute);
@@ -32,6 +34,8 @@ public interface SchemaAttributeAcceptor<T> {
 
     T accept(LongAttribute attribute);
 
+    T accept(ShortAttribute attribute);
+
     T accept(StringAttribute attribute);
 
     T accept(DateAttribute attribute);
@@ -41,4 +45,8 @@ public interface SchemaAttributeAcceptor<T> {
     T accept(MapAttribute attribute);
 
     T accept(ObjectAttribute attribute);
+
+    T accept(ParameterizedObjectAttribute attribute);
+
+    T accept(TypeAttribute attribute);
 }

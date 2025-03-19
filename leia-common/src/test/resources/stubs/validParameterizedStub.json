@@ -17,5 +17,14 @@
   "map": {
     "ONE": "Value 1",
     "TWO": "Value 2"
+  },
+  "piiDataGenericResponse" : {
+    "success": true,
+    "code": "SUCCESS",
+    "message": "This is Valid!!",
+    "data": {
+      "name": "John Doe",
+      "accountNumber": "1234-5678-9012"
+    }
   }
 }

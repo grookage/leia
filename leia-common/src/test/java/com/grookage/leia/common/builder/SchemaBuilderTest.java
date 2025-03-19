@@ -1,12 +1,27 @@
 package com.grookage.leia.common.builder;
 
 import com.grookage.leia.common.LeiaTestUtils;
-import com.grookage.leia.common.stubs.*;
+import com.grookage.leia.common.stubs.NestedStub;
+import com.grookage.leia.common.stubs.RecordStub;
+import com.grookage.leia.common.stubs.TestEnum;
+import com.grookage.leia.common.stubs.TestObjectStub;
+import com.grookage.leia.common.stubs.TestParameterizedStub;
+import com.grookage.leia.common.stubs.TestRawCollectionStub;
+import com.grookage.leia.models.GenericResponse;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.annotations.attribute.Optional;
 import com.grookage.leia.models.annotations.attribute.qualifiers.Encrypted;
 import com.grookage.leia.models.annotations.attribute.qualifiers.PII;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.BooleanAttribute;
+import com.grookage.leia.models.attributes.EnumAttribute;
+import com.grookage.leia.models.attributes.IntegerAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.ParameterizedObjectAttribute;
+import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.attributes.TypeAttribute;
 import com.grookage.leia.models.qualifiers.EncryptedQualifier;
 import com.grookage.leia.models.qualifiers.PIIQualifier;
 import com.grookage.leia.models.schema.SchemaType;
@@ -15,7 +30,11 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 class SchemaBuilderTest {
@@ -25,7 +44,7 @@ class SchemaBuilderTest {
         final var schemaCreateRequest = SchemaBuilder.buildSchemaRequest(TestRecord.class)
                 .orElse(null);
         Assertions.assertNotNull(schemaCreateRequest);
-        Assertions.assertEquals(5, schemaCreateRequest.getAttributes().size());
+        Assertions.assertEquals(7, schemaCreateRequest.getAttributes().size());
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRecord.class);
         Assertions.assertEquals(TestRecord.NAME, schemaCreateRequest.getSchemaName());
         Assertions.assertEquals(TestRecord.NAMESPACE, schemaCreateRequest.getNamespace());
@@ -103,7 +122,7 @@ class SchemaBuilderTest {
     void testSchemaAttributes_WithParameterizedType() {
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestParameterizedStub.class);
         Assertions.assertNotNull(schemaAttributes);
-        Assertions.assertEquals(3, schemaAttributes.size());
+        Assertions.assertEquals(4, schemaAttributes.size());
 
         final var valuesAttributes = new ArrayAttribute("values", false, new HashSet<>(),
                 new StringAttribute("element", false, new HashSet<>()));
@@ -122,6 +141,19 @@ class SchemaBuilderTest {
                 new EnumAttribute("key", false, new HashSet<>(), Set.of(TestEnum.ONE.name(), TestEnum.TWO.name())),
                 new StringAttribute("value", false, new HashSet<>()));
         LeiaTestUtils.assertEquals(mapAttribute, LeiaTestUtils.filter(schemaAttributes, "map").orElse(null));
+
+        final var genericResponseAttributes = new HashSet<SchemaAttribute>();
+        genericResponseAttributes.add(new BooleanAttribute("success", false, new HashSet<>()));
+        genericResponseAttributes.add(new StringAttribute("code", false, new HashSet<>()));
+        genericResponseAttributes.add(new StringAttribute("message", false, new HashSet<>()));
+        genericResponseAttributes.add(new TypeAttribute("data", false, new HashSet<>()));
+        final var genericResponseAttribute = new ObjectAttribute("piiDataGenericResponse", false, new HashSet<>(),
+                genericResponseAttributes);
+
+        final var typedPIIDataAttribute = new ObjectAttribute("type", false, new HashSet<>(), testPIIDataAttributes);
+        final var parameterizedAttribute = new ParameterizedObjectAttribute("piiDataGenericResponse",
+                false, new HashSet<>(), genericResponseAttribute, List.of(typedPIIDataAttribute));
+        LeiaTestUtils.assertEquals(parameterizedAttribute, LeiaTestUtils.filter(schemaAttributes, "piiDataGenericResponse").orElse(null));
     }
 
     @Test
@@ -205,6 +237,8 @@ class SchemaBuilderTest {
         long ttl;
         @Optional
         String accountId;
+        Date date;
+        LocalDateTime localDateTime;
     }
 
     static class TestObject {

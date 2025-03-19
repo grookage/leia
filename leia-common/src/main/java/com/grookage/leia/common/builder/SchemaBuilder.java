@@ -18,8 +18,25 @@ package com.grookage.leia.common.builder;
 
 import com.grookage.leia.common.utils.FieldUtils;
 import com.grookage.leia.common.utils.QualifierUtils;
+import com.grookage.leia.common.utils.SchemaConstants;
 import com.grookage.leia.models.annotations.SchemaDefinition;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.BooleanAttribute;
+import com.grookage.leia.models.attributes.ByteAttribute;
+import com.grookage.leia.models.attributes.CharacterAttribute;
+import com.grookage.leia.models.attributes.DateAttribute;
+import com.grookage.leia.models.attributes.DoubleAttribute;
+import com.grookage.leia.models.attributes.EnumAttribute;
+import com.grookage.leia.models.attributes.FloatAttribute;
+import com.grookage.leia.models.attributes.IntegerAttribute;
+import com.grookage.leia.models.attributes.LongAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.ParameterizedObjectAttribute;
+import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.attributes.ShortAttribute;
+import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.attributes.TypeAttribute;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
 import lombok.experimental.UtilityClass;
@@ -29,7 +46,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @UtilityClass
@@ -73,6 +96,11 @@ public class SchemaBuilder {
                                             final String name,
                                             final Set<QualifierInfo> qualifiers,
                                             final boolean optional) {
+        // Handle TypeVariable (Generic type parameters like T, U, etc.)
+        if (type instanceof TypeVariable<?>) {
+            return new TypeAttribute(name, optional, qualifiers);
+        }
+
         // Handle Class instances (eg. String, Enum classes, Complex POJO Objects etc.)
         if (type instanceof Class<?> klass) {
             return schemaAttribute(klass, name, qualifiers, optional);
@@ -105,7 +133,15 @@ public class SchemaBuilder {
         if (ClassUtils.isAssignable(rawType, Map.class)) {
             return handleMap(parameterizedType, name, qualifiers, optional);
         }
-        throw new UnsupportedOperationException("Unsupported field type: " + parameterizedType.getTypeName());
+
+        // Handle Class<T1,T2,T3> etc.
+        final var rawTypeAttribute = schemaAttribute(rawType, name, qualifiers, optional);
+        // Convert type parameters
+        final var typedAttributes = Arrays.stream(parameterizedType.getActualTypeArguments())
+                .map(type -> schemaAttribute(type, "type", QualifierUtils.getQualifiers(type), isOptional(type)))
+                .toList();
+
+        return new ParameterizedObjectAttribute(name, optional, qualifiers, rawTypeAttribute, typedAttributes);
     }
 
     private SchemaAttribute handleMap(final ParameterizedType parameterizedType,
@@ -163,8 +199,8 @@ public class SchemaBuilder {
             return new EnumAttribute(name, optional, qualifiers, getEnumValues(klass));
         }
 
-        // Handle int, long, boolean etc.
-        if (klass.isPrimitive()) {
+        // Handle int, Integer, long, Long, boolean  etc.
+        if (klass.isPrimitive() || SchemaConstants.BOXED_PRIMITIVES.contains(klass)) {
             return handlePrimitive(klass, name, qualifiers, optional);
         }
 
@@ -194,6 +230,10 @@ public class SchemaBuilder {
             return new ObjectAttribute(name, optional, qualifiers, null);
         }
 
+        if (SchemaConstants.SUPPORTED_DATE_CLASSES.contains(klass)) {
+            return new DateAttribute(name, optional, qualifiers);
+        }
+
         // Handling custom defined POJO's
         final var schemaAttributes = getSchemaAttributes(klass);
         return new ObjectAttribute(name, optional, qualifiers, schemaAttributes);
@@ -217,6 +257,15 @@ public class SchemaBuilder {
         }
         if (klass == Float.class || klass == float.class) {
             return new FloatAttribute(name, optional, qualifiers);
+        }
+        if (klass == Short.class || klass == short.class) {
+            return new ShortAttribute(name, optional, qualifiers);
+        }
+        if (klass == Character.class || klass == char.class) {
+            return new CharacterAttribute(name, optional, qualifiers);
+        }
+        if (klass == Byte.class || klass == byte.class) {
+            return new ByteAttribute(name, optional, qualifiers);
         }
 
         throw new UnsupportedOperationException("Unsupported primitive class type: " + klass.getName());

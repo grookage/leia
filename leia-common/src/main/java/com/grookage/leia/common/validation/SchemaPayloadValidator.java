@@ -17,7 +17,24 @@
 package com.grookage.leia.common.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.attributes.ArrayAttribute;
+import com.grookage.leia.models.attributes.BooleanAttribute;
+import com.grookage.leia.models.attributes.ByteAttribute;
+import com.grookage.leia.models.attributes.CharacterAttribute;
+import com.grookage.leia.models.attributes.DateAttribute;
+import com.grookage.leia.models.attributes.DoubleAttribute;
+import com.grookage.leia.models.attributes.EnumAttribute;
+import com.grookage.leia.models.attributes.FloatAttribute;
+import com.grookage.leia.models.attributes.IntegerAttribute;
+import com.grookage.leia.models.attributes.LongAttribute;
+import com.grookage.leia.models.attributes.MapAttribute;
+import com.grookage.leia.models.attributes.ObjectAttribute;
+import com.grookage.leia.models.attributes.ParameterizedObjectAttribute;
+import com.grookage.leia.models.attributes.SchemaAttribute;
+import com.grookage.leia.models.attributes.SchemaAttributeAcceptor;
+import com.grookage.leia.models.attributes.ShortAttribute;
+import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.attributes.TypeAttribute;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.utils.MapperUtils;
 import lombok.experimental.UtilityClass;
@@ -74,8 +91,8 @@ public class SchemaPayloadValidator {
         final var fieldName = attribute.getName();
         if (!isMatchingType(fieldNode, attribute)) {
             validationErrors.add("Type mismatch for field: " + fieldName +
-                    ". Expected: " + attribute.getType() +
-                    ", Found: " + fieldNode.getNodeType());
+                                 ". Expected: " + attribute.getType() +
+                                 ", Found: " + fieldNode.getNodeType());
             return;
         }
 
@@ -124,7 +141,7 @@ public class SchemaPayloadValidator {
                 validateField(entry.getValue(), mapAttribute.getValueAttribute(), schemaValidationType, validationErrors);
             } else {
                 validationErrors.add("Key Not present for map attribute field:" +
-                        mapAttribute.getName());
+                                     mapAttribute.getName());
             }
         });
 
@@ -141,6 +158,12 @@ public class SchemaPayloadValidator {
             @Override
             public Boolean accept(ByteAttribute attribute) {
                 return fieldNode.isArray();
+            }
+
+            @Override
+            public Boolean accept(CharacterAttribute attribute) {
+                // A CharacterAttribute must be a single character, not a full string
+                return fieldNode.isTextual() && fieldNode.asText().length() == 1;
             }
 
             @Override
@@ -169,13 +192,18 @@ public class SchemaPayloadValidator {
             }
 
             @Override
+            public Boolean accept(ShortAttribute attribute) {
+                return fieldNode.isShort() || fieldNode.isInt();
+            }
+
+            @Override
             public Boolean accept(StringAttribute attribute) {
                 return fieldNode.isTextual();
             }
 
             @Override
             public Boolean accept(DateAttribute attribute) {
-                return fieldNode.isTextual();
+                return fieldNode.isTextual() || fieldNode.isLong() || fieldNode.isInt();
             }
 
             @Override
@@ -195,6 +223,16 @@ public class SchemaPayloadValidator {
                     return true;
                 }
                 return fieldNode.isObject();
+            }
+
+            @Override
+            public Boolean accept(ParameterizedObjectAttribute attribute) {
+                return fieldNode.isObject();
+            }
+
+            @Override
+            public Boolean accept(TypeAttribute attribute) {
+                return true;
             }
         });
     }
