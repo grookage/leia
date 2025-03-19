@@ -12,6 +12,9 @@ import java.util.Set;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
+/*
+* For capturing Type variables (T, U, S etc.) inside a Generic Class
+* */
 public class TypeAttribute extends SchemaAttribute{
     public TypeAttribute(final String name,
                            final boolean optional,
