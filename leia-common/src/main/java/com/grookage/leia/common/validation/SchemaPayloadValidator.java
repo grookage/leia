@@ -74,8 +74,8 @@ public class SchemaPayloadValidator {
         final var fieldName = attribute.getName();
         if (!isMatchingType(fieldNode, attribute)) {
             validationErrors.add("Type mismatch for field: " + fieldName +
-                    ". Expected: " + attribute.getType() +
-                    ", Found: " + fieldNode.getNodeType());
+                                 ". Expected: " + attribute.getType() +
+                                 ", Found: " + fieldNode.getNodeType());
             return;
         }
 
@@ -124,7 +124,7 @@ public class SchemaPayloadValidator {
                 validateField(entry.getValue(), mapAttribute.getValueAttribute(), schemaValidationType, validationErrors);
             } else {
                 validationErrors.add("Key Not present for map attribute field:" +
-                        mapAttribute.getName());
+                                     mapAttribute.getName());
             }
         });
 
@@ -206,6 +206,16 @@ public class SchemaPayloadValidator {
                     return true;
                 }
                 return fieldNode.isObject();
+            }
+
+            @Override
+            public Boolean accept(ParameterizedObjectAttribute attribute) {
+                return fieldNode.isObject();
+            }
+
+            @Override
+            public Boolean accept(TypeAttribute attribute) {
+                return true;
             }
         });
     }

@@ -47,6 +47,8 @@ import java.util.Set;
         @JsonSubTypes.Type(value = ArrayAttribute.class, name = "ARRAY"),
         @JsonSubTypes.Type(value = MapAttribute.class, name = "MAP"),
         @JsonSubTypes.Type(value = ObjectAttribute.class, name = "OBJECT"),
+        @JsonSubTypes.Type(value = ParameterizedObjectAttribute.class, name = "PARAMETERIZED"),
+        @JsonSubTypes.Type(value = TypeAttribute.class, name = "TYPE"),
 })
 public abstract class SchemaAttribute {
 

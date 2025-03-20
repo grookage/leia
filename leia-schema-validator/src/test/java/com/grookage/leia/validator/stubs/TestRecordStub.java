@@ -7,6 +7,9 @@ import com.grookage.leia.models.annotations.attribute.qualifiers.PII;
 import com.grookage.leia.models.schema.SchemaType;
 import com.grookage.leia.models.schema.SchemaValidationType;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @SchemaDefinition(
         name = TestRecordStub.NAME,
         namespace = TestRecordStub.NAMESPACE,
@@ -29,4 +32,6 @@ public class TestRecordStub {
     long ttl;
     @Optional
     String accountId;
+    Date date;
+    LocalDateTime localDateTime;
 }

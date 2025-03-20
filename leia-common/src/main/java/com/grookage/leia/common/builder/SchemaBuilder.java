@@ -30,6 +30,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,6 +76,11 @@ public class SchemaBuilder {
                                             final String name,
                                             final Set<QualifierInfo> qualifiers,
                                             final boolean optional) {
+        // Handle TypeVariable (Generic type parameters like T, U, etc.)
+        if (type instanceof TypeVariable<?>) {
+            return new TypeAttribute(name, optional, qualifiers);
+        }
+
         // Handle Class instances (eg. String, Enum classes, Complex POJO Objects etc.)
         if (type instanceof Class<?> klass) {
             return schemaAttribute(klass, name, qualifiers, optional);
@@ -107,7 +113,15 @@ public class SchemaBuilder {
         if (ClassUtils.isAssignable(rawType, Map.class)) {
             return handleMap(parameterizedType, name, qualifiers, optional);
         }
-        throw new UnsupportedOperationException("Unsupported field type: " + parameterizedType.getTypeName());
+
+        // Handle Class<T1,T2,T3> etc.
+        final var rawTypeAttribute = schemaAttribute(rawType, name, qualifiers, optional);
+        // Convert type parameters
+        final var typedAttributes = Arrays.stream(parameterizedType.getActualTypeArguments())
+                .map(type -> schemaAttribute(type, "type", QualifierUtils.getQualifiers(type), isOptional(type)))
+                .toList();
+
+        return new ParameterizedObjectAttribute(name, optional, qualifiers, rawTypeAttribute, typedAttributes);
     }
 
     private SchemaAttribute handleMap(final ParameterizedType parameterizedType,

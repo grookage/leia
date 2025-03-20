@@ -1,5 +1,6 @@
 package com.grookage.leia.common.stubs;
 
+import com.grookage.leia.models.GenericResponse;
 import com.grookage.leia.models.annotations.attribute.qualifiers.Encrypted;
 import com.grookage.leia.models.annotations.attribute.qualifiers.PII;
 import lombok.Builder;
@@ -18,4 +19,5 @@ public class TestParameterizedStub {
     List<PIIData> piiDataList;
     @Encrypted
     Map<TestEnum, String> map;
+    GenericResponse<PIIData> piiDataGenericResponse;
 }

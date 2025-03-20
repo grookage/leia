@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 class SchemaBuilderTest {
@@ -106,7 +107,7 @@ class SchemaBuilderTest {
     void testSchemaAttributes_WithParameterizedType() {
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestParameterizedStub.class);
         Assertions.assertNotNull(schemaAttributes);
-        Assertions.assertEquals(3, schemaAttributes.size());
+        Assertions.assertEquals(4, schemaAttributes.size());
 
         final var valuesAttributes = new ArrayAttribute("values", false, new HashSet<>(),
                 new StringAttribute("element", false, new HashSet<>()));
@@ -125,6 +126,19 @@ class SchemaBuilderTest {
                 new EnumAttribute("key", false, new HashSet<>(), Set.of(TestEnum.ONE.name(), TestEnum.TWO.name())),
                 new StringAttribute("value", false, new HashSet<>()));
         LeiaTestUtils.assertEquals(mapAttribute, LeiaTestUtils.filter(schemaAttributes, "map").orElse(null));
+
+        final var genericResponseAttributes = new HashSet<SchemaAttribute>();
+        genericResponseAttributes.add(new BooleanAttribute("success", false, new HashSet<>()));
+        genericResponseAttributes.add(new StringAttribute("code", false, new HashSet<>()));
+        genericResponseAttributes.add(new StringAttribute("message", false, new HashSet<>()));
+        genericResponseAttributes.add(new TypeAttribute("data", false, new HashSet<>()));
+        final var genericResponseAttribute = new ObjectAttribute("piiDataGenericResponse", false, new HashSet<>(),
+                genericResponseAttributes);
+
+        final var typedPIIDataAttribute = new ObjectAttribute("type", false, Set.of(new PIIQualifier()), testPIIDataAttributes);
+        final var parameterizedAttribute = new ParameterizedObjectAttribute("piiDataGenericResponse",
+                false, new HashSet<>(), genericResponseAttribute, List.of(typedPIIDataAttribute));
+        LeiaTestUtils.assertEquals(parameterizedAttribute, LeiaTestUtils.filter(schemaAttributes, "piiDataGenericResponse").orElse(null));
     }
 
     @Test

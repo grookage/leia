@@ -141,6 +141,26 @@ public class LeiaTestUtils {
                 }
                 return null;
             }
+
+            @Override
+            public Void accept(ParameterizedObjectAttribute attribute) {
+                Assertions.assertInstanceOf(ParameterizedObjectAttribute.class, original, "Original is not ParameterizedAttribute");
+                ParameterizedObjectAttribute originalObject = (ParameterizedObjectAttribute) original;
+                assertEquals(attribute.getRawTypeAttribute(), originalObject.getRawTypeAttribute()); // Recursive comparison for key
+                Iterator<SchemaAttribute> expectedIterator = attribute.getTypeAttributes().iterator();
+                Iterator<SchemaAttribute> originalIterator = originalObject.getTypeAttributes().iterator();
+
+                while (expectedIterator.hasNext() && originalIterator.hasNext()) {
+                    assertEquals(expectedIterator.next(), originalIterator.next());
+                }
+                return null;
+            }
+
+            @Override
+            public Void accept(TypeAttribute attribute) {
+                Assertions.assertInstanceOf(TypeAttribute.class, original, "Original is not TypeAttribute");
+                return null;
+            }
         });
     }
 
