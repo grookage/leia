@@ -1,5 +1,6 @@
 package com.grookage.leia.validator.stubs;
 
+import com.grookage.leia.models.GenericResponse;
 import com.grookage.leia.models.annotations.SchemaDefinition;
 import com.grookage.leia.models.annotations.attribute.Optional;
 import com.grookage.leia.models.annotations.attribute.qualifiers.Encrypted;

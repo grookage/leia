@@ -15,8 +15,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +25,7 @@ class SchemaBuilderTest {
         final var schemaCreateRequest = SchemaBuilder.buildSchemaRequest(TestRecord.class)
                 .orElse(null);
         Assertions.assertNotNull(schemaCreateRequest);
-        Assertions.assertEquals(7, schemaCreateRequest.getAttributes().size());
+        Assertions.assertEquals(5, schemaCreateRequest.getAttributes().size());
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRecord.class);
         Assertions.assertEquals(TestRecord.NAME, schemaCreateRequest.getSchemaName());
         Assertions.assertEquals(TestRecord.NAMESPACE, schemaCreateRequest.getNamespace());
@@ -180,6 +178,52 @@ class SchemaBuilderTest {
 
     }
 
+    @Test
+    void testSchemaAttributes_WithGenerics() {
+        final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestGenericStub.class);
+        Assertions.assertNotNull(schemaAttributes);
+        Assertions.assertEquals(1, schemaAttributes.size());
+        final var objectAttribute = (ObjectAttribute) schemaAttributes.stream().findFirst().orElse(null);
+        Assertions.assertNotNull(objectAttribute);
+        final var nestedAttributes = objectAttribute.getNestedAttributes();
+        Assertions.assertEquals(7, nestedAttributes.size());
+
+        final var genericResponseAttributes = new HashSet<SchemaAttribute>();
+        genericResponseAttributes.add(new BooleanAttribute("success", false, Set.of()));
+        genericResponseAttributes.add(new StringAttribute("code", false, Set.of()));
+        genericResponseAttributes.add(new StringAttribute("message", false, Set.of()));
+        genericResponseAttributes.add(new IntegerAttribute("data", false, Set.of()));
+        final var genericResponseAttribute = new ObjectAttribute("rGenericResponse", false, Set.of(), genericResponseAttributes);
+        LeiaTestUtils.assertEquals(genericResponseAttribute, LeiaTestUtils.filter(nestedAttributes, "rGenericResponse").orElse(null));
+
+
+        final var dataAttribute = new StringAttribute("data", false, Set.of());
+        LeiaTestUtils.assertEquals(dataAttribute, LeiaTestUtils.filter(nestedAttributes, "data").orElse(null));
+
+        final var keyAttribute = new IntegerAttribute("key", false, Set.of());
+        LeiaTestUtils.assertEquals(keyAttribute, LeiaTestUtils.filter(nestedAttributes, "key").orElse(null));
+
+        final var rangeAttributes = new HashSet<SchemaAttribute>();
+        rangeAttributes.add(new ObjectAttribute("comparator", false, Set.of(), Set.of()));
+        rangeAttributes.add(new IntegerAttribute("maximum", false, Set.of()));
+        rangeAttributes.add(new IntegerAttribute("minimum", false, Set.of()));
+        final var rangeAttribute = new ObjectAttribute("tRange", false, Set.of(), rangeAttributes);
+        LeiaTestUtils.assertEquals(rangeAttribute, LeiaTestUtils.filter(nestedAttributes, "tRange").orElse(null));
+
+        final var listAttribute = new ArrayAttribute("rList", false, Set.of(),
+                new IntegerAttribute("element", false, Set.of()));
+        LeiaTestUtils.assertEquals(listAttribute, LeiaTestUtils.filter(nestedAttributes, "rList").orElse(null));
+
+        final var mapAttribute = new MapAttribute("urMap", false, Set.of(),
+                new StringAttribute("key", false, Set.of()),
+                new IntegerAttribute("value", false, Set.of()));
+        LeiaTestUtils.assertEquals(mapAttribute, LeiaTestUtils.filter(nestedAttributes, "urMap").orElse(null));
+
+        final var arrayAttribute = new ArrayAttribute("rArray", false, Set.of(),
+                new IntegerAttribute("element", false, Set.of()));
+        LeiaTestUtils.assertEquals(arrayAttribute, LeiaTestUtils.filter(nestedAttributes, "rArray").orElse(null));
+    }
+
     static class PrimitiveTestClass {
         @Optional
         String name;
@@ -216,8 +260,6 @@ class SchemaBuilderTest {
         long ttl;
         @Optional
         String accountId;
-        Date date;
-        LocalDateTime localDateTime;
     }
 
     static class TestObject {
