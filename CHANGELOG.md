@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.1-RC23]
+
+- LeiaMessageProduceClient: Append schema tags for multiplexed messages
+- TagBasedNameResolver: Bug Fix: Transform backend name to uppercase before comparison
+
 ## [0.0.1-RC22]
 
 - Removed the versionIdGenerator and the `latest` schema fetch

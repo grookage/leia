@@ -34,12 +34,11 @@ import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -64,11 +63,17 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
      */
     @SneakyThrows
     private Optional<LeiaMessage> createMessage(MessageRequest messageRequest,
-                                                SchemaDetails schemaDetails,
+                                                SchemaDetails sourceSchema,
                                                 TransformationTarget transformationTarget,
                                                 TargetValidator tValidator) {
-        if (!validTarget(messageRequest, schemaDetails, transformationTarget, tValidator)) {
+        if (!validTarget(messageRequest, sourceSchema, transformationTarget, tValidator)) {
             return Optional.empty();
+        }
+        final var schemaDetails = SchemaUtils.getMatchingSchema(super.getSchemaDetails(), messageRequest.getSchemaKey())
+                .orElse(null);
+        if (null == schemaDetails) {
+            log.error("No schema found for schemaKey {}", messageRequest.getSchemaKey());
+            throw new UnsupportedOperationException("No valid schema found for schemaKey " + messageRequest.getSchemaKey().getReferenceId());
         }
         final var registeredKlass = getSchemaValidator()
                 .getKlass(transformationTarget.getSchemaKey()).orElse(null);
@@ -79,10 +84,12 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         final var responseObject = MessageTransformerUtils.transformMessage(sourceContext, transformationTarget,
                 getJsonPaths(transformationTarget.getSchemaKey()), getMapper());
         getMapper().convertValue(responseObject, registeredKlass); //Do this to do the schema validation of if the conversion is right or not.
+        val tags = Stream.of(schemaDetails.getTags(), transformationTarget.getTags())
+                .flatMap(Collection::stream).toList();
         return Optional.of(
                 LeiaMessage.builder()
                         .schemaKey(transformationTarget.getSchemaKey())
-                        .tags(transformationTarget.getTags())
+                        .tags(tags)
                         .message(responseObject)
                         .build()
         );

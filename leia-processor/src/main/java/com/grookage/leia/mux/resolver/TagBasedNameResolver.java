@@ -47,7 +47,7 @@ public class TagBasedNameResolver implements BackendNameResolver {
             return List.of();
         }
         final List<String> eligibleBackends = null == backends ? List.of() :
-                Objects.requireNonNullElse(backends.get(), List.of());
+                Objects.requireNonNullElse(backends.get(), List.<String>of()).stream().map(String::toUpperCase).toList();
         final var configuredBackends = Arrays.asList(backendTag.toUpperCase(Locale.ROOT).substring(backendTag.lastIndexOf(TAG_SEPARATOR) + 1).split("\\s*::\\s*"));
         return eligibleBackends.stream()
                 .filter(configuredBackends::contains)

@@ -48,7 +48,13 @@
           "attributeName": "officialName",
           "transformationPath": "~TestName"
         }
+      ],
+      "tags": [
+        "backend-TRANSFORMATION_BACKEND"
       ]
     }
+  ],
+  "tags": [
+    "backend-BACKEND"
   ]
 }

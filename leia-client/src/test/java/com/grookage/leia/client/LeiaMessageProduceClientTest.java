@@ -115,6 +115,7 @@ class LeiaMessageProduceClientTest {
                 final var testMessage = messages.stream()
                         .filter(each -> each.getSchemaKey().getVersion().equalsIgnoreCase("v")).findFirst().orElse(null);
                 Assertions.assertNotNull(testMessage);
+                Assertions.assertEquals(List.of("backend-BACKEND","backend-TRANSFORMATION_BACKEND"),testMessage.getTags());
                 Assertions.assertEquals("TestName", testMessage.getMessage().get("officialName").asText());
             }
         }, null);
