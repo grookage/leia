@@ -3,7 +3,7 @@ package com.grookage.leia.common.utils;
 import com.grookage.leia.common.exception.ValidationErrorCode;
 import com.grookage.leia.common.stubs.NestedStub;
 import com.grookage.leia.common.stubs.PIIData;
-import com.grookage.leia.common.violation.ViolationContext;
+import com.grookage.leia.common.stubs.TestGenericStub;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -28,6 +28,17 @@ class SchemaValidationUtilsTest {
         schemaDetails.setValidationType(SchemaValidationType.STRICT);
         Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
     }
+
+    @SneakyThrows
+    @Test
+    void testGenericClass() {
+        final var schemaDetails = ResourceHelper
+                .getResource("validGenericSchema.json", SchemaDetails.class);
+        Assertions.assertNotNull(schemaDetails);
+        final var violations = SchemaValidationUtils.valid(schemaDetails, TestGenericStub.class);
+        Assertions.assertTrue(violations.isEmpty());
+    }
+
 
     @Test
     @SneakyThrows
@@ -94,26 +105,26 @@ class SchemaValidationUtilsTest {
         final var stringAttribute = new StringAttribute("stringAttribute", true, null);
         final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, stringAttribute);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                SetTestClass.class, new ViolationContext()).isEmpty());
+                SetTestClass.class).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                ListTestClass.class, new ViolationContext()).isEmpty());
+                ListTestClass.class).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                ArrayTestClass.class, new ViolationContext()).isEmpty());
+                ArrayTestClass.class).isEmpty());
         Assertions.assertFalse(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                RawSetTestClass.class, new ViolationContext()).isEmpty());
+                RawSetTestClass.class).isEmpty());
     }
 
     @Test
     void testRawArray() {
         final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-                Set.of(arrayAttribute), RawSetTestClass.class, new ViolationContext()).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-                Set.of(arrayAttribute), SetTestClass.class, new ViolationContext()).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-                Set.of(arrayAttribute), ListTestClass.class, new ViolationContext()).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING,
-                Set.of(arrayAttribute), ArrayTestClass.class, new ViolationContext()).isEmpty());
+        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+                RawSetTestClass.class).isEmpty());
+        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+                SetTestClass.class).isEmpty());
+        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+                ListTestClass.class).isEmpty());
+        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+                ArrayTestClass.class).isEmpty());
     }
 
     @Test
@@ -122,22 +133,22 @@ class SchemaValidationUtilsTest {
         final var valueAttribute = new StringAttribute("valueAttribute", true, null);
         final var mapAttribute = new MapAttribute("mapAttribute", true, null, keyAttribute, valueAttribute);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                MapTestClass.class, new ViolationContext()).isEmpty());
+                MapTestClass.class).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                ConcurrentMapTestClass.class, new ViolationContext()).isEmpty());
+                ConcurrentMapTestClass.class).isEmpty());
         Assertions.assertFalse(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                RawMapTestClass.class, new ViolationContext()).isEmpty());
+                RawMapTestClass.class).isEmpty());
     }
 
     @Test
     void testRawMap() {
         final var mapAttribute = new MapAttribute("mapAttribute", true, null, null, null);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                RawMapTestClass.class, new ViolationContext()).isEmpty());
+                RawMapTestClass.class).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                MapTestClass.class, new ViolationContext()).isEmpty());
+                MapTestClass.class).isEmpty());
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                ConcurrentMapTestClass.class, new ViolationContext()).isEmpty());
+                ConcurrentMapTestClass.class).isEmpty());
     }
 
     @Test
@@ -156,7 +167,7 @@ class SchemaValidationUtilsTest {
         final var listAttribute = new ArrayAttribute("listAttribute", true, null, stringAttribute);
         final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, listAttribute);
         Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                GenericArrayTestClass.class, new ViolationContext()).isEmpty());
+                GenericArrayTestClass.class).isEmpty());
     }
 
     @SneakyThrows
@@ -175,6 +186,7 @@ class SchemaValidationUtilsTest {
                 .toList();
         Assertions.assertEquals(1, piiDataViolations.size());
     }
+
 
     enum TestEnum {
         TEST_ENUM

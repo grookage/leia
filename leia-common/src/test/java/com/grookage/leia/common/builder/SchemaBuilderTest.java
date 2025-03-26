@@ -117,7 +117,7 @@ class SchemaBuilderTest {
         final var accountNumberAttribute = new StringAttribute("accountNumber", false, Set.of(new EncryptedQualifier()));
         testPIIDataAttributes.add(piiNameAttribute);
         testPIIDataAttributes.add(accountNumberAttribute);
-        final var piiDataListAttribute = new ArrayAttribute("piiDataList", false, Set.of(new PIIQualifier()),
+        final var piiDataListAttribute = new ArrayAttribute("piiDataList", false, Set.of(),
                 new ObjectAttribute("element", false, Set.of(new PIIQualifier()), testPIIDataAttributes));
         LeiaTestUtils.assertEquals(piiDataListAttribute, LeiaTestUtils.filter(schemaAttributes, "piiDataList").orElse(null));
 
@@ -178,6 +178,52 @@ class SchemaBuilderTest {
                 new ObjectAttribute("value", false, Set.of(), null));
         LeiaTestUtils.assertEquals(objectMapAttribute, LeiaTestUtils.filter(schemaAttributes, "objectMap").orElse(null));
 
+    }
+
+    @Test
+    void testSchemaAttributes_WithGenerics() {
+        final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestGenericStub.class);
+        Assertions.assertNotNull(schemaAttributes);
+        Assertions.assertEquals(1, schemaAttributes.size());
+        final var objectAttribute = (ObjectAttribute) schemaAttributes.stream().findFirst().orElse(null);
+        Assertions.assertNotNull(objectAttribute);
+        final var nestedAttributes = objectAttribute.getNestedAttributes();
+        Assertions.assertEquals(7, nestedAttributes.size());
+
+        final var genericResponseAttributes = new HashSet<SchemaAttribute>();
+        genericResponseAttributes.add(new BooleanAttribute("success", false, Set.of()));
+        genericResponseAttributes.add(new StringAttribute("code", false, Set.of()));
+        genericResponseAttributes.add(new StringAttribute("message", false, Set.of()));
+        genericResponseAttributes.add(new IntegerAttribute("data", false, Set.of()));
+        final var genericResponseAttribute = new ObjectAttribute("rGenericResponse", false, Set.of(), genericResponseAttributes);
+        LeiaTestUtils.assertEquals(genericResponseAttribute, LeiaTestUtils.filter(nestedAttributes, "rGenericResponse").orElse(null));
+
+
+        final var dataAttribute = new StringAttribute("data", false, Set.of());
+        LeiaTestUtils.assertEquals(dataAttribute, LeiaTestUtils.filter(nestedAttributes, "data").orElse(null));
+
+        final var keyAttribute = new IntegerAttribute("key", false, Set.of());
+        LeiaTestUtils.assertEquals(keyAttribute, LeiaTestUtils.filter(nestedAttributes, "key").orElse(null));
+
+        final var rangeAttributes = new HashSet<SchemaAttribute>();
+        rangeAttributes.add(new ObjectAttribute("comparator", false, Set.of(), Set.of()));
+        rangeAttributes.add(new IntegerAttribute("maximum", false, Set.of()));
+        rangeAttributes.add(new IntegerAttribute("minimum", false, Set.of()));
+        final var rangeAttribute = new ObjectAttribute("tRange", false, Set.of(), rangeAttributes);
+        LeiaTestUtils.assertEquals(rangeAttribute, LeiaTestUtils.filter(nestedAttributes, "tRange").orElse(null));
+
+        final var listAttribute = new ArrayAttribute("rList", false, Set.of(),
+                new IntegerAttribute("element", false, Set.of()));
+        LeiaTestUtils.assertEquals(listAttribute, LeiaTestUtils.filter(nestedAttributes, "rList").orElse(null));
+
+        final var mapAttribute = new MapAttribute("urMap", false, Set.of(),
+                new StringAttribute("key", false, Set.of()),
+                new IntegerAttribute("value", false, Set.of()));
+        LeiaTestUtils.assertEquals(mapAttribute, LeiaTestUtils.filter(nestedAttributes, "urMap").orElse(null));
+
+        final var arrayAttribute = new ArrayAttribute("rArray", false, Set.of(),
+                new IntegerAttribute("element", false, Set.of()));
+        LeiaTestUtils.assertEquals(arrayAttribute, LeiaTestUtils.filter(nestedAttributes, "rArray").orElse(null));
     }
 
     static class PrimitiveTestClass {

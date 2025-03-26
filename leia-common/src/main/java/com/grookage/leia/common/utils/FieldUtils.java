@@ -24,6 +24,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @UtilityClass
 public class FieldUtils {
@@ -43,5 +44,12 @@ public class FieldUtils {
         }
         int modifiers = field.getModifiers();
         return Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers);
+    }
+
+    public Optional<Field> filter(final String name,
+                                   final List<Field> fields) {
+        return fields.stream()
+                .filter(each -> each.getName().equals(name))
+                .findFirst();
     }
 }

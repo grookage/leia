@@ -1,0 +1,114 @@
+{
+  "namespace": "testNamespace",
+  "schemaName": "testSchema",
+  "version": "V1234",
+  "schemaState": "CREATED",
+  "schemaType": "JSON",
+  "schemaMeta": {
+    "createdBy": "testUser"
+  },
+  "attributes": [ {
+    "type" : "OBJECT",
+    "name" : "genericStub",
+    "optional" : false,
+    "qualifiers" : [ ],
+    "nestedAttributes" : [ {
+      "type" : "OBJECT",
+      "name" : "tRange",
+      "optional" : false,
+      "qualifiers" : [ ],
+      "nestedAttributes" : [ {
+        "type" : "OBJECT",
+        "name" : "comparator",
+        "optional" : false,
+        "qualifiers" : [ ],
+        "nestedAttributes" : [ ]
+      }, {
+        "type" : "INTEGER",
+        "name" : "minimum",
+        "optional" : false,
+        "qualifiers" : [ ]
+      }, {
+        "type" : "INTEGER",
+        "name" : "maximum",
+        "optional" : false,
+        "qualifiers" : [ ]
+      } ]
+    }, {
+      "type" : "INTEGER",
+      "name" : "key",
+      "optional" : false,
+      "qualifiers" : [ ]
+    }, {
+      "type" : "MAP",
+      "name" : "urMap",
+      "optional" : false,
+      "qualifiers" : [ ],
+      "keyAttribute" : {
+        "type" : "STRING",
+        "name" : "key",
+        "optional" : false,
+        "qualifiers" : [ ]
+      },
+      "valueAttribute" : {
+        "type" : "INTEGER",
+        "name" : "value",
+        "optional" : false,
+        "qualifiers" : [ ]
+      }
+    }, {
+      "type" : "OBJECT",
+      "name" : "rGenericResponse",
+      "optional" : false,
+      "qualifiers" : [ ],
+      "nestedAttributes" : [ {
+        "type" : "STRING",
+        "name" : "message",
+        "optional" : false,
+        "qualifiers" : [ ]
+      }, {
+        "type" : "STRING",
+        "name" : "code",
+        "optional" : false,
+        "qualifiers" : [ ]
+      }, {
+        "type" : "INTEGER",
+        "name" : "data",
+        "optional" : false,
+        "qualifiers" : [ ]
+      }, {
+        "type" : "BOOLEAN",
+        "name" : "success",
+        "optional" : false,
+        "qualifiers" : [ ]
+      } ]
+    }, {
+      "type" : "ARRAY",
+      "name" : "rArray",
+      "optional" : false,
+      "qualifiers" : [ ],
+      "elementAttribute" : {
+        "type" : "INTEGER",
+        "name" : "element",
+        "optional" : false,
+        "qualifiers" : [ ]
+      }
+    }, {
+      "type" : "STRING",
+      "name" : "data",
+      "optional" : false,
+      "qualifiers" : [ ]
+    }, {
+      "type" : "ARRAY",
+      "name" : "rList",
+      "optional" : false,
+      "qualifiers" : [ ],
+      "elementAttribute" : {
+        "type" : "INTEGER",
+        "name" : "element",
+        "optional" : false,
+        "qualifiers" : [ ]
+      }
+    } ]
+  } ]
+}

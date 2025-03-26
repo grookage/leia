@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
-@PII
 @Data
 @Builder
 @Jacksonized

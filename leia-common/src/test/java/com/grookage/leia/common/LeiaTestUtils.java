@@ -1,6 +1,5 @@
 package com.grookage.leia.common;
 
-import com.grookage.leia.common.utils.QualifierUtils;
 import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.qualifiers.QualifierInfo;
 import com.grookage.leia.models.qualifiers.QualifierType;
@@ -151,7 +150,7 @@ public class LeiaTestUtils {
         Assertions.assertEquals(expected.size(), original.size(), "Qualifier sets size mismatch");
 
         expected.forEach(expectedQualifier -> {
-            Optional<QualifierInfo> matchingQualifier = QualifierUtils.filter(original, expectedQualifier.getType());
+            Optional<QualifierInfo> matchingQualifier = filter(original, expectedQualifier.getType());
 
             Assertions.assertTrue(matchingQualifier.isPresent(),
                     "Missing qualifier of type: " + expectedQualifier.getType());
@@ -166,5 +165,15 @@ public class LeiaTestUtils {
                         "Mismatch in TTL seconds for SHORT_LIVED qualifier");
             }
         });
+    }
+
+    private Optional<QualifierInfo> filter(final Set<QualifierInfo> qualifiers,
+                                          final QualifierType type) {
+        if (Objects.isNull(qualifiers)) {
+            return Optional.empty();
+        }
+        return qualifiers.stream()
+                .filter(qualifierInfo -> qualifierInfo.getType().equals(type))
+                .findFirst();
     }
 }

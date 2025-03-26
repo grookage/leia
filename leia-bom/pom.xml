@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia</artifactId>
-        <version>0.0.1-RC22</version>
+        <version>0.0.1-RC23</version>
     </parent>
 
     <artifactId>leia-bom</artifactId>

@@ -14,8 +14,7 @@ import java.util.Map;
 @Jacksonized
 public class TestParameterizedStub {
     String[] values;
-    @PII
-    List<PIIData> piiDataList;
+    List<@PII PIIData> piiDataList;
     @Encrypted
     Map<TestEnum, String> map;
 }
