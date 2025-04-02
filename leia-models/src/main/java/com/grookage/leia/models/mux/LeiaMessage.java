@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @Builder
@@ -35,7 +36,7 @@ public class LeiaMessage {
 
     @NotEmpty
     private SchemaKey schemaKey;
-    private List<String> tags = List.of();
+    private Set<String> tags = Set.of();
     @NotNull
     private JsonNode message;
 }

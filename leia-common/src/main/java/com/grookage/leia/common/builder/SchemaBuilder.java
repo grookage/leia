@@ -71,7 +71,7 @@ public class SchemaBuilder {
                 .schemaType(schemaDefinition.schemaType())
                 .validationType(schemaDefinition.validation())
                 .attributes(getSchemaAttributes(klass))
-                .tags(Arrays.asList(schemaDefinition.tags()))
+                .tags(Set.of(schemaDefinition.tags()))
                 .build()
         );
     }

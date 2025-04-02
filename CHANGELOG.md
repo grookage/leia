@@ -3,7 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.0.1-RC24]
+
 - Adds support for handling Generics in `SchemaBuilder` & `SchemaValidationUtils`
+- SchemaDetails: Use set for tags
+- LeiaMessageProduceClient: Append schema tags for multiplexed messages
+- TagBasedNameResolver: Bug Fix: Transform backend name to uppercase before comparison
 
 ## [0.0.1-RC23]
 - Removed leia-refresher and replaced it with [korg](github.com/grookage/korg)

@@ -32,6 +32,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +43,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateSchemaRequest {
     @Builder.Default
-    List<String> tags = new ArrayList<>();
+    Set<String> tags = new HashSet<>();
     @NotNull
     @Valid
     private SchemaKey schemaKey;

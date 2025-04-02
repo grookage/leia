@@ -44,6 +44,7 @@ import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 class LeiaMessageProduceClientTest {
 
@@ -54,6 +55,7 @@ class LeiaMessageProduceClientTest {
     private SchemaKey sourceSchema;
     private SchemaKey targetSchema;
     private SchemaDetails schemaDetails;
+    private SchemaDetails targetSchemaDetails;
 
     @SneakyThrows
     @BeforeEach
@@ -78,8 +80,10 @@ class LeiaMessageProduceClientTest {
                 .build();
         schemaDetails = ResourceHelper
                 .getResource("schema/schemaDetails.json", SchemaDetails.class);
+        targetSchemaDetails = ResourceHelper
+                .getResource("schema/targetSchemaDetails.json", SchemaDetails.class);
         Assertions.assertNotNull(schemaDetails);
-        Mockito.when(clientRefresher.getData()).thenAnswer(i -> List.of(schemaDetails));
+        Mockito.when(clientRefresher.getData()).thenAnswer(i -> List.of(schemaDetails, targetSchemaDetails));
         Mockito.when(schemaValidator.getKlass(sourceSchema)).thenReturn(Optional.of(TestSchema.class));
         Mockito.when(schemaValidator.getKlass(targetSchema)).thenReturn(Optional.of(TargetSchema.class));
         Mockito.when(schemaValidator.valid(Mockito.any(SchemaKey.class))).thenReturn(true);
@@ -105,7 +109,7 @@ class LeiaMessageProduceClientTest {
                 .includeSource(true)
                 .build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 
@@ -121,6 +125,7 @@ class LeiaMessageProduceClientTest {
                 final var testMessage = messages.stream()
                         .filter(each -> each.getSchemaKey().getVersion().equalsIgnoreCase("v")).findFirst().orElse(null);
                 Assertions.assertNotNull(testMessage);
+                Assertions.assertEquals(Set.of("backend-TRANSFORMATION_BACKEND","backend-BACKEND"),testMessage.getTags());
                 Assertions.assertEquals("TestName", testMessage.getMessage().get("officialName").asText());
             }
         }, null);
@@ -139,7 +144,7 @@ class LeiaMessageProduceClientTest {
                 .includeSource(false)
                 .build(), new DefaultMessageProcessor("test", 10_000L, nameResolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 
@@ -213,7 +218,7 @@ class LeiaMessageProduceClientTest {
                 .includeSource(true)
                 .build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 
@@ -235,7 +240,7 @@ class LeiaMessageProduceClientTest {
                 .includeSource(true)
                 .build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 

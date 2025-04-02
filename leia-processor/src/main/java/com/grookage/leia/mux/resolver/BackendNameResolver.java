@@ -19,9 +19,10 @@ package com.grookage.leia.mux.resolver;
 import com.grookage.leia.models.mux.LeiaMessage;
 
 import java.util.List;
+import java.util.Set;
 
 public interface BackendNameResolver {
 
-    List<String> getEligibleBackends(LeiaMessage leiaMessage);
+    Set<String> getEligibleBackends(LeiaMessage leiaMessage);
 
 }

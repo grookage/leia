@@ -69,7 +69,7 @@ public class StoredElasticRecord {
     @Builder.Default
     Set<SchemaHistoryItem> histories = new HashSet<>();
     @Builder.Default
-    List<String> tags = new ArrayList<>();
+    Set<String> tags = new HashSet<>();
 
     @JsonIgnore
     public SchemaKey getSchemaKey() {

@@ -1,0 +1,29 @@
+{
+  "schemaKey": {
+    "namespace": "testNamespace",
+    "schemaName": "testSchema",
+    "version": "v",
+    "orgId": "testOrg",
+    "tenantId": "tenantId",
+    "type": "default"
+  },
+  "schemaState": "CREATED",
+  "schemaType": "JSON",
+  "attributes": [
+    {
+      "type": "STRING",
+      "name": "name",
+      "optional": true
+    },
+    {
+      "type": "STRING",
+      "name": "officialName",
+      "optional": true
+    }
+  ],
+  "transformationTargets": [
+  ],
+  "tags": [
+    "backend-BACKEND"
+  ]
+}

@@ -30,13 +30,14 @@ import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 class DefaultMessageProcessorTest {
 
     @Test
     @SneakyThrows
     void testHttpMessageProcessor() {
-        final var resolver = new TagBasedNameResolver(() -> List.of("BACKEND1"));
+        final var resolver = new TagBasedNameResolver(() -> Set.of("BACKEND1"));
         final var httpExecutor = Mockito.mock(MessageExecutor.class);
         final var executorFactory = new MessageExecutorFactory() {
             @Override
@@ -48,7 +49,7 @@ class DefaultMessageProcessorTest {
         });
         final var messageProcessor = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return false;
             }
 
@@ -58,11 +59,11 @@ class DefaultMessageProcessorTest {
             }
         };
         Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages));
-        leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(List.of("backend-backend1::backend2",
+        leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1::backend2",
                 "importance-mild::extreme")));
         final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
             @Override
-            protected boolean validBackends(List<String> backends) {
+            protected boolean validBackends(Set<String> backends) {
                 return true;
             }
 

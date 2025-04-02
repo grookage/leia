@@ -54,7 +54,7 @@ public class SchemaDetails {
     @Builder.Default
     Set<SchemaHistoryItem> histories = new HashSet<>();
     @Builder.Default
-    List<String> tags = new ArrayList<>();
+    Set<String> tags = new HashSet<>();
     @NotNull
     @Valid
     private SchemaKey schemaKey;
