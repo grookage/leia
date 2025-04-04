@@ -41,6 +41,7 @@ import java.util.function.Supplier;
 public abstract class LeiaClientBundle<T extends Configuration> implements ConfiguredBundle<T> {
 
     private LeiaMessageProduceClient producerClient;
+    private LeiaSchemaValidator validator;
 
     protected abstract Supplier<LeiaClientRequest> getClientRequestSupplier(T configuration);
 
@@ -98,7 +99,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                 .refreshTimeInSeconds(dataRefreshSeconds)
                 .periodicRefresh(refreshEnabled(configuration))
                 .build();
-        final var validator = getSchemaValidator(configuration, clientRefresher);
+        this.validator = getSchemaValidator(configuration, clientRefresher);
         environment.lifecycle().manage(new Managed() {
             @Override
             public void start() {

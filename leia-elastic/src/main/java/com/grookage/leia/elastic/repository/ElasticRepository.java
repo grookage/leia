@@ -28,11 +28,11 @@ import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.UpdateRequest;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import co.elastic.clients.elasticsearch.indices.IndexSettings;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.grookage.leia.elastic.client.ElasticClientManager;
 import com.grookage.leia.elastic.config.ElasticConfig;
 import com.grookage.leia.elastic.storage.StoredElasticRecord;
@@ -49,31 +49,34 @@ import java.util.stream.Collectors;
 @Getter
 public class ElasticRepository implements SchemaRepository {
 
-    private static final String SCHEMA_INDEX = "schema_registry";
+    private static final String DEFAULT_SCHEMA_INDEX = "schemas";
     private static final String NAMESPACE = "namespace";
     private static final String ORG = "orgId";
     private static final String TENANT = "tenantId";
     private static final String SCHEMA_NAME = "schemaName";
-    private static final String VERSION = "version";
     private static final String SCHEMA_STATE = "schemaState";
     private final ElasticsearchClient client;
     private final ElasticConfig elasticConfig;
+    private final String schemaIndex;
 
     public ElasticRepository(ElasticConfig elasticConfig) {
         super();
         Preconditions.checkNotNull(elasticConfig, "Elastic Config can't be null");
         this.elasticConfig = elasticConfig;
         this.client = new ElasticClientManager(elasticConfig).getElasticClient();
+        this.schemaIndex = !Strings.isNullOrEmpty(elasticConfig.getSchemaIndex())
+                ? elasticConfig.getSchemaIndex()
+                : DEFAULT_SCHEMA_INDEX;
         this.initialize();
     }
 
     @SneakyThrows
     private void initialize() {
         final var indexExists = client.indices()
-                .exists(ExistsRequest.of(s -> s.index(SCHEMA_INDEX)))
+                .exists(ExistsRequest.of(s -> s.index(schemaIndex)))
                 .value();
         if (!indexExists) {
-            final var registryInitialized = client.indices().create(CreateIndexRequest.of(idx -> idx.index(SCHEMA_INDEX)
+            final var registryInitialized = client.indices().create(CreateIndexRequest.of(idx -> idx.index(schemaIndex)
                     .settings(IndexSettings.of(s -> s.numberOfShards("1")
                             .numberOfReplicas("2"))))
             ).shardsAcknowledged();
@@ -124,6 +127,7 @@ public class ElasticRepository implements SchemaRepository {
                 .tags(storedElasticRecord.getTags())
                 .build();
     }
+
     @Override
     @SneakyThrows
     public boolean createdRecordExists(SchemaKey schemaKey) {
@@ -136,7 +140,7 @@ public class ElasticRepository implements SchemaRepository {
         )))._toQuery();
         final var searchResponse = client.search(SearchRequest.of(s -> s.query(searchQuery)
                         .requestCache(true)
-                        .index(List.of(SCHEMA_INDEX))
+                        .index(List.of(schemaIndex))
                         .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
                         .timeout(elasticConfig.getTimeout())),
                 StoredElasticRecord.class
@@ -149,7 +153,7 @@ public class ElasticRepository implements SchemaRepository {
     public void create(SchemaDetails schema) {
         final var createDocument = new IndexRequest.Builder<>()
                 .document(toStorageRecord(schema))
-                .index(SCHEMA_INDEX)
+                .index(schemaIndex)
                 .refresh(Refresh.WaitFor)
                 .id(schema.getReferenceId())
                 .timeout(Time.of(s -> s.time(elasticConfig.getTimeout())))
@@ -161,7 +165,7 @@ public class ElasticRepository implements SchemaRepository {
     @SneakyThrows
     public void update(SchemaDetails schema) {
         final var updateRequest = new UpdateRequest.Builder<>()
-                .index(SCHEMA_INDEX)
+                .index(schemaIndex)
                 .id(schema.getReferenceId())
                 .doc(toStorageRecord(schema))
                 .refresh(Refresh.WaitFor)
@@ -173,7 +177,7 @@ public class ElasticRepository implements SchemaRepository {
     @Override
     @SneakyThrows
     public Optional<SchemaDetails> get(SchemaKey schemaKey) {
-        final var getResponse = client.get(GetRequest.of(request -> request.index(SCHEMA_INDEX).id(schemaKey.getReferenceId())), StoredElasticRecord.class);
+        final var getResponse = client.get(GetRequest.of(request -> request.index(schemaIndex).id(schemaKey.getReferenceId())), StoredElasticRecord.class);
         return Optional.ofNullable(getResponse.source()).map(this::toSchemaDetails);
     }
 
@@ -204,7 +208,7 @@ public class ElasticRepository implements SchemaRepository {
         final var searchResponse = client.search(SearchRequest.of(
                         s -> s.query(searchQuery)
                                 .requestCache(true)
-                                .index(List.of(SCHEMA_INDEX))
+                                .index(List.of(schemaIndex))
                                 .size(elasticConfig.getMaxResultSize()) //If you have more than 10K schemas, this will hold you up!
                                 .timeout(elasticConfig.getTimeout())),
                 StoredElasticRecord.class

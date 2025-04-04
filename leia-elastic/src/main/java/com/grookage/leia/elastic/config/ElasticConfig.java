@@ -37,6 +37,7 @@ public class ElasticConfig {
     private String clusterName = "elasticsearch";
     @NotEmpty
     private List<HostAndPort> servers = List.of();
+    private String schemaIndex;
     private int maxResultSize = 10000;
     private int operationTimeoutMs = 10000;
     private AuthConfig authConfig;
