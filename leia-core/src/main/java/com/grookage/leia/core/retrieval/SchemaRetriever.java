@@ -75,13 +75,17 @@ public class SchemaRetriever {
 
     private boolean match(SchemaDetails schemaDetails, SearchRequest searchRequest) {
         final var schemaKey = schemaDetails.getSchemaKey();
+        final var orgIdMatch = CollectionUtils.isNullOrEmpty(searchRequest.getOrgIds()) ||
+                               searchRequest.getOrgIds().contains(schemaKey.getOrgId());
         final var namespaceMatch = CollectionUtils.isNullOrEmpty(searchRequest.getNamespaces()) ||
                 searchRequest.getNamespaces().contains(schemaKey.getNamespace());
+        final var tenantIdMatch = CollectionUtils.isNullOrEmpty(searchRequest.getTenants()) ||
+                                  searchRequest.getTenants().contains(schemaKey.getTenantId());
         final var schemaNameMatch = CollectionUtils.isNullOrEmpty(searchRequest.getSchemaNames()) ||
                 searchRequest.getSchemaNames().contains(schemaKey.getSchemaName());
         final var schemaStateMatch = CollectionUtils.isNullOrEmpty(searchRequest.getStates()) ||
                 searchRequest.getStates().contains(schemaDetails.getSchemaState());
-        return namespaceMatch && schemaNameMatch && schemaStateMatch;
+        return orgIdMatch && namespaceMatch && tenantIdMatch && schemaNameMatch && schemaStateMatch;
     }
 
     public List<SchemaDetails> getSchemaDetails(final LeiaRequestContext requestContext,

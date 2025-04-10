@@ -30,7 +30,7 @@ public class LeiaClientRequest {
     @Builder.Default
     private final Set<String> tenants = Set.of();
     @Builder.Default
-    private final Set<String> orgs = Set.of();
+    private final Set<String> orgIds = Set.of();
     @Builder.Default
     private final Set<String> namespaces = Set.of();
     @Builder.Default

@@ -1,6 +1,6 @@
 {
-  "orgIds": [
-    "testOrgId"
+  "orgs": [
+    "testOrg"
   ],
   "namespaces": [
     "test"

@@ -28,6 +28,8 @@ public enum LeiaSchemaErrorCode implements LeiaErrorCode {
 
     SCHEMA_ALREADY_EXISTS(400),
 
+    SCHEMA_APPROVAL_UNAUTHORIZED(400),
+
     NO_SCHEMA_FOUND(400);
 
     final int status;

@@ -106,6 +106,11 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                 clientRefresher.start();
                 validator.start();
             }
+
+            @Override
+            public void stop() {
+                validator.stop();
+            }
         });
         if (withProducerClient) {
             producerClient = LeiaMessageProduceClient.builder()
@@ -119,6 +124,11 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                 @Override
                 public void start() {
                     producerClient.start();
+                }
+
+                @Override
+                public void stop() {
+                    // No op
                 }
             });
         }

@@ -47,6 +47,7 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
                 CreateSchemaRequest.class
         );
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
+        Mockito.when(getRepositorySupplier().get().recordExists(Mockito.any(SchemaKey.class))).thenReturn(false);
         Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.any(SchemaKey.class))).thenReturn(false);
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
         schemaContext.addContext("USER", "testUser");
@@ -54,6 +55,24 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
         schemaContext.addContext("USER_ID", "testUserId");
         getSchemaProcessor().process(schemaContext);
         Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).create(Mockito.any(SchemaDetails.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void testCreateSchemaAlreadyExists_withDifferentVersion() {
+        final var schemaContext = new SchemaContext();
+        final var schemaProcessor = getSchemaProcessor();
+        final var createSchemaRequest = ResourceHelper.getResource(
+                "schema/createSchemaRequest.json",
+                CreateSchemaRequest.class
+        );
+        schemaContext.addContext("USER", "testUser");
+        schemaContext.addContext("EMAIL", "testEmail");
+        schemaContext.addContext("USER_ID", "testUserId");
+        schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
+        Mockito.when(getRepositorySupplier().get().recordExists(Mockito.any(SchemaKey.class))).thenReturn(false);
+        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.any(SchemaKey.class))).thenReturn(true);
+        Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
     }
 
     @Test
@@ -68,10 +87,8 @@ class CreateSchemaProcessorTest extends SchemaProcessorTest {
         schemaContext.addContext("USER", "testUser");
         schemaContext.addContext("EMAIL", "testEmail");
         schemaContext.addContext("USER_ID", "testUserId");
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
-        Mockito.when(getRepositorySupplier().get().createdRecordExists(Mockito.any(SchemaKey.class))).thenReturn(true);
+        Mockito.when(getRepositorySupplier().get().recordExists(Mockito.any(SchemaKey.class))).thenReturn(true);
         Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
     }
 }

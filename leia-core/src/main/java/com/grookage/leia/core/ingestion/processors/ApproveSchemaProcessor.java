@@ -17,6 +17,7 @@
 package com.grookage.leia.core.ingestion.processors;
 
 import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
+import com.grookage.leia.core.ingestion.utils.ContextUtils;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
@@ -54,6 +55,16 @@ public class ApproveSchemaProcessor extends SchemaProcessor {
                     schemaKey.getVersion(),
                     schemaKey.getSchemaName());
             throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
+        }
+        final var modifiedByApprover = storedSchema.getHistories().stream()
+                .filter(schemaHistoryItem -> schemaHistoryItem.getSchemaEvent().equals(SchemaEvent.CREATE_SCHEMA)
+                                             || schemaHistoryItem.getSchemaEvent().equals(SchemaEvent.UPDATE_SCHEMA))
+                .anyMatch(schemaHistoryItem -> schemaHistoryItem.getConfigUpdaterId()
+                        .equalsIgnoreCase(ContextUtils.getUserId(context)));
+        if (modifiedByApprover) {
+            log.error("User:{} cannot approve the schema:{} because they have either created or updated it",
+                    ContextUtils.getUser(context), schemaKey.getReferenceId());
+            throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_APPROVAL_UNAUTHORIZED);
         }
         addHistory(context, storedSchema);
         storedSchema.setSchemaState(SchemaState.APPROVED);

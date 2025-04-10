@@ -83,6 +83,10 @@ public class AerospikeManager {
         );
     }
 
+    public boolean exists(String key) {
+        return client.exists(client.getReadPolicyDefault(), getKey(key));
+    }
+
     private void augmentExpressions(final String binName,
                                     final Set<String> comparators,
                                     final List<Exp> searchableExpressions) {
@@ -110,7 +114,7 @@ public class AerospikeManager {
         augmentExpressions(AerospikeStorageConstants.SCHEMA_BIN, searchRequest.getSchemaNames(), searchableExpressions);
         augmentExpressions(AerospikeStorageConstants.SCHEMA_STATE_BIN, searchRequest.getStates().stream().map(Enum::name).collect(Collectors.toSet()),
                 searchableExpressions);
-        augmentExpressions(AerospikeStorageConstants.ORG_BIN, searchRequest.getOrgs(), searchableExpressions);
+        augmentExpressions(AerospikeStorageConstants.ORG_BIN, searchRequest.getOrgIds(), searchableExpressions);
         augmentExpressions(AerospikeStorageConstants.TENANT_BIN, searchRequest.getTenants(), searchableExpressions);
         if (!searchableExpressions.isEmpty()) {
             if (searchableExpressions.size() == 1) {
@@ -139,6 +143,7 @@ public class AerospikeManager {
 
     public boolean exists(final String orgId,
                           final String configNamespace,
+                          final String tenantId,
                           final String schemaName,
                           final String schemaState) {
         final var queryStatement = new Statement();
@@ -148,6 +153,7 @@ public class AerospikeManager {
         queryPolicy.filterExp = Exp.build(Exp.and(
                 Exp.eq(Exp.stringBin(AerospikeStorageConstants.ORG_BIN), Exp.val(orgId)),
                 Exp.eq(Exp.stringBin(AerospikeStorageConstants.NAMESPACE_BIN), Exp.val(configNamespace)),
+                Exp.eq(Exp.stringBin(AerospikeStorageConstants.TENANT_BIN), Exp.val(tenantId)),
                 Exp.eq(Exp.stringBin(AerospikeStorageConstants.SCHEMA_BIN), Exp.val(schemaName)),
                 Exp.eq(Exp.stringBin(AerospikeStorageConstants.SCHEMA_STATE_BIN), Exp.val(schemaState))
         ));

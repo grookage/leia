@@ -27,6 +27,8 @@ public interface SchemaRepository {
 
     boolean createdRecordExists(final SchemaKey schemaKey);
 
+    boolean recordExists(final SchemaKey schemaKey);
+
     void create(final SchemaDetails schema);
 
     void update(final SchemaDetails schema);

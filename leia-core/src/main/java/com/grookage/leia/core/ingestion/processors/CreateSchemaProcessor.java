@@ -47,12 +47,19 @@ public class CreateSchemaProcessor extends SchemaProcessor {
     public void process(SchemaContext context) {
         final var createSchemaRequest = context.getContext(CreateSchemaRequest.class)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
-        final var recordExists = getRepositorySupplier()
+        final var recordExists = getRepositorySupplier().get()
+                .recordExists(createSchemaRequest.getSchemaKey());
+        if (recordExists) {
+            log.error("Stored Schema already present against schemaKey:{}",
+                    createSchemaRequest.getSchemaKey());
+            throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_ALREADY_EXISTS);
+        }
+        final var createdRecordExists = getRepositorySupplier()
                 .get()
                 .createdRecordExists(createSchemaRequest.getSchemaKey());
-        if (recordExists) {
-            log.error("There are already stored schemas present with schemaKey {}. Please try updating them instead",
-                    createSchemaRequest.getSchemaKey());
+        if (createdRecordExists) {
+            log.error("There are already stored schemas in created state present with schemaName {}. Please try updating them instead",
+                    createSchemaRequest.getSchemaKey().getSchemaName());
             throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_ALREADY_EXISTS);
         }
         final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest);

@@ -34,7 +34,7 @@ public class AerospikeRepository implements SchemaRepository {
     }
 
     @SneakyThrows
-    private SchemaDetails toConfigDetails(AerospikeRecord aerospikeRecord) {
+    private SchemaDetails toSchemaDetails(AerospikeRecord aerospikeRecord) {
         return MapperUtils.mapper().readValue(aerospikeRecord.getData(), SchemaDetails.class);
     }
 
@@ -44,30 +44,36 @@ public class AerospikeRepository implements SchemaRepository {
         return aerospikeManager.exists(
                 schemaKey.getOrgId(),
                 schemaKey.getNamespace(),
+                schemaKey.getTenantId(),
                 schemaKey.getSchemaName(),
                 SchemaState.CREATED.name()
         );
     }
 
     @Override
-    public void create(SchemaDetails configDetails) {
-        aerospikeManager.save(toStorageRecord(configDetails));
+    public boolean recordExists(SchemaKey schemaKey) {
+        return aerospikeManager.exists(schemaKey.getReferenceId());
     }
 
     @Override
-    public void update(SchemaDetails configDetails) {
-        aerospikeManager.save(toStorageRecord(configDetails));
+    public void create(SchemaDetails schemaDetails) {
+        aerospikeManager.save(toStorageRecord(schemaDetails));
+    }
+
+    @Override
+    public void update(SchemaDetails schemaDetails) {
+        aerospikeManager.save(toStorageRecord(schemaDetails));
     }
 
     @Override
     public Optional<SchemaDetails> get(SchemaKey schemaKey) {
         return aerospikeManager.getRecord(schemaKey.getReferenceId())
-                .map(this::toConfigDetails);
+                .map(this::toSchemaDetails);
     }
 
     @Override
     public List<SchemaDetails> getSchemas(SearchRequest searchRequest) {
         return aerospikeManager.getRecords(searchRequest)
-                .stream().map(this::toConfigDetails).toList();
+                .stream().map(this::toSchemaDetails).toList();
     }
 }

@@ -65,7 +65,7 @@ public class LeiaClientSupplier extends KorgHttpSupplier<List<SchemaDetails>> {
                 MapperUtils.mapper().writeValueAsString(SearchRequest.builder()
                         .namespaces(clientRequest.getNamespaces())
                         .tenants(clientRequest.getTenants())
-                        .orgs(clientRequest.getOrgs())
+                        .orgIds(clientRequest.getOrgIds())
                         .schemaNames(clientRequest.getSchemaNames())
                         .states(Set.of(SchemaState.APPROVED))
                         .build()));
