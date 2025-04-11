@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.grookage.leia</groupId>
     <artifactId>leia</artifactId>
-    <version>0.0.1-RC25</version>
+    <version>0.0.1-RC26</version>
     <packaging>pom</packaging>
 
     <name>Leia</name>

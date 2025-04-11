@@ -42,6 +42,7 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaDetails {
     String description;
+    String changeLog;
     @NotNull
     SchemaState schemaState;
     @NotNull

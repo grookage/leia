@@ -42,6 +42,7 @@ public class UpdateSchemaRequest {
     @NotNull
     private SchemaKey schemaKey;
     private String description;
+    private String changeLog;
     private SchemaValidationType validationType;
     private SchemaType schemaType;
     @NotEmpty
