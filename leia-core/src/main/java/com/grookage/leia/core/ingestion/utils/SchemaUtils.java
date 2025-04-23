@@ -30,6 +30,7 @@ public class SchemaUtils {
                 .schemaState(SchemaState.CREATED)
                 .schemaType(createSchemaRequest.getSchemaType())
                 .description(createSchemaRequest.getDescription())
+                .changeLog(createSchemaRequest.getChangeLog())
                 .attributes(createSchemaRequest.getAttributes())
                 .validationType(createSchemaRequest.getValidationType())
                 .transformationTargets(createSchemaRequest.getTransformationTargets())

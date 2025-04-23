@@ -22,7 +22,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-parent</artifactId>
-        <version>0.0.1-RC25</version>
+        <version>0.0.1-RC27</version>
         <relativePath>../leia-parent</relativePath>
     </parent>
 
@@ -37,6 +37,10 @@
         <dependency>
             <artifactId>dropwizard-core</artifactId>
             <groupId>io.dropwizard</groupId>
+        </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-aerospike</artifactId>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/io.dropwizard/dropwizard-validation -->

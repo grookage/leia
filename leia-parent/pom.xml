@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-bom</artifactId>
-        <version>0.0.1-RC25</version>
+        <version>0.0.1-RC27</version>
         <relativePath>../leia-bom</relativePath>
     </parent>
 
@@ -61,6 +61,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.grookage.concierge</groupId>
+                <artifactId>concierge-bom</artifactId>
+                <type>pom</type>
+                <scope>import</scope>
+                <version>1.0.0</version>
+            </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>

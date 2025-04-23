@@ -57,6 +57,7 @@ public class StoredElasticRecord {
     @NotBlank
     private String type;
     String description;
+    String changeLog;
     @NotNull
     SchemaState schemaState;
     @NotNull

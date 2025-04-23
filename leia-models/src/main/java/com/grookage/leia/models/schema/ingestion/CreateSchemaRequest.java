@@ -50,6 +50,7 @@ public class CreateSchemaRequest {
     private SchemaType schemaType;
     private SchemaValidationType validationType = SchemaValidationType.MATCHING;
     private String description;
+    private String changeLog;
     @NotEmpty
     private Set<SchemaAttribute> attributes;
     @Builder.Default

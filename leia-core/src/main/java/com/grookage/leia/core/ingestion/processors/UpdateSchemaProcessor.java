@@ -57,6 +57,7 @@ public class UpdateSchemaProcessor extends SchemaProcessor {
         }
         storedSchema.setDescription(updateSchemaRequest.getDescription());
         storedSchema.setAttributes(updateSchemaRequest.getAttributes());
+        storedSchema.setChangeLog(updateSchemaRequest.getChangeLog());
         addHistory(context, storedSchema);
         storedSchema.setValidationType(updateSchemaRequest.getValidationType());
         storedSchema.setSchemaType(updateSchemaRequest.getSchemaType());

@@ -24,7 +24,6 @@ public @interface SchemaDefinition {
     String type();
 
     String description() default "";
-
     SchemaType schemaType() default SchemaType.JSON;
 
     SchemaValidationType validation() default SchemaValidationType.MATCHING;

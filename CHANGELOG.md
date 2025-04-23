@@ -1,6 +1,8 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [0.0.1-RC27]
+- Replaced Leia logic with concierge
 
 ## [0.0.1-RC25]
 - Adds support for handling Generics in `SchemaBuilder` & `SchemaValidationUtils`
