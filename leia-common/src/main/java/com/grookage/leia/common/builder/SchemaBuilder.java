@@ -204,6 +204,7 @@ public class SchemaBuilder {
         }
 
         if (klass.isEnum()) {
+            // For enum fields inside classes, use EnumAttribute as before
             return new EnumAttribute(name, optional, qualifiers, BuilderUtils.getEnumValues(klass));
         }
 
@@ -247,3 +248,4 @@ public class SchemaBuilder {
         return new ObjectAttribute(name, optional, qualifiers, schemaAttributes);
     }
 }
+

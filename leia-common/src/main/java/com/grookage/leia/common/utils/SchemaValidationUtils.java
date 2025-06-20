@@ -115,6 +115,16 @@ public class SchemaValidationUtils {
 
         schemaAttribute.accept(new SchemaAttributeHandler<Void>(a -> null) {
             @Override
+            public Void accept(EnumAttribute attribute) {
+                final var providedValues = BuilderUtils.getEnumValues(klass);
+                if (!attribute.getValues().equals(providedValues)) {
+                    violationContext.addViolation(String.format("Enum values mismatch, expected: %s, provided: %s",
+                            attribute.getValues(), providedValues), attribute.getName());
+                }
+                return null;
+            }
+
+            @Override
             public Void accept(ArrayAttribute attribute) {
                 if (Objects.nonNull(attribute.getElementAttribute())) {
                     if (klass.isArray()) {
@@ -196,6 +206,12 @@ public class SchemaValidationUtils {
     private boolean isMatchingType(final Class<?> klass,
                                    final SchemaAttribute attribute) {
         return attribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {
+            @Override
+            public Boolean accept(StringAttribute attribute) {
+                // String attributes in the schema can also correspond to Enum types
+                return klass.isEnum() || ClassUtils.isAssignable(klass, String.class);
+            }
+
             @Override
             public Boolean accept(ArrayAttribute attribute) {
                 return klass.isArray() || ClassUtils.isAssignable(klass, Collection.class);
