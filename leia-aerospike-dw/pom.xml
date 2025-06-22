@@ -39,6 +39,10 @@
             <artifactId>dropwizard-core</artifactId>
             <groupId>io.dropwizard</groupId>
         </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-aerospike</artifactId>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/io.dropwizard/dropwizard-validation -->
         <dependency>

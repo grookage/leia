@@ -43,6 +43,7 @@ public class SchemaDetails {
     @Valid
     private SchemaKey schemaKey;
     String description;
+    String changeLog;
     @NotNull
     SchemaState schemaState;
     @NotNull

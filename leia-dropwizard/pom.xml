@@ -60,6 +60,22 @@
             <groupId>com.grookage.leia</groupId>
             <artifactId>leia-elastic</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-models</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-dw</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-elastic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-aerospike</artifactId>
+        </dependency>
 
     </dependencies>
 

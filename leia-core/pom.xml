@@ -90,6 +90,14 @@
             </exclusions>
             <groupId>com.grookage.leia</groupId>
         </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-models</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-core</artifactId>
+        </dependency>
 
     </dependencies>
 

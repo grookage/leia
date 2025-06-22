@@ -41,6 +41,10 @@
             <groupId>com.grookage.leia</groupId>
             <artifactId>leia-models</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-repository</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

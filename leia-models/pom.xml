@@ -95,6 +95,10 @@
             <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.grookage.concierge</groupId>
+            <artifactId>concierge-models</artifactId>
+        </dependency>
     </dependencies>
 
 
