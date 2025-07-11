@@ -90,7 +90,9 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
         }
     }
 
-    public abstract T getRequestData(LeiaHttpEntity leiaHttpEntity);
+    protected T getRequestData(LeiaHttpEntity leiaHttpEntity) {
+        return (T) leiaHttpEntity;
+    }
 
     public abstract Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig);
 
