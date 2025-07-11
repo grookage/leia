@@ -58,7 +58,7 @@ class HttpMessageExecutorTest {
                 .withRequestBody(binaryEqualTo(ResourceHelper.getObjectMapper().writeValueAsBytes(entityMessages)))
                 .willReturn(aResponse()
                         .withStatus(200)));
-        final var testableExecutor = new HttpMessageExecutor(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
+        final var testableExecutor = new HttpMessageExecutor<>(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
             @Override
             public Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig) {
                 return Optional.of(LeiaHttpEndPoint.builder()

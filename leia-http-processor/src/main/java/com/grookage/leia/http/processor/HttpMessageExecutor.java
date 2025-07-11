@@ -24,6 +24,7 @@ import com.grookage.leia.http.processor.config.BackendType;
 import com.grookage.leia.http.processor.config.HttpBackendConfig;
 import com.grookage.leia.http.processor.config.LeiaHttpEndPoint;
 import com.grookage.leia.http.processor.exception.LeiaHttpErrorCode;
+import com.grookage.leia.http.processor.request.LeiaHttpEntity;
 import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
 import com.grookage.leia.models.exception.LeiaException;
@@ -58,7 +59,7 @@ import java.util.function.UnaryOperator;
 @AllArgsConstructor
 @Slf4j
 @Getter
-public abstract class HttpMessageExecutor implements MessageExecutor {
+public abstract class HttpMessageExecutor<T> implements MessageExecutor {
 
     private final String name;
     private final HttpBackendConfig backendConfig;
@@ -89,13 +90,18 @@ public abstract class HttpMessageExecutor implements MessageExecutor {
         }
     }
 
+    protected T getRequestData(LeiaHttpEntity leiaHttpEntity) {
+        return (T) leiaHttpEntity;
+    }
+
     public abstract Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig);
 
     @SneakyThrows
     public void executeRequest(List<LeiaMessage> messages) {
         try {
             retryer.call(() -> {
-                final var requestData = HttpRequestUtils.toHttpEntity(messages, backendConfig);
+                final var leiaHttpEntity = HttpRequestUtils.toHttpEntity(messages, backendConfig);
+                final var requestData =  getRequestData(leiaHttpEntity);
                 final var endPoint = getEndPoint(backendConfig).orElse(null);
                 if (null == endPoint) {
                     log.debug("No valid end point found for backendConfig {}", backendConfig);
