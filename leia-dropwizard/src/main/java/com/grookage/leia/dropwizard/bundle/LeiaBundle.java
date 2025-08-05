@@ -19,6 +19,7 @@ package com.grookage.leia.dropwizard.bundle;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.core.ingestion.SchemaIngestor;
 import com.grookage.leia.core.ingestion.hub.SchemaProcessorHub;
+import com.grookage.leia.core.managers.SchemaProcessorFactory;
 import com.grookage.leia.core.retrieval.SchemaRetriever;
 import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
 import com.grookage.leia.dropwizard.bundle.lifecycle.Lifecycle;
@@ -58,6 +59,11 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
 
     protected abstract Supplier<PermissionValidator<U>> getPermissionResolver(T configuration);
 
+    protected Supplier<SchemaProcessorFactory> withProcessorFactory(T configuration) {
+        return () -> null;
+    }
+
+
     protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
         return List.of();
     }
@@ -75,15 +81,17 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
 
         this.repositorySupplier = getRepositorySupplier(configuration);
         Preconditions.checkNotNull(repositorySupplier, "Schema Repository Supplier can't be null");
-
+        final var processorFactory = withProcessorFactory(configuration);
         final var schemaProcessorHub = SchemaProcessorHub.of()
                 .withRepositoryResolver(repositorySupplier)
+                .withProcessorFactory(processorFactory)
                 .build();
         this.schemaIngestor = new SchemaIngestor<U>()
                 .withProcessorHub(schemaProcessorHub)
                 .build();
         final var cacheConfig = getCacheConfig(configuration);
         this.schemaRetriever = new SchemaRetriever(repositorySupplier, cacheConfig);
+
         withLifecycleManagers(configuration)
                 .forEach(lifecycle -> environment.lifecycle().manage(new Managed() {
                     @Override

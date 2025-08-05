@@ -1,6 +1,9 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [1.0.2]
+- Introduced `SchemaProcessorFactory` to enable pre/post processing hooks via `SchemaEventProcessor`
 ## [1.0.1]
 - Added support for request data resolver in `HttpMessageExecutor`
 
