@@ -16,9 +16,13 @@
 
 package com.grookage.leia.core.ingestion.processors;
 
+import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
 import com.grookage.leia.core.ingestion.utils.ContextUtils;
+import com.grookage.leia.core.managers.SchemaProcessorFactory;
+import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaHistoryItem;
+import com.grookage.leia.models.schema.engine.LeiaProcessorKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.repository.SchemaRepository;
@@ -35,6 +39,7 @@ import java.util.function.Supplier;
 public abstract class SchemaProcessor {
 
     private final Supplier<SchemaRepository> repositorySupplier;
+    private final Supplier<SchemaProcessorFactory> processorFactorySupplier;
 
     public abstract SchemaEvent name();
 
@@ -55,7 +60,21 @@ public abstract class SchemaProcessor {
 
     public abstract void process(final SchemaContext schemaContext);
 
-    public void fire(SchemaContext context) {
+    public void fire(SchemaContext context) throws Throwable {
+        final var processorKey = context.getContext(LeiaProcessorKey.class)
+                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.PROCESSOR_KEY_NOT_FOUND));
+
+        final var processor = null != processorFactorySupplier && null != processorFactorySupplier.get() ?
+                processorFactorySupplier.get().getProcessor(processorKey).orElse(null) : null;
+
+        if (null != processor) {
+            processor.preProcess(processorKey, context);
+        }
         process(context);
+
+        if (null != processor) {
+            processor.postProcess(processorKey, context);
+        }
     }
+
 }

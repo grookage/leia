@@ -19,6 +19,7 @@ package com.grookage.leia.core.ingestion.hub;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.grookage.leia.core.ingestion.processors.*;
+import com.grookage.leia.core.managers.SchemaProcessorFactory;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.models.schema.engine.SchemaEventVisitor;
 import com.grookage.leia.repository.SchemaRepository;
@@ -34,6 +35,7 @@ public class SchemaProcessorHub {
 
     private final Map<SchemaEvent, SchemaProcessor> processors = Maps.newHashMap();
     private Supplier<SchemaRepository> repositorySupplier;
+    private Supplier<SchemaProcessorFactory> schemaProcessorFactorySupplier;
 
     private SchemaProcessorHub() {
 
@@ -48,11 +50,17 @@ public class SchemaProcessorHub {
         return this;
     }
 
+    public SchemaProcessorHub withProcessorFactory(Supplier<SchemaProcessorFactory> schemaProcessorFactorySupplier) {
+        this.schemaProcessorFactorySupplier = schemaProcessorFactorySupplier;
+        return this;
+    }
+
     public SchemaProcessorHub build() {
         Preconditions.checkNotNull(repositorySupplier, "Schema Repository can't be null");
         Arrays.stream(SchemaEvent.values()).forEach(this::buildProcessor);
         return this;
     }
+
 
     public void buildProcessor(final SchemaEvent event) {
         processors.putIfAbsent(event, event.accept(new SchemaEventVisitor<>() {
@@ -60,6 +68,7 @@ public class SchemaProcessorHub {
             public SchemaProcessor schemaCreate() {
                 return CreateSchemaProcessor.builder()
                         .repositorySupplier(repositorySupplier)
+                        .processorFactorySupplier(schemaProcessorFactorySupplier)
                         .build();
             }
 
@@ -67,6 +76,7 @@ public class SchemaProcessorHub {
             public SchemaProcessor schemaUpdate() {
                 return UpdateSchemaProcessor.builder()
                         .repositorySupplier(repositorySupplier)
+                        .processorFactorySupplier(schemaProcessorFactorySupplier)
                         .build();
             }
 
@@ -74,6 +84,7 @@ public class SchemaProcessorHub {
             public SchemaProcessor schemaApprove() {
                 return ApproveSchemaProcessor.builder()
                         .repositorySupplier(repositorySupplier)
+                        .processorFactorySupplier(schemaProcessorFactorySupplier)
                         .build();
             }
 
@@ -81,6 +92,7 @@ public class SchemaProcessorHub {
             public SchemaProcessor schemaReject() {
                 return RejectSchemaProcessor.builder()
                         .repositorySupplier(repositorySupplier)
+                        .processorFactorySupplier(schemaProcessorFactorySupplier)
                         .build();
             }
         }));

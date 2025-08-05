@@ -23,6 +23,7 @@ import com.grookage.leia.core.ingestion.utils.ContextUtils;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
+import com.grookage.leia.models.schema.engine.LeiaProcessorKey;
 import com.grookage.leia.models.schema.engine.SchemaContext;
 import com.grookage.leia.models.schema.engine.SchemaEvent;
 import com.grookage.leia.models.schema.ingestion.CreateSchemaRequest;
@@ -56,9 +57,14 @@ public class SchemaIngestor<U extends SchemaUpdater> {
         final var schemaContext = new SchemaContext();
         schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
         ContextUtils.addSchemaUpdaterContext(schemaContext, schemaUpdater);
+        final var processorKey = LeiaProcessorKey.builder()
+                .schemaKey(createSchemaRequest.getSchemaKey())
+                .schemaEvent(SchemaEvent.CREATE_SCHEMA)
+                .build();
+        schemaContext.addContext(LeiaProcessorKey.class.getSimpleName(), processorKey);
         final var processor = processorHub.getProcessor(SchemaEvent.CREATE_SCHEMA)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.PROCESSOR_NOT_FOUND));
-        processor.process(schemaContext);
+        processor.fire(schemaContext);
         return schemaContext.getContext(SchemaDetails.class).orElse(null);
     }
 
@@ -67,9 +73,14 @@ public class SchemaIngestor<U extends SchemaUpdater> {
         final var schemaContext = new SchemaContext();
         schemaContext.addContext(UpdateSchemaRequest.class.getSimpleName(), updateRequest);
         ContextUtils.addSchemaUpdaterContext(schemaContext, schemaUpdater);
+        final var processorKey = LeiaProcessorKey.builder()
+                .schemaKey(updateRequest.getSchemaKey())
+                .schemaEvent(SchemaEvent.UPDATE_SCHEMA)
+                .build();
+        schemaContext.addContext(LeiaProcessorKey.class.getSimpleName(), processorKey);
         final var processor = processorHub.getProcessor(SchemaEvent.UPDATE_SCHEMA)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.PROCESSOR_NOT_FOUND));
-        processor.process(schemaContext);
+        processor.fire(schemaContext);
         return schemaContext.getContext(SchemaDetails.class).orElse(null);
     }
 
@@ -78,9 +89,15 @@ public class SchemaIngestor<U extends SchemaUpdater> {
         final var schemaContext = new SchemaContext();
         schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
         ContextUtils.addSchemaUpdaterContext(schemaContext, schemaUpdater);
+        final var processorKey = LeiaProcessorKey.builder()
+                .schemaKey(schemaKey)
+                .schemaEvent(SchemaEvent.APPROVE_SCHEMA)
+                .build();
+        schemaContext.addContext(LeiaProcessorKey.class.getSimpleName(), processorKey);
+
         final var processor = processorHub.getProcessor(SchemaEvent.APPROVE_SCHEMA)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.PROCESSOR_NOT_FOUND));
-        processor.process(schemaContext);
+        processor.fire(schemaContext);
         return schemaContext.getContext(SchemaDetails.class).orElse(null);
     }
 
@@ -89,9 +106,15 @@ public class SchemaIngestor<U extends SchemaUpdater> {
         final var schemaContext = new SchemaContext();
         schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
         ContextUtils.addSchemaUpdaterContext(schemaContext, schemaUpdater);
+        final var processorKey = LeiaProcessorKey.builder()
+                .schemaKey(schemaKey)
+                .schemaEvent(SchemaEvent.REJECT_SCHEMA)
+                .build();
+        schemaContext.addContext(LeiaProcessorKey.class.getSimpleName(), processorKey);
+
         final var processor = processorHub.getProcessor(SchemaEvent.REJECT_SCHEMA)
                 .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.PROCESSOR_NOT_FOUND));
-        processor.process(schemaContext);
+        processor.fire(schemaContext);
         return schemaContext.getContext(SchemaDetails.class).orElse(null);
     }
 }

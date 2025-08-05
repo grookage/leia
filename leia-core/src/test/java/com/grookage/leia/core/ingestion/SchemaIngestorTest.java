@@ -72,7 +72,7 @@ class SchemaIngestorTest {
         );
         Assertions.assertNotNull(createSchemaRequest);
         schemaIngestor.add(schemaUpdater, createSchemaRequest);
-        Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
+        Mockito.verify(schemaProcessor, Mockito.times(1)).fire(Mockito.any());
     }
 
     @Test
@@ -87,7 +87,7 @@ class SchemaIngestorTest {
         );
         Assertions.assertNotNull(updateSchemaRequest);
         schemaIngestor.update(schemaUpdater, updateSchemaRequest);
-        Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
+        Mockito.verify(schemaProcessor, Mockito.times(1)).fire(Mockito.any());
     }
 
     @Test
@@ -102,7 +102,7 @@ class SchemaIngestorTest {
         );
         Assertions.assertNotNull(schemaKey);
         schemaIngestor.approve(schemaUpdater, schemaKey);
-        Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
+        Mockito.verify(schemaProcessor, Mockito.times(1)).fire(Mockito.any());
     }
 
     @Test
@@ -117,6 +117,6 @@ class SchemaIngestorTest {
         );
         Assertions.assertNotNull(schemaKey);
         schemaIngestor.reject(schemaUpdater, schemaKey);
-        Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
+        Mockito.verify(schemaProcessor, Mockito.times(1)).fire(Mockito.any());
     }
 }
