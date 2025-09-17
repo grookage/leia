@@ -26,7 +26,7 @@ public class RepositoryRefresher extends AbstractKorgRefresher<SchemaRegistry> {
     protected RepositoryRefresher(final RepositorySupplier supplier,
                                   final int refreshTimeInSeconds,
                                   final boolean periodicRefresh) {
-        super(supplier, refreshTimeInSeconds, periodicRefresh);
+        super(supplier, refreshTimeInSeconds, periodicRefresh, null);
     }
 
 }

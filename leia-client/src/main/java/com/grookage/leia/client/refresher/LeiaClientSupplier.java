@@ -19,6 +19,7 @@ package com.grookage.leia.client.refresher;
 import com.google.common.base.Strings;
 import com.google.common.net.HttpHeaders;
 import com.grookage.korg.config.KorgHttpConfiguration;
+import com.grookage.korg.endpoint.KorgEndPointProvider;
 import com.grookage.korg.suppliers.KorgHttpSupplier;
 import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.models.request.SearchRequest;
@@ -44,9 +45,10 @@ public class LeiaClientSupplier extends KorgHttpSupplier<List<SchemaDetails>> {
 
     @Builder
     public LeiaClientSupplier(KorgHttpConfiguration httpConfiguration,
+                              KorgEndPointProvider endPointProvider,
                               Supplier<LeiaClientRequest> clientRequestSupplier,
                               Supplier<String> authHeaderSupplier) {
-        super(httpConfiguration, LeiaClientMarshaller.getInstance(), "getClientNamespaces");
+        super(httpConfiguration, LeiaClientMarshaller.getInstance(), endPointProvider, "getClientNamespaces");
         this.clientRequestSupplier = clientRequestSupplier;
         this.authHeaderSupplier = authHeaderSupplier;
     }

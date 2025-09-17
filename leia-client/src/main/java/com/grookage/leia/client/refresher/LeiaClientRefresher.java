@@ -28,7 +28,7 @@ public class LeiaClientRefresher extends HttpKorgRefresher<List<SchemaDetails>> 
     public LeiaClientRefresher(LeiaClientSupplier supplier,
                                int refreshTimeInSeconds,
                                boolean periodicRefresh) {
-        super(supplier, refreshTimeInSeconds, periodicRefresh);
+        super(supplier, refreshTimeInSeconds, periodicRefresh, null);
     }
 
 }
