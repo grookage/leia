@@ -1,6 +1,11 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.0.2]
+- Added support for Korg Endpoint provider to be passed from the client
+- Added optional configuration to disable creating aerospike indexes on startup
+
+
 ## [1.0.1]
 - Added support for request data resolver in `HttpMessageExecutor`
 

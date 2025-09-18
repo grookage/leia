@@ -18,6 +18,7 @@ package com.grookage.leia.dw.client;
 
 import com.google.common.base.Preconditions;
 import com.grookage.korg.config.KorgHttpConfiguration;
+import com.grookage.korg.endpoint.KorgEndPointProvider;
 import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
@@ -57,6 +58,8 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 
     protected abstract KorgHttpConfiguration getHttpConfiguration(T configuration);
 
+    protected abstract KorgEndPointProvider getEndpointProvider(T configuration);
+
     protected abstract Set<String> getPackageRoots(T configuration);
 
     protected Supplier<String> getAuthHeaderSupplier(T configuration) {
@@ -92,6 +95,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                 .supplier(
                         LeiaClientSupplier.builder()
                                 .httpConfiguration(httpConfiguration)
+                                .endPointProvider(getEndpointProvider(configuration))
                                 .clientRequestSupplier(clientRequestSupplier)
                                 .authHeaderSupplier(getAuthHeaderSupplier(configuration))
                                 .build()

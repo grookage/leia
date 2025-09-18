@@ -22,6 +22,7 @@ public class AerospikeConfig {
     private String username;
     private String password;
     private boolean tlsEnabled = false;
+    private boolean indexCreationDisabled = false;
 
     @Builder.Default
     private int maxConnectionsPerNode = 10;

@@ -63,7 +63,9 @@ public class AerospikeClientUtils {
                 .map(
                         connection -> new Host(connection.getHost(), connection.getTls(), connection.getPort()))
                 .toArray(Host[]::new));
-        createIndex(config.getNamespace(), aerospikeClient);
+        if (!config.isIndexCreationDisabled()) {
+            createIndex(config.getNamespace(), aerospikeClient);
+        }
         log.info("Started the Aerospike Client after creating indexes");
         return aerospikeClient;
     }
