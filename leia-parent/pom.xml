@@ -56,7 +56,7 @@
         <awaitility.version>4.1.1</awaitility.version>
         <appform.json-rules.version>1.0.17</appform.json-rules.version>
 
-        <korg.version>1.0.5</korg.version>
+        <korg.version>1.0.3</korg.version>
     </properties>
 
     <dependencyManagement>
