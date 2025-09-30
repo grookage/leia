@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.NotEmpty;
@@ -40,6 +41,7 @@ public class HttpBackendConfig {
     String uri;
     String requestEnv;
     @NotEmpty
+    @ToString.Exclude
     String hasher;
     @Builder.Default
     BackendType backendType = BackendType.SYNC;
