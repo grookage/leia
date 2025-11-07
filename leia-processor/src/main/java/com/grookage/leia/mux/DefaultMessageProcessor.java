@@ -92,7 +92,15 @@ public class DefaultMessageProcessor implements MessageProcessor {
         final var futures = CompletableFuture.allOf(
                 executorMapping.entrySet().stream()
                         .map(each -> CompletableFuture.runAsync(
-                                () -> each.getKey().send(each.getValue())))
+                                () -> {
+                                    try {
+                                        each.getKey().send(each.getValue());
+                                    } catch (Exception e) {
+                                        log.error("Failed to send messages via executor, handling exception", e);
+                                        each.getKey().handleException(each.getValue(), e);
+                                        throw e;
+                                    }
+                                }))
                         .toArray(CompletableFuture[]::new));
         try {
             futures.get(getProcessingThresholdMs(), TimeUnit.MILLISECONDS);
@@ -124,5 +132,3 @@ public class DefaultMessageProcessor implements MessageProcessor {
         return (thatKey.getName().equalsIgnoreCase(this.getName()));
     }
 }
-
-

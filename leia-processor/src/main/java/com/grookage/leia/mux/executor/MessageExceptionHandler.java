@@ -20,9 +20,18 @@ import com.grookage.leia.models.mux.LeiaMessage;
 
 import java.util.List;
 
-public interface MessageExecutor {
+/**
+ * Interface for handling exceptions that occur during message sending.
+ */
+public interface MessageExceptionHandler {
 
-    void send(List<LeiaMessage> messages);
-
-    void handleException(List<LeiaMessage> messages, Exception exception);
+    /**
+     * Handle exceptions for failed messages
+     *
+     * @param messages    Failed List of messages
+     * @param exception   exception
+     * @param backendName backend tag
+     * @param executor    the executor instance
+     */
+    void handleException(List<LeiaMessage> messages, Exception exception, String backendName, MessageExecutor executor);
 }

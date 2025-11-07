@@ -18,7 +18,11 @@ package com.grookage.leia.http.processor;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.rholder.retry.*;
+import com.github.rholder.retry.BlockStrategies;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.http.processor.config.BackendType;
 import com.grookage.leia.http.processor.config.HttpBackendConfig;
@@ -29,6 +33,7 @@ import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.mux.executor.MessageExceptionHandler;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.leansoft.bigqueue.BigQueueImpl;
 import com.leansoft.bigqueue.IBigQueue;
@@ -67,14 +72,23 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
     private final ObjectMapper mapper;
     private final Retryer<String> retryer;
     private QueuedSender queuedSender;
+    private final MessageExceptionHandler exceptionHandler;
 
     protected HttpMessageExecutor(HttpBackendConfig backendConfig,
                                   Supplier<String> authSupplier,
                                   ObjectMapper mapper) {
+        this(backendConfig, authSupplier, mapper, null);
+    }
+
+    protected HttpMessageExecutor(HttpBackendConfig backendConfig,
+                                  Supplier<String> authSupplier,
+                                  ObjectMapper mapper,
+                                  MessageExceptionHandler exceptionHandler) {
         this.name = backendConfig.getBackendName();
         this.backendConfig = backendConfig;
         this.authSupplier = authSupplier;
         this.mapper = mapper;
+        this.exceptionHandler = exceptionHandler;
         this.retryer = RetryerBuilder.<String>newBuilder()
                 .retryIfExceptionOfType(HttpResponseException.class)
                 .withWaitStrategy(
@@ -86,7 +100,7 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
             this.queuedSender = new QueuedSender(backendConfig, mapper, messages -> {
                 executeRequest(messages);
                 return messages;
-            });
+            }, exceptionHandler);
         }
     }
 
@@ -94,12 +108,25 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
 
     public abstract Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig);
 
+    @Override
+    public void handleException(List<LeiaMessage> messages, Exception exception) {
+        if (exceptionHandler != null) {
+            try {
+                exceptionHandler.handleException(messages, exception, backendConfig.getBackendName(), this);
+            } catch (Exception e) {
+                log.error("Exception handler failed for backend {} with exception", backendConfig.getBackendName(), e);
+            }
+        } else {
+            log.warn("No exception handler configured for backend {}", backendConfig.getBackendName());
+        }
+    }
+
     @SneakyThrows
-    public void executeRequest(List<LeiaMessage> messages) {
+    private void executeRequest(List<LeiaMessage> messages) {
         try {
             retryer.call(() -> {
                 final var leiaHttpEntity = HttpRequestUtils.toHttpEntity(messages, backendConfig);
-                final var requestData =  getRequestData(leiaHttpEntity);
+                final var requestData = getRequestData(leiaHttpEntity);
                 final var endPoint = getEndPoint(backendConfig).orElse(null);
                 if (null == endPoint) {
                     log.debug("No valid end point found for backendConfig {}", backendConfig);
@@ -136,6 +163,7 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
             });
         } catch (Exception e) {
             log.error("Sending to the backend {} has failed with exception {}", backendConfig, e.getMessage());
+            handleException(messages, e);
             throw LeiaException.error(LeiaHttpErrorCode.EVENT_SEND_FAILED, e);
         }
     }
@@ -159,17 +187,20 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
     public static class QueuedSender {
         private final IBigQueue messageQueue;
         private final ObjectMapper mapper;
+        private final MessageExceptionHandler exceptionHandler;
 
         @SneakyThrows
         public QueuedSender(final HttpBackendConfig backendConfig,
                             final ObjectMapper mapper,
-                            final UnaryOperator<List<LeiaMessage>> messageOperator) {
+                            final UnaryOperator<List<LeiaMessage>> messageOperator,
+                            final MessageExceptionHandler exceptionHandler) {
             final var perms = PosixFilePermissions.fromString("rwxrwxrwx");
             final var attr = PosixFilePermissions.asFileAttribute(perms);
             Files.createDirectories(Paths.get(backendConfig.getQueuePath()), attr);
             this.mapper = mapper;
+            this.exceptionHandler = exceptionHandler;
             this.messageQueue = new BigQueueImpl(backendConfig.getQueuePath(), backendConfig.getBackendName());
-            final var flushRunner = new FlushRunner(mapper, messageQueue, backendConfig, messageOperator);
+            final var flushRunner = new FlushRunner(mapper, messageQueue, backendConfig, messageOperator, exceptionHandler);
             final var scheduler = Executors.newScheduledThreadPool(2);
             scheduler.scheduleWithFixedDelay(flushRunner, 0, 1, TimeUnit.SECONDS);
             scheduler.scheduleWithFixedDelay(new GcRunner(messageQueue), 0, 15, TimeUnit.SECONDS);
@@ -187,15 +218,18 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
         private final ObjectMapper mapper;
         private final HttpBackendConfig backendConfig;
         private final UnaryOperator<List<LeiaMessage>> messageOperator;
+        private final MessageExceptionHandler exceptionHandler;
 
         public FlushRunner(ObjectMapper mapper,
                            IBigQueue queue,
                            HttpBackendConfig backendConfig,
-                           UnaryOperator<List<LeiaMessage>> messageOperator) {
+                           UnaryOperator<List<LeiaMessage>> messageOperator,
+                           MessageExceptionHandler exceptionHandler) {
             this.queue = queue;
             this.mapper = mapper;
             this.backendConfig = backendConfig;
             this.messageOperator = messageOperator;
+            this.exceptionHandler = exceptionHandler;
         }
 
         @Override
@@ -209,7 +243,15 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
                 }
 
                 if (!messages.isEmpty()) {
-                    messageOperator.apply(messages);
+                    try {
+                        messageOperator.apply(messages);
+                    } catch (Exception e) {
+                        log.error("Failed to send messages for backend config {} with retries:{} with exception; Requeueing the messages again", backendConfig, backendConfig.getRetryCount(), e);
+                        if (exceptionHandler != null) {
+                            exceptionHandler.handleException(messages, e, backendConfig.getBackendName(), null);
+                        }
+                        queue.enqueue(mapper.writeValueAsBytes(messages));
+                    }
                 }
             } catch (Exception e) {
                 log.error("Queue flush failed for backend config {} with exception", backendConfig, e);
