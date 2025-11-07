@@ -28,7 +28,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -98,7 +102,6 @@ public class DefaultMessageProcessor implements MessageProcessor {
                                     } catch (Exception e) {
                                         log.error("Failed to send messages via executor, handling exception", e);
                                         each.getKey().handleException(each.getValue(), e);
-                                        throw e;
                                     }
                                 }))
                         .toArray(CompletableFuture[]::new));
