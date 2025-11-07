@@ -39,4 +39,6 @@ public class TransformationTarget {
     Expression criteria;
     @NotEmpty List<AttributeTransformer> transformers = List.of();
     private List<String> tags = List.of();
+    @Builder.Default
+    private boolean validateSchema = true;
 }
