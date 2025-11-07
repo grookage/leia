@@ -100,7 +100,7 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
             this.queuedSender = new QueuedSender(backendConfig, mapper, messages -> {
                 executeRequest(messages);
                 return messages;
-            }, exceptionHandler);
+            }, exceptionHandler, this);
         }
     }
 
@@ -187,20 +187,20 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
     public static class QueuedSender {
         private final IBigQueue messageQueue;
         private final ObjectMapper mapper;
-        private final MessageExceptionHandler exceptionHandler;
 
         @SneakyThrows
         public QueuedSender(final HttpBackendConfig backendConfig,
                             final ObjectMapper mapper,
                             final UnaryOperator<List<LeiaMessage>> messageOperator,
-                            final MessageExceptionHandler exceptionHandler) {
+                            final MessageExceptionHandler exceptionHandler,
+                            final MessageExecutor messageExecutor) {
             final var perms = PosixFilePermissions.fromString("rwxrwxrwx");
             final var attr = PosixFilePermissions.asFileAttribute(perms);
             Files.createDirectories(Paths.get(backendConfig.getQueuePath()), attr);
             this.mapper = mapper;
-            this.exceptionHandler = exceptionHandler;
             this.messageQueue = new BigQueueImpl(backendConfig.getQueuePath(), backendConfig.getBackendName());
-            final var flushRunner = new FlushRunner(mapper, messageQueue, backendConfig, messageOperator, exceptionHandler);
+            final var flushRunner = new FlushRunner(mapper, messageQueue, backendConfig, messageOperator,
+                    exceptionHandler, messageExecutor);
             final var scheduler = Executors.newScheduledThreadPool(2);
             scheduler.scheduleWithFixedDelay(flushRunner, 0, 1, TimeUnit.SECONDS);
             scheduler.scheduleWithFixedDelay(new GcRunner(messageQueue), 0, 15, TimeUnit.SECONDS);
@@ -219,17 +219,20 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
         private final HttpBackendConfig backendConfig;
         private final UnaryOperator<List<LeiaMessage>> messageOperator;
         private final MessageExceptionHandler exceptionHandler;
+        private final MessageExecutor messageExecutor;
 
         public FlushRunner(ObjectMapper mapper,
                            IBigQueue queue,
                            HttpBackendConfig backendConfig,
                            UnaryOperator<List<LeiaMessage>> messageOperator,
-                           MessageExceptionHandler exceptionHandler) {
+                           MessageExceptionHandler exceptionHandler,
+                           MessageExecutor messageExecutor) {
             this.queue = queue;
             this.mapper = mapper;
             this.backendConfig = backendConfig;
             this.messageOperator = messageOperator;
             this.exceptionHandler = exceptionHandler;
+            this.messageExecutor = messageExecutor;
         }
 
         @Override
@@ -248,9 +251,8 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
                     } catch (Exception e) {
                         log.error("Failed to send messages for backend config {} with retries:{} with exception; Requeueing the messages again", backendConfig, backendConfig.getRetryCount(), e);
                         if (exceptionHandler != null) {
-                            exceptionHandler.handleException(messages, e, backendConfig.getBackendName(), null);
+                            exceptionHandler.handleException(messages, e, backendConfig.getBackendName(), messageExecutor);
                         }
-                        queue.enqueue(mapper.writeValueAsBytes(messages));
                     }
                 }
             } catch (Exception e) {
