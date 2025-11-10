@@ -17,6 +17,7 @@
 package com.grookage.leia.client;
 
 import com.grookage.leia.common.validation.LeiaMessageValidator;
+import com.grookage.leia.common.validation.NoOpLeiaMessageValidator;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -60,10 +61,11 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
             .mappingProvider(new JacksonMappingProvider())
             .build();
     private static final TargetValidator DEFAULT_VALIDATOR = new DefaultTargetValidator();
+    private static final LeiaMessageValidator DEFAULT_MESSAGE_VALIDATOR = new NoOpLeiaMessageValidator();
     private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
     private final Supplier<MessageProcessor> processorSupplier;
     private final Supplier<TargetValidator> targetValidator;
-    private final LeiaMessageValidator messageValidator;
+    private final LeiaMessageValidator leiaMessageValidator;
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -87,6 +89,8 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         final var sourceContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
         final var responseObject = MessageTransformerUtils.transformMessage(sourceContext, transformationTarget,
                 getJsonPaths(transformationTarget.getSchemaKey()), getMapper());
+        final var messageValidator = Objects.nonNull(this.leiaMessageValidator) ? this.leiaMessageValidator :
+                DEFAULT_MESSAGE_VALIDATOR;
         final var validationErrors = messageValidator.validate(targetSchema, responseObject);
         if (!validationErrors.isEmpty()) {
             log.error("Transformed message validation failed for target schemaKey {} with errors {}",
@@ -158,7 +162,9 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         processor.processMessages(messages);
     }
 
-    public void processMessages(List<LeiaMessage> messages, MessageProcessor messageProcessor, BackendFilter backendFilter) {
+    public void processMessages(List<LeiaMessage> messages,
+                                MessageProcessor messageProcessor,
+                                BackendFilter backendFilter) {
         final var processor = null != messageProcessor ? messageProcessor : processorSupplier.get();
         if (null == processor) {
             log.error("No message processor hub supplied to process messages, call getMessages instead");

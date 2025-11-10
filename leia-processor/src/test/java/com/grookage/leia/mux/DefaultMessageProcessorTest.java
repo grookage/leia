@@ -22,6 +22,7 @@ import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
+import com.grookage.leia.mux.filter.BackendFilter;
 import com.grookage.leia.mux.resolver.TagBasedNameResolver;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
@@ -74,5 +75,23 @@ class DefaultMessageProcessorTest {
         };
         messageProcessor1.processMessages(leiaMessages);
         Mockito.verify(httpExecutor, Mockito.times(1)).send(leiaMessages);
+
+        leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1::backend2::backend3",
+                "importance-mild::extreme")));
+        final var messageProcessor2 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+            @Override
+            protected boolean validBackends(Set<String> backends) {
+                return true;
+            }
+        };
+        messageProcessor2.processMessages(leiaMessages, new BackendFilter() {
+            public static final Set<String> WHITELISTED_BACKENDS = Set.of("BACKEND1");
+
+            @Override
+            public boolean shouldProcess(String backendName) {
+                return WHITELISTED_BACKENDS.contains(backendName);
+            }
+        });
+        Mockito.verify(httpExecutor, Mockito.times(2)).send(leiaMessages);
     }
 }

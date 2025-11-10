@@ -124,7 +124,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                     .mapper(environment.getObjectMapper())
                     .processorSupplier(getMessageProcessor(configuration))
                     .targetValidator(getTargetRetriever(configuration))
-                    .messageValidator(new NoOpLeiaMessageValidator())
+                    .leiaMessageValidator(new NoOpLeiaMessageValidator())
                     .build();
             environment.lifecycle().manage(new Managed() {
                 @Override
