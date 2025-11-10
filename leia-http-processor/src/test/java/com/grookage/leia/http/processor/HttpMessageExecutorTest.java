@@ -27,8 +27,6 @@ import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.mux.LeiaMessage;
-import com.grookage.leia.mux.executor.MessageExceptionHandler;
-import com.grookage.leia.mux.executor.MessageExecutor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -69,6 +67,16 @@ class HttpMessageExecutorTest {
                         .withStatus(200)));
         final var testableExecutor = new HttpMessageExecutor<>(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
             @Override
+            public String backendName() {
+                return backend.getBackendName();
+            }
+
+            @Override
+            public void handleException(List<LeiaMessage> messages, Exception exception) {
+                log.error("Error sending messages to backend {}: {}", this.getBackendConfig().getBackendName(), exception.getMessage());
+            }
+
+            @Override
             public Object getRequestData(LeiaHttpEntity leiaHttpEntity) {
                 return leiaHttpEntity;
             }
@@ -99,16 +107,40 @@ class HttpMessageExecutorTest {
         backend.setUri("/ingest");
         backend.setRetryCount(1);
 
+        final var backendName = backend.getBackendName();
+
         final var messages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
         });
-
-        final var exceptionHandler = new RetryableMessageExceptionHandler();
 
         final var testableExecutor = new HttpMessageExecutor<>(
                 backend,
                 () -> "Bearer 1234",
-                ResourceHelper.getObjectMapper(),
-                exceptionHandler) {
+                ResourceHelper.getObjectMapper()) {
+            @Override
+            public String backendName() {
+                return backendName;
+            }
+
+            @Override
+            public void handleException(List<LeiaMessage> messages, Exception exception) {
+                final var backendName = backendName();
+                log.error("Message send failed for backend: {}. Attempting custom retry logic...", backendName);
+                log.error("Exception details: Type={}, Message={}", exception.getClass().getName(), exception.getMessage());
+
+                // Categorize errors and handle differently
+                if (isRetryableError(exception)) {
+                    log.warn("Retryable error detected for backend {}. Will attempt retry using executor", backendName);
+                } else if (isClientError(exception)) {
+                    log.error("Client error detected for backend {}. Messages need manual intervention", backendName);
+                    sendToDeadLetterQueue(messages, backendName);
+                } else {
+                    log.error("Unknown error for backend {}. Sending to DLQ", backendName);
+                    sendToDeadLetterQueue(messages, backendName);
+                }
+
+                logFailedMessages(messages);
+            }
+
             @Override
             public Object getRequestData(LeiaHttpEntity leiaHttpEntity) {
                 return leiaHttpEntity;
@@ -132,54 +164,28 @@ class HttpMessageExecutorTest {
         testableExecutor.send(messages);
     }
 
-    /**
-     * Sample implementation with retry logic using MessageExecutor
-     */
-    static class RetryableMessageExceptionHandler implements MessageExceptionHandler {
+    private boolean isRetryableError(Exception exception) {
+        return exception.getMessage().contains("500") ||
+                exception.getMessage().contains("503") ||
+                exception.getMessage().contains("429");
+    }
 
+    private boolean isClientError(Exception exception) {
+        return exception.getMessage().contains("400") ||
+                exception.getMessage().contains("401") ||
+                exception.getMessage().contains("403");
+    }
 
-        @Override
-        public void handleException(List<LeiaMessage> messages, Exception exception, String backendName, MessageExecutor executor) {
-            log.error("Message send failed for backend: {}. Attempting custom retry logic...", backendName);
-            log.error("Exception details: Type={}, Message={}", exception.getClass().getName(), exception.getMessage());
+    private void sendToDeadLetterQueue(List<LeiaMessage> messages, String backendName) {
+        log.warn("Sending {} messages to DLQ for backend {}", messages.size(), backendName);
+        // Implementation: Send to DLQ, persist to database, or alert
+    }
 
-            // Categorize errors and handle differently
-            if (isRetryableError(exception)) {
-                log.warn("Retryable error detected for backend {}. Will attempt retry using executor", backendName);
-            } else if (isClientError(exception)) {
-                log.error("Client error detected for backend {}. Messages need manual intervention", backendName);
-                sendToDeadLetterQueue(messages, backendName);
-            } else {
-                log.error("Unknown error for backend {}. Sending to DLQ", backendName);
-                sendToDeadLetterQueue(messages, backendName);
-            }
-
-            logFailedMessages(messages);
-        }
-
-        private boolean isRetryableError(Exception exception) {
-            return exception.getMessage().contains("500") ||
-                    exception.getMessage().contains("503") ||
-                    exception.getMessage().contains("429");
-        }
-
-        private boolean isClientError(Exception exception) {
-            return exception.getMessage().contains("400") ||
-                    exception.getMessage().contains("401") ||
-                    exception.getMessage().contains("403");
-        }
-
-        private void sendToDeadLetterQueue(List<LeiaMessage> messages, String backendName) {
-            log.warn("Sending {} messages to DLQ for backend {}", messages.size(), backendName);
-            // Implementation: Send to DLQ, persist to database, or alert
-        }
-
-        private void logFailedMessages(List<LeiaMessage> messages) {
-            messages.forEach(msg ->
-                    log.debug("Failed message - Schema: {}, Tags: {}",
-                            msg.getSchemaKey(), msg.getTags())
-            );
-        }
+    private void logFailedMessages(List<LeiaMessage> messages) {
+        messages.forEach(msg ->
+                log.debug("Failed message - Schema: {}, Tags: {}",
+                        msg.getSchemaKey(), msg.getTags())
+        );
     }
 
 }

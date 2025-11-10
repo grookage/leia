@@ -16,6 +16,7 @@
 
 package com.grookage.leia.client;
 
+import com.grookage.leia.common.validation.LeiaMessageValidator;
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
@@ -23,6 +24,7 @@ import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import com.grookage.leia.models.utils.SchemaUtils;
 import com.grookage.leia.mux.MessageProcessor;
+import com.grookage.leia.mux.filter.BackendFilter;
 import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
 import com.grookage.leia.mux.targetvalidator.TargetValidator;
 import com.jayway.jsonpath.Configuration;
@@ -36,7 +38,12 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,6 +63,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
     private final Map<SchemaKey, Map<String, JsonPath>> compiledPaths = new HashMap<>();
     private final Supplier<MessageProcessor> processorSupplier;
     private final Supplier<TargetValidator> targetValidator;
+    private final LeiaMessageValidator messageValidator;
 
     /*
         Multiplexes from source and generates the list of messages as applicable
@@ -76,22 +84,16 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
             log.error("No schema found for target schemaKey {}", transformationTarget.getSchemaKey());
             throw new UnsupportedOperationException("No valid schema found for target schemaKey " + transformationTarget.getSchemaKey().getReferenceId());
         }
-
         final var sourceContext = JsonPath.using(configuration).parse(messageRequest.getMessage());
         final var responseObject = MessageTransformerUtils.transformMessage(sourceContext, transformationTarget,
                 getJsonPaths(transformationTarget.getSchemaKey()), getMapper());
-
-        if (transformationTarget.isValidateSchema()) {
-            final var registeredKlass = getSchemaValidator()
-                    .getKlass(transformationTarget.getSchemaKey()).orElse(null);
-            if (null == registeredKlass) {
-                return Optional.empty();
-            }
-            getMapper().convertValue(responseObject, registeredKlass); //Do this to do the schema validation of if the conversion is right or not.
-        } else {
-            log.debug("Schema validation skipped for target schemaKey {} as per configuration", transformationTarget.getSchemaKey());
+        final var validationErrors = messageValidator.validate(targetSchema, responseObject);
+        if (!validationErrors.isEmpty()) {
+            log.error("Transformed message validation failed for target schemaKey {} with errors {}",
+                    transformationTarget.getSchemaKey(), validationErrors);
+            throw new IllegalStateException("Transformed message validation failed for target schemaKey "
+                    + transformationTarget.getSchemaKey().getReferenceId() + " with errors " + validationErrors);
         }
-
         val tags = Stream.of(targetSchema.getTags(), transformationTarget.getTags())
                 .flatMap(Collection::stream).collect(Collectors.toSet());
         return Optional.of(
@@ -146,14 +148,23 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 
     public void processMessages(MessageRequest messageRequest,
                                 MessageProcessor messageProcessor,
-                                TargetValidator retriever) {
+                                TargetValidator targetValidator) {
         final var processor = null != messageProcessor ? messageProcessor : processorSupplier.get();
         if (null == processor) {
             log.error("No message processor hub supplied to process messages, call getMessages instead");
             throw new UnsupportedOperationException("No message processor hub found");
         }
-        final var messages = getMessages(messageRequest, retriever).values().stream().toList();
+        final var messages = getMessages(messageRequest, targetValidator).values().stream().toList();
         processor.processMessages(messages);
+    }
+
+    public void processMessages(List<LeiaMessage> messages, MessageProcessor messageProcessor, BackendFilter backendFilter) {
+        final var processor = null != messageProcessor ? messageProcessor : processorSupplier.get();
+        if (null == processor) {
+            log.error("No message processor hub supplied to process messages, call getMessages instead");
+            throw new UnsupportedOperationException("No message processor hub found");
+        }
+        processor.processMessages(messages, backendFilter);
     }
 
     @Override

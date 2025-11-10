@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.mux.executor;
+package com.grookage.leia.mux.filter;
 
 import com.grookage.leia.models.mux.LeiaMessage;
 
 import java.util.List;
 
 /**
- * Interface for handling exceptions that occur during message sending.
+ * Default implementation that allows all backends to process messages.
  */
-public interface MessageExceptionHandler {
+public class NoOpBackendFilter implements BackendFilter {
 
-    /**
-     * Handle exceptions for failed messages
-     *
-     * @param messages    Failed List of messages
-     * @param exception   exception
-     * @param backendName backend tag
-     * @param executor    the executor instance
-     */
-    void handleException(List<LeiaMessage> messages, Exception exception, String backendName, MessageExecutor executor);
+    @Override
+    public boolean shouldProcess(String backendName) {
+        return true;
+    }
 }

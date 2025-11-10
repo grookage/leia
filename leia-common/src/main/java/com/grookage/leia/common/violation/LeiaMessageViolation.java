@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.mux;
+package com.grookage.leia.common.violation;
 
-import com.grookage.leia.models.mux.LeiaMessage;
-import com.grookage.leia.mux.filter.BackendFilter;
+import com.grookage.leia.models.schema.SchemaKey;
 
-import java.util.List;
+/**
+ * Violation for message validation against a schema
+ */
+public interface LeiaMessageViolation extends LeiaViolation {
 
-public interface MessageProcessor {
-
-    String getName();
-
-    void processMessages(List<LeiaMessage> messages);
-
-    void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter);
+    /**
+     * @return SchemaKey against which the message was validated
+     */
+    SchemaKey schemaKey();
 }
+

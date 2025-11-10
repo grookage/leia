@@ -21,6 +21,7 @@ import com.grookage.leia.models.mux.LeiaMessage;
 import java.util.List;
 
 public interface MessageExecutor {
+    String backendName();
 
     void send(List<LeiaMessage> messages);
 

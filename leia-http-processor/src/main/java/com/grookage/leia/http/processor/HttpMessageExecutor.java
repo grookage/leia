@@ -18,7 +18,11 @@ package com.grookage.leia.http.processor;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.rholder.retry.*;
+import com.github.rholder.retry.BlockStrategies;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.http.processor.config.BackendType;
 import com.grookage.leia.http.processor.config.HttpBackendConfig;
@@ -29,7 +33,6 @@ import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;
-import com.grookage.leia.mux.executor.MessageExceptionHandler;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.leansoft.bigqueue.BigQueueImpl;
 import com.leansoft.bigqueue.IBigQueue;
@@ -68,23 +71,14 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
     private final ObjectMapper mapper;
     private final Retryer<String> retryer;
     private QueuedSender queuedSender;
-    private final MessageExceptionHandler exceptionHandler;
 
     protected HttpMessageExecutor(HttpBackendConfig backendConfig,
                                   Supplier<String> authSupplier,
                                   ObjectMapper mapper) {
-        this(backendConfig, authSupplier, mapper, null);
-    }
-
-    protected HttpMessageExecutor(HttpBackendConfig backendConfig,
-                                  Supplier<String> authSupplier,
-                                  ObjectMapper mapper,
-                                  MessageExceptionHandler exceptionHandler) {
         this.name = backendConfig.getBackendName();
         this.backendConfig = backendConfig;
         this.authSupplier = authSupplier;
         this.mapper = mapper;
-        this.exceptionHandler = exceptionHandler;
         this.retryer = RetryerBuilder.<String>newBuilder()
                 .retryIfExceptionOfType(HttpResponseException.class)
                 .withWaitStrategy(
@@ -103,19 +97,6 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
     public abstract T getRequestData(LeiaHttpEntity leiaHttpEntity);
 
     public abstract Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig);
-
-    @Override
-    public void handleException(List<LeiaMessage> messages, Exception exception) {
-        if (exceptionHandler != null) {
-            try {
-                exceptionHandler.handleException(messages, exception, backendConfig.getBackendName(), this);
-            } catch (Exception e) {
-                log.error("Exception handler failed for backend {} with exception", backendConfig.getBackendName(), e);
-            }
-        } else {
-            log.warn("No exception handler configured for backend {}", backendConfig.getBackendName());
-        }
-    }
 
     @SneakyThrows
     private void executeRequest(List<LeiaMessage> messages) {
@@ -160,6 +141,7 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
         } catch (Exception e) {
             log.error("Sending to the backend {} has failed with exception {}", backendConfig, e.getMessage());
             handleException(messages, e.getCause() != null ? (Exception) e.getCause() : e);
+            throw e;
         }
     }
 

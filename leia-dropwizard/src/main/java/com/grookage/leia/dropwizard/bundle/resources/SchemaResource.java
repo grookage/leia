@@ -18,7 +18,8 @@ package com.grookage.leia.dropwizard.bundle.resources;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Timed;
-import com.grookage.leia.common.validation.SchemaPayloadValidator;
+import com.grookage.leia.common.validation.LeiaMessageValidator;
+import com.grookage.leia.common.violation.LeiaMessageViolation;
 import com.grookage.leia.core.exception.LeiaSchemaErrorCode;
 import com.grookage.leia.core.retrieval.SchemaRetriever;
 import com.grookage.leia.models.GenericResponse;
@@ -36,7 +37,11 @@ import lombok.extern.slf4j.Slf4j;
 import javax.annotation.security.PermitAll;
 import javax.inject.Singleton;
 import javax.validation.Valid;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -52,6 +57,7 @@ import java.util.List;
 public class SchemaResource {
 
     private final SchemaRetriever schemaRetriever;
+    private final LeiaMessageValidator messageValidator;
 
     private LeiaRequestContext toRequestContext(final boolean ignoreCache) {
         return LeiaRequestContext.builder()
@@ -84,19 +90,17 @@ public class SchemaResource {
     @Timed
     @ExceptionMetered
     @Path("/details/validate")
-    public GenericResponse<List<String>> validateSchema(@QueryParam("ignoreCache") boolean ignoreCache,
-                                                        @Valid final ValidateSchemaRequest validateSchemaRequest) {
+    public GenericResponse<List<LeiaMessageViolation>> validateSchema(@QueryParam("ignoreCache") boolean ignoreCache,
+                                                                      @Valid final ValidateSchemaRequest validateSchemaRequest) {
         final var schemaDetails = schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), validateSchemaRequest.getSchemaKey())
                 .orElseThrow(() -> LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND));
-        final var validationErrors = SchemaPayloadValidator.validate(validateSchemaRequest.getJsonNode(),
-                schemaDetails.getValidationType(),
-                schemaDetails.getAttributes());
+        final var validationErrors = messageValidator.validate(schemaDetails, validateSchemaRequest.getJsonNode());
         if (validationErrors.isEmpty()) {
-            return GenericResponse.<List<String>>builder()
+            return GenericResponse.<List<LeiaMessageViolation>>builder()
                     .success(true)
                     .build();
         }
-        return GenericResponse.<List<String>>builder()
+        return GenericResponse.<List<LeiaMessageViolation>>builder()
                 .data(validationErrors)
                 .build();
     }

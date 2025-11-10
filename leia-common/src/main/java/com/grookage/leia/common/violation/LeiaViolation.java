@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.mux;
+package com.grookage.leia.common.violation;
 
-import com.grookage.leia.models.mux.LeiaMessage;
-import com.grookage.leia.mux.filter.BackendFilter;
+/**
+ * Base interface for all Leia validation violations
+ */
+public interface LeiaViolation {
 
-import java.util.List;
+    /**
+     * @return Error message for the violation
+     */
+    String message();
 
-public interface MessageProcessor {
-
-    String getName();
-
-    void processMessages(List<LeiaMessage> messages);
-
-    void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter);
+    /**
+     * @return Relative path of the field being validated
+     */
+    String fieldPath();
 }
+

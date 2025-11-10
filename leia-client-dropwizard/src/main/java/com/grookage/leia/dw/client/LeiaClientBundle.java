@@ -23,6 +23,7 @@ import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
+import com.grookage.leia.common.validation.NoOpLeiaMessageValidator;
 import com.grookage.leia.mux.MessageProcessor;
 import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
 import com.grookage.leia.mux.targetvalidator.TargetValidator;
@@ -123,6 +124,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                     .mapper(environment.getObjectMapper())
                     .processorSupplier(getMessageProcessor(configuration))
                     .targetValidator(getTargetRetriever(configuration))
+                    .messageValidator(new NoOpLeiaMessageValidator())
                     .build();
             environment.lifecycle().manage(new Managed() {
                 @Override
