@@ -141,7 +141,6 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
         } catch (Exception e) {
             log.error("Sending to the backend {} has failed with exception {}", backendConfig, e.getMessage());
             handleException(messages, e.getCause() != null ? (Exception) e.getCause() : e);
-            throw e;
         }
     }
 
