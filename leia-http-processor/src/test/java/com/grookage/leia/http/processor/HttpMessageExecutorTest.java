@@ -63,11 +63,6 @@ class HttpMessageExecutorTest {
                         .withStatus(200)));
         final var testableExecutor = new HttpMessageExecutor<>(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
             @Override
-            public String backendName() {
-                return backend.getBackendName();
-            }
-
-            @Override
             public void handleException(List<LeiaMessage> messages, Exception exception) {
                 log.error("Error sending messages to backend {}: {}", this.getBackendConfig().getBackendName(), exception.getMessage());
             }
@@ -103,8 +98,6 @@ class HttpMessageExecutorTest {
         backend.setUri("/ingest");
         backend.setRetryCount(1);
 
-        final var backendName = backend.getBackendName();
-
         final var messages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
         });
 
@@ -112,14 +105,10 @@ class HttpMessageExecutorTest {
                 backend,
                 () -> "Bearer 1234",
                 ResourceHelper.getObjectMapper()) {
-            @Override
-            public String backendName() {
-                return backendName;
-            }
 
             @Override
             public void handleException(List<LeiaMessage> messages, Exception exception) {
-                final var backendName = backendName();
+                final var backendName = backend.getBackendName();
                 log.error("Message send failed for backend: {}. Attempting custom retry logic...", backendName);
                 log.error("Exception details: Type={}, Message={}", exception.getClass().getName(), exception.getMessage());
 
