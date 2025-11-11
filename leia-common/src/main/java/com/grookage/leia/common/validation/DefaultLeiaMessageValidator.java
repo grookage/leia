@@ -19,56 +19,33 @@ package com.grookage.leia.common.validation;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.grookage.leia.common.violation.LeiaMessageViolation;
 import com.grookage.leia.common.violation.LeiaMessageViolationImpl;
-import com.grookage.leia.models.attributes.ArrayAttribute;
-import com.grookage.leia.models.attributes.BooleanAttribute;
-import com.grookage.leia.models.attributes.ByteAttribute;
-import com.grookage.leia.models.attributes.CharacterAttribute;
-import com.grookage.leia.models.attributes.DateAttribute;
-import com.grookage.leia.models.attributes.DoubleAttribute;
-import com.grookage.leia.models.attributes.EnumAttribute;
-import com.grookage.leia.models.attributes.FloatAttribute;
-import com.grookage.leia.models.attributes.IntegerAttribute;
-import com.grookage.leia.models.attributes.LongAttribute;
-import com.grookage.leia.models.attributes.MapAttribute;
-import com.grookage.leia.models.attributes.ObjectAttribute;
-import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.attributes.SchemaAttributeAcceptor;
-import com.grookage.leia.models.attributes.ShortAttribute;
-import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.attributes.*;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import com.grookage.leia.models.utils.MapperUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefaultLeiaMessageValidator implements LeiaMessageValidator {
 
     @Override
     public List<LeiaMessageViolation> validate(final SchemaDetails schemaDetails, final JsonNode message) {
-        return validate(message, schemaDetails.getValidationType(),
-                schemaDetails.getAttributes());
-    }
-
-    public List<LeiaMessageViolation> validate(final JsonNode jsonNode,
-                                               final SchemaValidationType validationType,
-                                               final Set<SchemaAttribute> schemaAttributes) {
-        final var validationErrors = validateInternal(jsonNode, validationType, schemaAttributes, "");
-        return validationErrors.stream()
+        return validateInternal(message, schemaDetails.getValidationType(),
+                schemaDetails.getAttributes(), "")
+                .stream()
                 .map(error -> LeiaMessageViolationImpl.builder()
                         .message(error.getMessage())
                         .fieldPath(error.getFieldPath())
+                        .schemaKey(schemaDetails.getSchemaKey())
                         .build())
                 .collect(Collectors.toList());
     }
 
-    public List<ValidationError> validateInternal(final JsonNode jsonNode,
-                                                  final SchemaValidationType validationType,
-                                                  final Set<SchemaAttribute> schemaAttributes,
-                                                  final String currentPath) {
+    private List<ValidationError> validateInternal(final JsonNode jsonNode,
+                                                   final SchemaValidationType validationType,
+                                                   final Set<SchemaAttribute> schemaAttributes,
+                                                   final String currentPath) {
         final List<ValidationError> validationErrors = new ArrayList<>();
         final var schemaMap = schemaAttributes.stream()
                 .collect(Collectors.toMap(SchemaAttribute::getName, attribute -> attribute, (a, b) -> b));

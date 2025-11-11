@@ -6,13 +6,9 @@ import com.grookage.leia.common.stubs.TestObjectStub;
 import com.grookage.leia.common.stubs.TestParameterizedStub;
 import com.grookage.leia.common.stubs.TestRawCollectionStub;
 import com.grookage.leia.models.ResourceHelper;
-import com.grookage.leia.models.attributes.ArrayAttribute;
-import com.grookage.leia.models.attributes.BooleanAttribute;
-import com.grookage.leia.models.attributes.IntegerAttribute;
-import com.grookage.leia.models.attributes.MapAttribute;
-import com.grookage.leia.models.attributes.ObjectAttribute;
-import com.grookage.leia.models.attributes.SchemaAttribute;
-import com.grookage.leia.models.attributes.StringAttribute;
+import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
@@ -21,12 +17,18 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DefaultLeiaMessageValidatorTest {
     private DefaultLeiaMessageValidator validator;
+    private static final SchemaKey SCHEMA_KEY = SchemaKey.builder()
+            .namespace("testNamespace")
+            .schemaName("testSchema")
+            .version("v")
+            .orgId("testOrg")
+            .type("default")
+            .tenantId("tenantId")
+            .build();
 
     @BeforeEach
     public void setup() {
@@ -48,8 +50,13 @@ class DefaultLeiaMessageValidatorTest {
                 new IntegerAttribute("age", false, null),
                 new BooleanAttribute("isActive", false, null)
         );
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
 
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertTrue(errors.isEmpty());
     }
@@ -71,7 +78,13 @@ class DefaultLeiaMessageValidatorTest {
                 new BooleanAttribute("isActive", false, null)
         );
 
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
@@ -91,7 +104,13 @@ class DefaultLeiaMessageValidatorTest {
                 new IntegerAttribute("age", false, null)
         );
 
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
@@ -112,7 +131,13 @@ class DefaultLeiaMessageValidatorTest {
                 new IntegerAttribute("age", false, null)
         );
 
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
@@ -139,7 +164,13 @@ class DefaultLeiaMessageValidatorTest {
                 new ObjectAttribute("user", false, null, nestedAttributes)
         );
 
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertTrue(errors.isEmpty());
     }
@@ -156,7 +187,13 @@ class DefaultLeiaMessageValidatorTest {
                 new ArrayAttribute("numbers", false, null, new IntegerAttribute("element", false, null))
         );
 
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertTrue(errors.isEmpty());
     }
@@ -182,7 +219,13 @@ class DefaultLeiaMessageValidatorTest {
                 )
         );
 
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertTrue(errors.isEmpty());
     }
@@ -207,7 +250,13 @@ class DefaultLeiaMessageValidatorTest {
                 )
         );
 
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
@@ -219,7 +268,13 @@ class DefaultLeiaMessageValidatorTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validNestedStub.json",
                 NestedStub.class));
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(NestedStub.class);
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
         assertTrue(errors.isEmpty());
     }
 
@@ -229,7 +284,13 @@ class DefaultLeiaMessageValidatorTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validParameterizedStub.json",
                 TestParameterizedStub.class));
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestParameterizedStub.class);
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
         assertTrue(errors.isEmpty());
     }
 
@@ -239,7 +300,13 @@ class DefaultLeiaMessageValidatorTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validObjectStub.json",
                 TestObjectStub.class));
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestObjectStub.class);
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
         Assertions.assertTrue(errors.isEmpty());
     }
 
@@ -249,7 +316,13 @@ class DefaultLeiaMessageValidatorTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validRawCollectionStub.json",
                 TestRawCollectionStub.class));
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRawCollectionStub.class);
-        final var errors = validator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
         Assertions.assertTrue(errors.isEmpty());
     }
 }

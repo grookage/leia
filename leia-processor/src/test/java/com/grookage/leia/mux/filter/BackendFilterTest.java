@@ -16,13 +16,10 @@
 
 package com.grookage.leia.mux.filter;
 
-import com.grookage.leia.models.mux.LeiaMessage;
-import com.grookage.leia.models.schema.SchemaKey;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -121,42 +118,6 @@ class BackendFilterTest {
             boolean matches = backendName.matches(pattern);
             if (!matches) {
                 log.debug("Backend {} does not match pattern {}, filtering out", backendName, pattern);
-            }
-            return matches;
-        }
-    }
-
-    /**
-     * Sample composite filter that combines multiple filters with AND logic
-     */
-    static class CompositeBackendFilter implements BackendFilter {
-        private final List<BackendFilter> filters;
-
-        public CompositeBackendFilter(List<BackendFilter> filters) {
-            this.filters = filters;
-        }
-
-        @Override
-        public boolean shouldProcess(String backendName) {
-            return filters.stream().allMatch(filter -> filter.shouldProcess(backendName));
-        }
-    }
-
-    /**
-     * Sample filter that allows backends based on environment prefix
-     */
-    static class EnvironmentBackendFilter implements BackendFilter {
-        private final String environment;
-
-        public EnvironmentBackendFilter(String environment) {
-            this.environment = environment;
-        }
-
-        @Override
-        public boolean shouldProcess(String backendName) {
-            boolean matches = backendName.toUpperCase().startsWith(environment.toUpperCase());
-            if (!matches) {
-                log.debug("Backend {} does not match environment {}, filtering out", backendName, environment);
             }
             return matches;
         }
