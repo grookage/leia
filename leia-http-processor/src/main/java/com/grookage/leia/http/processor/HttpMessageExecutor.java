@@ -135,7 +135,7 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
                 return response;
             });
         } catch (Exception e) {
-            log.error("Sending to the backend {} has failed with exception {}", backendConfig, e.getMessage(), e);
+            log.error("Sending message to the backend {} has failed with exception {}", backendConfig.getBackendName(), e.getMessage(), e);
             throw LeiaException.error(LeiaHttpErrorCode.EVENT_SEND_FAILED, e);
         }
     }
