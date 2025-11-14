@@ -23,6 +23,8 @@ import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.mux.exception.LeiaProcessorErrorCode;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
+import com.grookage.leia.mux.filter.BackendFilter;
+import com.grookage.leia.mux.filter.NoOpBackendFilter;
 import com.grookage.leia.mux.resolver.BackendNameResolver;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 @Data
@@ -63,10 +66,14 @@ public class DefaultMessageProcessor implements MessageProcessor {
         return null != executor;
     }
 
-    private Map<MessageExecutor, List<LeiaMessage>> getExecutorMapping(List<LeiaMessage> messages) {
+    private Map<MessageExecutor, List<LeiaMessage>> getExecutorMapping(List<LeiaMessage> messages,
+                                                                       BackendFilter backendFilter) {
         final var executorMapping = new HashMap<MessageExecutor, List<LeiaMessage>>();
         messages.forEach(message -> {
-            final var backends = backendNameResolver.getEligibleBackends(message);
+            final var backends = backendNameResolver.getEligibleBackends(message)
+                    .stream()
+                    .filter(backendFilter::shouldProcess)
+                    .collect(Collectors.toSet());
             if (!validBackends(backends)) {
                 log.error("No backends found for message with schemaKey {} and tags {}", message.getSchemaKey(), message.getTags());
                 throw LeiaException.error(LeiaProcessorErrorCode.BACKENDS_NOT_FOUND);
@@ -80,11 +87,17 @@ public class DefaultMessageProcessor implements MessageProcessor {
                 executorMapping.computeIfAbsent(executor, k -> new ArrayList<>()).add(message);
             });
         });
+
         return executorMapping;
     }
 
     public void processMessages(List<LeiaMessage> messages) {
-        final var executorMapping = getExecutorMapping(messages);
+        processMessages(messages, new NoOpBackendFilter());
+    }
+
+    public void processMessages(List<LeiaMessage> messages,
+                                BackendFilter backendFilter) {
+        final var executorMapping = getExecutorMapping(messages, backendFilter);
         if (executorMapping.isEmpty()) {
             log.debug("Haven't found any eligible executors with the set of messages {}", messages);
             return;
@@ -92,7 +105,14 @@ public class DefaultMessageProcessor implements MessageProcessor {
         final var futures = CompletableFuture.allOf(
                 executorMapping.entrySet().stream()
                         .map(each -> CompletableFuture.runAsync(
-                                () -> each.getKey().send(each.getValue())))
+                                () -> {
+                                    try {
+                                        each.getKey().send(each.getValue());
+                                    } catch (Exception e) {
+                                        log.error("Failed to send messages via executor, handling exception", e);
+                                        each.getKey().handleException(each.getValue(), e);
+                                    }
+                                }))
                         .toArray(CompletableFuture[]::new));
         try {
             futures.get(getProcessingThresholdMs(), TimeUnit.MILLISECONDS);
@@ -124,5 +144,3 @@ public class DefaultMessageProcessor implements MessageProcessor {
         return (thatKey.getName().equalsIgnoreCase(this.getName()));
     }
 }
-
-

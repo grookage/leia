@@ -30,7 +30,9 @@ import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import com.grookage.leia.mux.DefaultMessageProcessor;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
+import com.grookage.leia.mux.filter.BackendFilter;
 import com.grookage.leia.mux.resolver.BackendNameResolver;
+import com.grookage.leia.mux.resolver.TagBasedNameResolver;
 import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
 import com.grookage.leia.mux.targetvalidator.JsonRuleTargetValidator;
 import com.grookage.leia.mux.targetvalidator.TargetValidator;
@@ -125,7 +127,7 @@ class LeiaMessageProduceClientTest {
                 final var testMessage = messages.stream()
                         .filter(each -> each.getSchemaKey().getVersion().equalsIgnoreCase("v")).findFirst().orElse(null);
                 Assertions.assertNotNull(testMessage);
-                Assertions.assertEquals(Set.of("backend-TRANSFORMATION_BACKEND","backend-BACKEND"),testMessage.getTags());
+                Assertions.assertEquals(Set.of("backend-TRANSFORMATION_BACKEND", "backend-BACKEND"), testMessage.getTags());
                 Assertions.assertEquals("TestName", testMessage.getMessage().get("officialName").asText());
             }
         }, null);
@@ -255,5 +257,35 @@ class LeiaMessageProduceClientTest {
                 Assertions.assertEquals(1, messages.size());
             }
         }, null);
+    }
+
+    @Test
+    void testBackendFilter() {
+        final var testSchema = TestSchema.builder()
+                .userName("testUser")
+                .schemaUnits(List.of(TestSchemaUnit.builder()
+                        .registeredName("testRegisteredName").build()))
+                .build();
+        final var messageRequest = MessageRequest.builder()
+                .schemaKey(sourceSchema)
+                .message(mapper.valueToTree(testSchema))
+                .includeSource(false)
+                .build();
+        final var httpExecutor = Mockito.mock(MessageExecutor.class);
+        Mockito.when(executorFactory.getExecutor("TRANSFORMATION_BACKEND")).thenReturn(Optional.of(httpExecutor));
+        var messages = schemaClient.getMessages(messageRequest, null);
+        final var leiaMessages = messages.values().stream().toList();
+        Assertions.assertNotNull(leiaMessages);
+        Assertions.assertFalse(leiaMessages.isEmpty());
+        Assertions.assertEquals(1, leiaMessages.size());
+
+        schemaClient.processMessages(leiaMessages,
+                new DefaultMessageProcessor("test", 10_000L, new TagBasedNameResolver(), executorFactory) {}, new BackendFilter() {
+                    @Override
+                    public boolean shouldProcess(String backendName) {
+                        return backendName.equals("TRANSFORMATION_BACKEND");
+                    }
+                });
+        Mockito.verify(httpExecutor, Mockito.times(1)).send(leiaMessages);
     }
 }

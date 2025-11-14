@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.mux.executor;
+package com.grookage.leia.common.violation;
 
-import com.grookage.leia.models.mux.LeiaMessage;
+/**
+ * Base interface for all Leia validation violations
+ */
+public interface LeiaViolation {
 
-import java.util.List;
+    /**
+     * @return Error message for the violation
+     */
+    String message();
 
-public interface MessageExecutor {
-    void send(List<LeiaMessage> messages);
-
-    void handleException(List<LeiaMessage> messages, Exception exception);
+    /**
+     * @return Relative path of the field being validated
+     */
+    String fieldPath();
 }
+

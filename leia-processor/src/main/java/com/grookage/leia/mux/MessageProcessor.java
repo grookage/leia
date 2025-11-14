@@ -17,6 +17,7 @@
 package com.grookage.leia.mux;
 
 import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.mux.filter.BackendFilter;
 
 import java.util.List;
 
@@ -25,4 +26,6 @@ public interface MessageProcessor {
     String getName();
 
     void processMessages(List<LeiaMessage> messages);
+
+    void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter);
 }

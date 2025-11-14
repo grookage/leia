@@ -17,6 +17,7 @@
 package com.grookage.leia.dropwizard.bundle;
 
 import com.google.common.base.Preconditions;
+import com.grookage.leia.common.validation.NoOpLeiaMessageValidator;
 import com.grookage.leia.core.ingestion.SchemaIngestor;
 import com.grookage.leia.core.ingestion.hub.SchemaProcessorHub;
 import com.grookage.leia.core.retrieval.SchemaRetriever;
@@ -84,6 +85,7 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
                 .build();
         final var cacheConfig = getCacheConfig(configuration);
         this.schemaRetriever = new SchemaRetriever(repositorySupplier, cacheConfig);
+        final var messageValidator = new NoOpLeiaMessageValidator();
         withLifecycleManagers(configuration)
                 .forEach(lifecycle -> environment.lifecycle().manage(new Managed() {
                     @Override
@@ -99,7 +101,7 @@ public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdate
         withHealthChecks(configuration)
                 .forEach(leiaHealthCheck -> environment.healthChecks().register(leiaHealthCheck.getName(), leiaHealthCheck));
         environment.jersey().register(new IngestionResource<>(schemaIngestor, userResolver, permissionResolver));
-        environment.jersey().register(new SchemaResource(schemaRetriever));
+        environment.jersey().register(new SchemaResource(schemaRetriever, messageValidator));
         environment.jersey().register(new LeiaExceptionMapper());
     }
 

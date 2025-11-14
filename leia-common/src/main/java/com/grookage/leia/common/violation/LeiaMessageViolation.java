@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.mux.executor;
+package com.grookage.leia.common.violation;
 
-import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.models.schema.SchemaKey;
 
-import java.util.List;
+/**
+ * Violation for message validation against a schema
+ */
+public interface LeiaMessageViolation extends LeiaViolation {
 
-public interface MessageExecutor {
-    void send(List<LeiaMessage> messages);
-
-    void handleException(List<LeiaMessage> messages, Exception exception);
+    /**
+     * @return SchemaKey against which the message was validated
+     */
+    SchemaKey schemaKey();
 }
+

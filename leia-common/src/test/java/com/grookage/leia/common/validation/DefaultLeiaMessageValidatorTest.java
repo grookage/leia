@@ -7,16 +7,34 @@ import com.grookage.leia.common.stubs.TestParameterizedStub;
 import com.grookage.leia.common.stubs.TestRawCollectionStub;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.attributes.*;
+import com.grookage.leia.models.schema.SchemaDetails;
+import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.SchemaValidationType;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SchemaPayloadValidatorTest {
+class DefaultLeiaMessageValidatorTest {
+    private DefaultLeiaMessageValidator validator;
+    private static final SchemaKey SCHEMA_KEY = SchemaKey.builder()
+            .namespace("testNamespace")
+            .schemaName("testSchema")
+            .version("v")
+            .orgId("testOrg")
+            .type("default")
+            .tenantId("tenantId")
+            .build();
+
+    @BeforeEach
+    public void setup() {
+        validator = new DefaultLeiaMessageValidator();
+    }
+
     @Test
     void testValidJsonAgainstSchema() throws Exception {
         final var jsonNode = ResourceHelper.getObjectMapper().readTree("""
@@ -32,8 +50,13 @@ class SchemaPayloadValidatorTest {
                 new IntegerAttribute("age", false, null),
                 new BooleanAttribute("isActive", false, null)
         );
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
 
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertTrue(errors.isEmpty());
     }
@@ -55,11 +78,17 @@ class SchemaPayloadValidatorTest {
                 new BooleanAttribute("isActive", false, null)
         );
 
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
-        assertEquals("Unexpected field: unexpectedField", errors.get(0));
+        assertEquals("Unexpected field: unexpectedField", errors.get(0).message());
     }
 
     @Test
@@ -75,11 +104,17 @@ class SchemaPayloadValidatorTest {
                 new IntegerAttribute("age", false, null)
         );
 
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
-        assertEquals("Missing required field: age", errors.get(0));
+        assertEquals("Missing required field: age", errors.get(0).message());
     }
 
     @Test
@@ -96,11 +131,17 @@ class SchemaPayloadValidatorTest {
                 new IntegerAttribute("age", false, null)
         );
 
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
-        assertEquals("Type mismatch for field: age. Expected: INTEGER, Found: STRING", errors.get(0));
+        assertEquals("Type mismatch for field: age. Expected: INTEGER, Found: STRING", errors.get(0).message());
     }
 
     @Test
@@ -123,7 +164,13 @@ class SchemaPayloadValidatorTest {
                 new ObjectAttribute("user", false, null, nestedAttributes)
         );
 
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertTrue(errors.isEmpty());
     }
@@ -140,7 +187,13 @@ class SchemaPayloadValidatorTest {
                 new ArrayAttribute("numbers", false, null, new IntegerAttribute("element", false, null))
         );
 
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertTrue(errors.isEmpty());
     }
@@ -166,7 +219,13 @@ class SchemaPayloadValidatorTest {
                 )
         );
 
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertTrue(errors.isEmpty());
     }
@@ -191,7 +250,13 @@ class SchemaPayloadValidatorTest {
                 )
         );
 
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
 
         assertFalse(errors.isEmpty());
         assertEquals(1, errors.size());
@@ -203,7 +268,13 @@ class SchemaPayloadValidatorTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validNestedStub.json",
                 NestedStub.class));
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(NestedStub.class);
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
         assertTrue(errors.isEmpty());
     }
 
@@ -213,7 +284,13 @@ class SchemaPayloadValidatorTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validParameterizedStub.json",
                 TestParameterizedStub.class));
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestParameterizedStub.class);
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
         assertTrue(errors.isEmpty());
     }
 
@@ -223,7 +300,13 @@ class SchemaPayloadValidatorTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validObjectStub.json",
                 TestObjectStub.class));
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestObjectStub.class);
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
         Assertions.assertTrue(errors.isEmpty());
     }
 
@@ -233,7 +316,13 @@ class SchemaPayloadValidatorTest {
         final var jsonNode = ResourceHelper.getObjectMapper().valueToTree(ResourceHelper.getResource("stubs/validRawCollectionStub.json",
                 TestRawCollectionStub.class));
         final var schemaAttributes = SchemaBuilder.getSchemaAttributes(TestRawCollectionStub.class);
-        final var errors = SchemaPayloadValidator.validate(jsonNode, SchemaValidationType.STRICT, schemaAttributes);
+        final var schemaDetails = SchemaDetails.builder()
+                .schemaKey(SCHEMA_KEY)
+                .attributes(schemaAttributes)
+                .validationType(SchemaValidationType.STRICT)
+                .build();
+
+        final var errors = validator.validate(schemaDetails, jsonNode);
         Assertions.assertTrue(errors.isEmpty());
     }
 }

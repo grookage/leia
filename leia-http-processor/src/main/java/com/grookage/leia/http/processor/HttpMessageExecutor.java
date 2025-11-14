@@ -18,7 +18,11 @@ package com.grookage.leia.http.processor;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.rholder.retry.*;
+import com.github.rholder.retry.BlockStrategies;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.http.processor.config.BackendType;
 import com.grookage.leia.http.processor.config.HttpBackendConfig;
@@ -95,11 +99,11 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
     public abstract Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig);
 
     @SneakyThrows
-    public void executeRequest(List<LeiaMessage> messages) {
+    private void executeRequest(List<LeiaMessage> messages) {
         try {
             retryer.call(() -> {
                 final var leiaHttpEntity = HttpRequestUtils.toHttpEntity(messages, backendConfig);
-                final var requestData =  getRequestData(leiaHttpEntity);
+                final var requestData = getRequestData(leiaHttpEntity);
                 final var endPoint = getEndPoint(backendConfig).orElse(null);
                 if (null == endPoint) {
                     log.debug("No valid end point found for backendConfig {}", backendConfig);
@@ -136,7 +140,7 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
             });
         } catch (Exception e) {
             log.error("Sending message to the backend {} has failed with exception {}", backendConfig.getBackendName(), e.getMessage(), e);
-            throw LeiaException.error(LeiaHttpErrorCode.EVENT_SEND_FAILED, e);
+            handleException(messages, e.getCause() != null ? (Exception) e.getCause() : e);
         }
     }
 

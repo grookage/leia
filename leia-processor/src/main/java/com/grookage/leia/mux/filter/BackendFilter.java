@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.grookage.leia.mux.executor;
+package com.grookage.leia.mux.filter;
 
-import com.grookage.leia.models.mux.LeiaMessage;
+/**
+ * Interface for filtering backends based on backend name.
+ * Implementations can define custom logic to determine if a backend
+ * should process messages.
+ */
+public interface BackendFilter {
 
-import java.util.List;
-
-public interface MessageExecutor {
-    void send(List<LeiaMessage> messages);
-
-    void handleException(List<LeiaMessage> messages, Exception exception);
+    /**
+     * Determine if a backend should process messages
+     *
+     * @param backendName Name of the backend to evaluate
+     * @return true if the backend should process messages, false otherwise
+     */
+    boolean shouldProcess(String backendName);
 }
