@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
   - Added support for sending messages to specific backends on the basis of runtime backendFilter predicate
   - Introduced LeiaMessageValidator to validate message payloads against target schema before sending to backends
   - Refactored SchemaPayloadValidator to be used as an implementation of LeiaMessageValidator
+- Removed logging of entire backendConfig to avoid logging hashing key
 
 ## [1.0.2]
 - Added support for Korg Endpoint provider to be passed from the client

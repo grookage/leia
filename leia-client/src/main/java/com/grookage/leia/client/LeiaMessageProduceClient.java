@@ -73,6 +73,8 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
                                                 TransformationTarget transformationTarget,
                                                 TargetValidator tValidator) {
         if (!validTarget(messageRequest, sourceSchema, transformationTarget, tValidator)) {
+            log.error("Transformation target {} is not valid for source schemaKey {}",
+                    transformationTarget.getSchemaKey().getReferenceId(), messageRequest.getSchemaKey().getReferenceId());
             return Optional.empty();
         }
         final var targetSchema = SchemaUtils.getMatchingSchema(super.getSchemaDetails(), transformationTarget.getSchemaKey())

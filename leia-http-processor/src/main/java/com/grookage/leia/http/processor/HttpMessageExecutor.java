@@ -139,7 +139,7 @@ public abstract class HttpMessageExecutor<T> implements MessageExecutor {
                 return response;
             });
         } catch (Exception e) {
-            log.error("Sending to the backend {} has failed with exception {}", backendConfig, e.getMessage());
+            log.error("Sending message to the backend {} has failed with exception {}", backendConfig.getBackendName(), e.getMessage(), e);
             handleException(messages, e.getCause() != null ? (Exception) e.getCause() : e);
         }
     }
