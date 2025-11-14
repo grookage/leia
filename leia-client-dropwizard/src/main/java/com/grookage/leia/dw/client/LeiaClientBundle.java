@@ -23,6 +23,8 @@ import com.grookage.leia.client.LeiaMessageProduceClient;
 import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
+import com.grookage.leia.common.validation.DefaultLeiaMessageValidator;
+import com.grookage.leia.common.validation.LeiaMessageValidator;
 import com.grookage.leia.common.validation.NoOpLeiaMessageValidator;
 import com.grookage.leia.mux.MessageProcessor;
 import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
@@ -81,6 +83,10 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
         return DefaultTargetValidator::new;
     }
 
+    protected LeiaMessageValidator getMessageValidator(T configuration) {
+        return new DefaultLeiaMessageValidator();
+    }
+
     @Override
     public void run(T configuration, Environment environment) {
         final var clientRequestSupplier = getClientRequestSupplier(configuration);
@@ -124,7 +130,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
                     .mapper(environment.getObjectMapper())
                     .processorSupplier(getMessageProcessor(configuration))
                     .targetValidator(getTargetRetriever(configuration))
-                    .leiaMessageValidator(new NoOpLeiaMessageValidator())
+                    .leiaMessageValidator(getMessageValidator(configuration))
                     .build();
             environment.lifecycle().manage(new Managed() {
                 @Override
