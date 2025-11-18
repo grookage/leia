@@ -13,26 +13,26 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 public class ViolationContext {
-    @Getter
-    private final List<LeiaSchemaViolation> violations = new ArrayList<>();
-    private final LinkedList<Class<?>> klassPath = new LinkedList<>();
+	@Getter
+	private final List<LeiaSchemaViolation> violations = new ArrayList<>();
+	private final LinkedList<Class<?>> klassPath = new LinkedList<>();
 
-    public void addViolation(final String message) {
-        violations.add(new LeiaSchemaViolationImpl(message, null, klassPath.peekLast()));
-    }
+	public void addViolation(final String message) {
+		violations.add(new LeiaSchemaViolationImpl(message, null, klassPath.peekLast()));
+	}
 
-    public void addViolation(final String message,
-                             final String path) {
-        violations.add(new LeiaSchemaViolationImpl(message, path, klassPath.peekLast()));
-    }
+	public void addViolation(final String message,
+	                         final String path) {
+		violations.add(new LeiaSchemaViolationImpl(message, path, klassPath.peekLast()));
+	}
 
-    public void pushClass(final Class<?> klass) {
-        klassPath.addLast(klass);
-    }
+	public void pushClass(final Class<?> klass) {
+		klassPath.addLast(klass);
+	}
 
-    public void popClass() {
-        if (!klassPath.isEmpty()) {
-            klassPath.removeLast();
-        }
-    }
+	public void popClass() {
+		if (!klassPath.isEmpty()) {
+			klassPath.removeLast();
+		}
+	}
 }

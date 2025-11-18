@@ -35,28 +35,28 @@ import java.util.function.Supplier;
 @Getter
 public abstract class LeiaElasticBundle<T extends Configuration, U extends SchemaUpdater> extends LeiaBundle<T, U> {
 
-    private ElasticConfig elasticConfig;
-    private ElasticsearchClient elasticsearchClient;
-    private ElasticRepository elasticSchemaRepository;
+	private ElasticConfig elasticConfig;
+	private ElasticsearchClient elasticsearchClient;
+	private ElasticRepository elasticSchemaRepository;
 
-    protected abstract ElasticConfig getElasticConfig(T configuration);
+	protected abstract ElasticConfig getElasticConfig(T configuration);
 
-    @Override
-    protected Supplier<SchemaRepository> getRepositorySupplier(T configuration) {
-        return () -> elasticSchemaRepository;
-    }
+	@Override
+	protected Supplier<SchemaRepository> getRepositorySupplier(T configuration) {
+		return () -> elasticSchemaRepository;
+	}
 
-    @Override
-    protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
-        return List.of(new ElasticHealthCheck(elasticConfig, elasticsearchClient));
-    }
+	@Override
+	protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
+		return List.of(new ElasticHealthCheck(elasticConfig, elasticsearchClient));
+	}
 
-    @Override
-    public void run(T configuration, Environment environment) {
-        this.elasticConfig = getElasticConfig(configuration);
-        this.elasticSchemaRepository = new ElasticRepository(elasticConfig);
-        this.elasticsearchClient = elasticSchemaRepository.getClient();
-        super.run(configuration, environment);
-    }
+	@Override
+	public void run(T configuration, Environment environment) {
+		this.elasticConfig = getElasticConfig(configuration);
+		this.elasticSchemaRepository = new ElasticRepository(elasticConfig);
+		this.elasticsearchClient = elasticSchemaRepository.getClient();
+		super.run(configuration, environment);
+	}
 
 }

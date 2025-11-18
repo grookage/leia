@@ -25,14 +25,14 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShortLivedQualifier extends QualifierInfo {
 
-    private long ttlSeconds;
+	private long ttlSeconds;
 
-    public ShortLivedQualifier() {
-        super(QualifierType.SHORT_LIVED);
-    }
+	public ShortLivedQualifier() {
+		super(QualifierType.SHORT_LIVED);
+	}
 
-    public ShortLivedQualifier(long ttlSeconds) {
-        this();
-        this.ttlSeconds = ttlSeconds;
-    }
+	public ShortLivedQualifier(long ttlSeconds) {
+		this();
+		this.ttlSeconds = ttlSeconds;
+	}
 }

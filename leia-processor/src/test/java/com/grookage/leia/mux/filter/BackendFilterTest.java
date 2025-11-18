@@ -25,101 +25,101 @@ import java.util.Set;
 @Slf4j
 class BackendFilterTest {
 
-    @Test
-    void testNoOpBackendFilter() {
-        BackendFilter filter = new NoOpBackendFilter();
+	@Test
+	void testNoOpBackendFilter() {
+		BackendFilter filter = new NoOpBackendFilter();
 
-        Assertions.assertTrue(filter.shouldProcess("TEST"));
-        Assertions.assertTrue(filter.shouldProcess("PROD"));
-    }
+		Assertions.assertTrue(filter.shouldProcess("TEST"));
+		Assertions.assertTrue(filter.shouldProcess("PROD"));
+	}
 
-    @Test
-    void testWhitelistBackendFilter() {
-        // Filter that only allows specific backends
-        BackendFilter whitelistFilter = new WhitelistBackendFilter(Set.of("BACKEND1", "BACKEND2"));
+	@Test
+	void testWhitelistBackendFilter() {
+		// Filter that only allows specific backends
+		BackendFilter whitelistFilter = new WhitelistBackendFilter(Set.of("BACKEND1", "BACKEND2"));
 
-        Assertions.assertTrue(whitelistFilter.shouldProcess("BACKEND1"));
-        Assertions.assertTrue(whitelistFilter.shouldProcess("BACKEND2"));
-        Assertions.assertFalse(whitelistFilter.shouldProcess("BACKEND3"));
-    }
+		Assertions.assertTrue(whitelistFilter.shouldProcess("BACKEND1"));
+		Assertions.assertTrue(whitelistFilter.shouldProcess("BACKEND2"));
+		Assertions.assertFalse(whitelistFilter.shouldProcess("BACKEND3"));
+	}
 
-    @Test
-    void testBlacklistBackendFilter() {
-        // Filter that excludes specific backends
-        BackendFilter blacklistFilter = new BlacklistBackendFilter(Set.of("PROD", "STAGING"));
+	@Test
+	void testBlacklistBackendFilter() {
+		// Filter that excludes specific backends
+		BackendFilter blacklistFilter = new BlacklistBackendFilter(Set.of("PROD", "STAGING"));
 
-        Assertions.assertTrue(blacklistFilter.shouldProcess("DEV"));
-        Assertions.assertFalse(blacklistFilter.shouldProcess("PROD"));
-        Assertions.assertFalse(blacklistFilter.shouldProcess("STAGING"));
-    }
+		Assertions.assertTrue(blacklistFilter.shouldProcess("DEV"));
+		Assertions.assertFalse(blacklistFilter.shouldProcess("PROD"));
+		Assertions.assertFalse(blacklistFilter.shouldProcess("STAGING"));
+	}
 
-    @Test
-    void testRegexBackendFilter() {
-        // Filter based on regex pattern
-        BackendFilter regexFilter = new RegexBackendFilter("^TEST.*");
+	@Test
+	void testRegexBackendFilter() {
+		// Filter based on regex pattern
+		BackendFilter regexFilter = new RegexBackendFilter("^TEST.*");
 
-        Assertions.assertTrue(regexFilter.shouldProcess("TEST-BACKEND1"));
-        Assertions.assertTrue(regexFilter.shouldProcess("TEST-BACKEND2"));
-        Assertions.assertFalse(regexFilter.shouldProcess("PROD-BACKEND"));
-    }
+		Assertions.assertTrue(regexFilter.shouldProcess("TEST-BACKEND1"));
+		Assertions.assertTrue(regexFilter.shouldProcess("TEST-BACKEND2"));
+		Assertions.assertFalse(regexFilter.shouldProcess("PROD-BACKEND"));
+	}
 
-    /**
-     * Sample filter that only allows whitelisted backends
-     */
-    static class WhitelistBackendFilter implements BackendFilter {
-        private final Set<String> allowedBackends;
+	/**
+	 * Sample filter that only allows whitelisted backends
+	 */
+	static class WhitelistBackendFilter implements BackendFilter {
+		private final Set<String> allowedBackends;
 
-        public WhitelistBackendFilter(Set<String> allowedBackends) {
-            this.allowedBackends = allowedBackends;
-        }
+		public WhitelistBackendFilter(Set<String> allowedBackends) {
+			this.allowedBackends = allowedBackends;
+		}
 
-        @Override
-        public boolean shouldProcess(String backendName) {
-            boolean allowed = allowedBackends.contains(backendName);
-            if (!allowed) {
-                log.debug("Backend {} not in whitelist, filtering out", backendName);
-            }
-            return allowed;
-        }
-    }
+		@Override
+		public boolean shouldProcess(String backendName) {
+			boolean allowed = allowedBackends.contains(backendName);
+			if (!allowed) {
+				log.debug("Backend {} not in whitelist, filtering out", backendName);
+			}
+			return allowed;
+		}
+	}
 
-    /**
-     * Sample filter that excludes blacklisted backends
-     */
-    static class BlacklistBackendFilter implements BackendFilter {
-        private final Set<String> excludedBackends;
+	/**
+	 * Sample filter that excludes blacklisted backends
+	 */
+	static class BlacklistBackendFilter implements BackendFilter {
+		private final Set<String> excludedBackends;
 
-        public BlacklistBackendFilter(Set<String> excludedBackends) {
-            this.excludedBackends = excludedBackends;
-        }
+		public BlacklistBackendFilter(Set<String> excludedBackends) {
+			this.excludedBackends = excludedBackends;
+		}
 
-        @Override
-        public boolean shouldProcess(String backendName) {
-            boolean excluded = excludedBackends.contains(backendName);
-            if (excluded) {
-                log.debug("Backend {} is blacklisted, filtering out", backendName);
-            }
-            return !excluded;
-        }
-    }
+		@Override
+		public boolean shouldProcess(String backendName) {
+			boolean excluded = excludedBackends.contains(backendName);
+			if (excluded) {
+				log.debug("Backend {} is blacklisted, filtering out", backendName);
+			}
+			return !excluded;
+		}
+	}
 
-    /**
-     * Sample filter based on regex pattern
-     */
-    static class RegexBackendFilter implements BackendFilter {
-        private final String pattern;
+	/**
+	 * Sample filter based on regex pattern
+	 */
+	static class RegexBackendFilter implements BackendFilter {
+		private final String pattern;
 
-        public RegexBackendFilter(String pattern) {
-            this.pattern = pattern;
-        }
+		public RegexBackendFilter(String pattern) {
+			this.pattern = pattern;
+		}
 
-        @Override
-        public boolean shouldProcess(String backendName) {
-            boolean matches = backendName.matches(pattern);
-            if (!matches) {
-                log.debug("Backend {} does not match pattern {}, filtering out", backendName, pattern);
-            }
-            return matches;
-        }
-    }
+		@Override
+		public boolean shouldProcess(String backendName) {
+			boolean matches = backendName.matches(pattern);
+			if (!matches) {
+				log.debug("Backend {} does not match pattern {}, filtering out", backendName, pattern);
+			}
+			return matches;
+		}
+	}
 }

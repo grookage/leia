@@ -10,10 +10,10 @@ import java.util.*;
 @Builder
 @Jacksonized
 public class TestRawCollectionStub {
-    List rawList;
-    LinkedList rawLinkedList;
-    Set rawSet;
-    HashSet rawHashSet;
-    Map rawMap;
-    SortedMap rawSortedMap;
+	List rawList;
+	LinkedList rawLinkedList;
+	Set rawSet;
+	HashSet rawHashSet;
+	Map rawMap;
+	SortedMap rawSortedMap;
 }

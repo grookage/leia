@@ -39,162 +39,162 @@ import java.util.stream.Collectors;
 
 class SchemaRetrieverTest {
 
-    private static SchemaRepository repository;
+	private static SchemaRepository repository;
 
-    @BeforeEach
-    void setup() {
-        repository = Mockito.mock(SchemaRepository.class);
-    }
+	@BeforeEach
+	void setup() {
+		repository = Mockito.mock(SchemaRepository.class);
+	}
 
-    CacheConfig getCacheConfig() {
-        return CacheConfig.builder()
-                .enabled(true)
-                .refreshCacheSeconds(1)
-                .build();
-    }
+	CacheConfig getCacheConfig() {
+		return CacheConfig.builder()
+				.enabled(true)
+				.refreshCacheSeconds(1)
+				.build();
+	}
 
-    @Test
-    @SneakyThrows
-    void testGetSchemaDetailsCacheDisabled() {
-        final var retriever = new SchemaRetriever(() -> repository, null);
-        Assertions.assertNull(retriever.getRefresher());
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        final var schemaKey = ResourceHelper
-                .getResource("schema/schemaKey.json", SchemaKey.class);
-        Mockito.when(repository.get(schemaKey))
-                .thenReturn(Optional.of(schemaDetails));
-        final var schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().build(), schemaKey).orElse(null);
-        Assertions.assertNotNull(schemas);
-    }
+	@Test
+	@SneakyThrows
+	void testGetSchemaDetailsCacheDisabled() {
+		final var retriever = new SchemaRetriever(() -> repository, null);
+		Assertions.assertNull(retriever.getRefresher());
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		final var schemaKey = ResourceHelper
+				.getResource("schema/schemaKey.json", SchemaKey.class);
+		Mockito.when(repository.get(schemaKey))
+				.thenReturn(Optional.of(schemaDetails));
+		final var schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().build(), schemaKey).orElse(null);
+		Assertions.assertNotNull(schemas);
+	}
 
-    @Test
-    @SneakyThrows
-    void testGetSchemaDetailsCacheEnabled() {
-        final var cacheConfig = getCacheConfig();
-        final var retriever = new SchemaRetriever(() -> repository, cacheConfig);
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        final var schemaKey = ResourceHelper
-                .getResource("schema/schemaKey.json", SchemaKey.class);
-        Mockito.when(repository.get(schemaKey))
-                .thenReturn(Optional.of(schemaDetails));
-        var schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().ignoreCache(false).build(), schemaKey).orElse(null);
-        Assertions.assertNull(schemas);
-        Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
-                .thenReturn(List.of(schemaDetails));
-        LeiaUtils.sleepUntil(4);
-        schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().ignoreCache(false).build(), schemaKey).orElse(null);
-        Assertions.assertNotNull(schemas);
-    }
+	@Test
+	@SneakyThrows
+	void testGetSchemaDetailsCacheEnabled() {
+		final var cacheConfig = getCacheConfig();
+		final var retriever = new SchemaRetriever(() -> repository, cacheConfig);
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		final var schemaKey = ResourceHelper
+				.getResource("schema/schemaKey.json", SchemaKey.class);
+		Mockito.when(repository.get(schemaKey))
+				.thenReturn(Optional.of(schemaDetails));
+		var schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().ignoreCache(false).build(), schemaKey).orElse(null);
+		Assertions.assertNull(schemas);
+		Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
+				.thenReturn(List.of(schemaDetails));
+		LeiaUtils.sleepUntil(4);
+		schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().ignoreCache(false).build(), schemaKey).orElse(null);
+		Assertions.assertNotNull(schemas);
+	}
 
-    @Test
-    @SneakyThrows
-    void testGetCurrentSchemasNoCache() {
-        final var retriever = new SchemaRetriever(() -> repository, null);
-        Assertions.assertNull(retriever.getRefresher());
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        final var searchRequest = SearchRequest.builder()
-                .schemaNames(Set.of("testNamespace"))
-                .states(Set.of(SchemaState.APPROVED))
-                .build();
-        Mockito.when(repository.getSchemas(searchRequest))
-                .thenReturn(List.of());
-        var schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().build(), searchRequest);
-        Assertions.assertTrue(schemas.isEmpty());
-        Mockito.when(repository.getSchemas(searchRequest))
-                .thenReturn(List.of(schemaDetails));
-        schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().build(), searchRequest);
-        Assertions.assertFalse(schemas.isEmpty());
-    }
+	@Test
+	@SneakyThrows
+	void testGetCurrentSchemasNoCache() {
+		final var retriever = new SchemaRetriever(() -> repository, null);
+		Assertions.assertNull(retriever.getRefresher());
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		final var searchRequest = SearchRequest.builder()
+				.schemaNames(Set.of("testNamespace"))
+				.states(Set.of(SchemaState.APPROVED))
+				.build();
+		Mockito.when(repository.getSchemas(searchRequest))
+				.thenReturn(List.of());
+		var schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().build(), searchRequest);
+		Assertions.assertTrue(schemas.isEmpty());
+		Mockito.when(repository.getSchemas(searchRequest))
+				.thenReturn(List.of(schemaDetails));
+		schemas = retriever.getSchemaDetails(LeiaRequestContext.builder().build(), searchRequest);
+		Assertions.assertFalse(schemas.isEmpty());
+	}
 
-    @Test
-    @SneakyThrows
-    void testGetCurrentSchemasWithCache() {
-        final var retriever = new SchemaRetriever(() -> repository, getCacheConfig());
-        Assertions.assertNotNull(retriever.getRefresher());
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
-                .thenReturn(List.of());
-        final var searchRequest = SearchRequest.builder()
-                .schemaNames(Set.of("testNamespace"))
-                .build();
-        final var requestContext = LeiaRequestContext.builder().ignoreCache(false).build();
-        var schemas = retriever.getSchemaDetails(requestContext, searchRequest);
-        Assertions.assertTrue(schemas.isEmpty());
-        Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
-                .thenReturn(List.of(schemaDetails));
-        LeiaUtils.sleepUntil(4);
-        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
-        Assertions.assertTrue(schemas.isEmpty());
-        schemaDetails.setSchemaState(SchemaState.APPROVED);
-        Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
-                .thenReturn(List.of(schemaDetails));
-        LeiaUtils.sleepUntil(4);
-        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
-        Assertions.assertTrue(schemas.isEmpty());
-    }
+	@Test
+	@SneakyThrows
+	void testGetCurrentSchemasWithCache() {
+		final var retriever = new SchemaRetriever(() -> repository, getCacheConfig());
+		Assertions.assertNotNull(retriever.getRefresher());
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
+				.thenReturn(List.of());
+		final var searchRequest = SearchRequest.builder()
+				.schemaNames(Set.of("testNamespace"))
+				.build();
+		final var requestContext = LeiaRequestContext.builder().ignoreCache(false).build();
+		var schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+		Assertions.assertTrue(schemas.isEmpty());
+		Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
+				.thenReturn(List.of(schemaDetails));
+		LeiaUtils.sleepUntil(4);
+		schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+		Assertions.assertTrue(schemas.isEmpty());
+		schemaDetails.setSchemaState(SchemaState.APPROVED);
+		Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
+				.thenReturn(List.of(schemaDetails));
+		LeiaUtils.sleepUntil(4);
+		schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+		Assertions.assertTrue(schemas.isEmpty());
+	}
 
-    @Test
-    @SneakyThrows
-    void testGetAllSchemasNoCache() {
-        final var retriever = new SchemaRetriever(() -> repository, null);
-        Assertions.assertNull(retriever.getRefresher());
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        var searchRequest = SearchRequest.builder()
-                .schemaNames(Set.of("testNamespace"))
-                .states(Set.of(SchemaState.APPROVED))
-                .build();
-        Mockito.when(repository.getSchemas(searchRequest))
-                .thenReturn(List.of());
+	@Test
+	@SneakyThrows
+	void testGetAllSchemasNoCache() {
+		final var retriever = new SchemaRetriever(() -> repository, null);
+		Assertions.assertNull(retriever.getRefresher());
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		var searchRequest = SearchRequest.builder()
+				.schemaNames(Set.of("testNamespace"))
+				.states(Set.of(SchemaState.APPROVED))
+				.build();
+		Mockito.when(repository.getSchemas(searchRequest))
+				.thenReturn(List.of());
 
-        final var requestContext = LeiaRequestContext.builder().build();
-        var schemas = retriever.getSchemaDetails(requestContext, searchRequest);
-        Assertions.assertTrue(schemas.isEmpty());
-        searchRequest =
-                SearchRequest.builder()
-                        .schemaNames(Set.of("testNamespace"))
-                        .states(Arrays.stream(SchemaState.values()).collect(Collectors.toSet()))
-                        .build();
-        Mockito.when(repository.getSchemas(searchRequest)).thenReturn(List.of());
-        searchRequest = SearchRequest.builder()
-                .schemaNames(Set.of("testNamespace"))
-                .build();
-        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
-        Assertions.assertTrue(schemas.isEmpty());
-    }
+		final var requestContext = LeiaRequestContext.builder().build();
+		var schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+		Assertions.assertTrue(schemas.isEmpty());
+		searchRequest =
+				SearchRequest.builder()
+						.schemaNames(Set.of("testNamespace"))
+						.states(Arrays.stream(SchemaState.values()).collect(Collectors.toSet()))
+						.build();
+		Mockito.when(repository.getSchemas(searchRequest)).thenReturn(List.of());
+		searchRequest = SearchRequest.builder()
+				.schemaNames(Set.of("testNamespace"))
+				.build();
+		schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+		Assertions.assertTrue(schemas.isEmpty());
+	}
 
-    @Test
-    @SneakyThrows
-    void testGetAllSchemasWithCache() {
-        final var retriever = new SchemaRetriever(() -> repository, getCacheConfig());
-        Assertions.assertNotNull(retriever.getRefresher());
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        var searchRequest = SearchRequest.builder()
-                .build();
-        Mockito.when(repository.getSchemas(searchRequest))
-                .thenReturn(List.of());
-        searchRequest = SearchRequest.builder()
-                .schemaNames(Set.of("testNamespace"))
-                .build();
-        final var requestContext = LeiaRequestContext.builder().ignoreCache(false).build();
-        var schemas = retriever.getSchemaDetails(requestContext, searchRequest);
-        Assertions.assertTrue(schemas.isEmpty());
-        searchRequest = SearchRequest.builder()
-                .build();
-        Mockito.when(repository.getSchemas(searchRequest))
-                .thenReturn(List.of());
-        LeiaUtils.sleepUntil(4);
-        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
-        Assertions.assertTrue(schemas.isEmpty());
-        Mockito.when(repository.getSchemas(Mockito.any(SearchRequest.class)))
-                .thenReturn(List.of(schemaDetails));
-        LeiaUtils.sleepUntil(4);
-        schemas = retriever.getSchemaDetails(requestContext, searchRequest);
-        Assertions.assertFalse(schemas.isEmpty());
-    }
+	@Test
+	@SneakyThrows
+	void testGetAllSchemasWithCache() {
+		final var retriever = new SchemaRetriever(() -> repository, getCacheConfig());
+		Assertions.assertNotNull(retriever.getRefresher());
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		var searchRequest = SearchRequest.builder()
+				.build();
+		Mockito.when(repository.getSchemas(searchRequest))
+				.thenReturn(List.of());
+		searchRequest = SearchRequest.builder()
+				.schemaNames(Set.of("testNamespace"))
+				.build();
+		final var requestContext = LeiaRequestContext.builder().ignoreCache(false).build();
+		var schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+		Assertions.assertTrue(schemas.isEmpty());
+		searchRequest = SearchRequest.builder()
+				.build();
+		Mockito.when(repository.getSchemas(searchRequest))
+				.thenReturn(List.of());
+		LeiaUtils.sleepUntil(4);
+		schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+		Assertions.assertTrue(schemas.isEmpty());
+		Mockito.when(repository.getSchemas(Mockito.any(SearchRequest.class)))
+				.thenReturn(List.of(schemaDetails));
+		LeiaUtils.sleepUntil(4);
+		schemas = retriever.getSchemaDetails(requestContext, searchRequest);
+		Assertions.assertFalse(schemas.isEmpty());
+	}
 }

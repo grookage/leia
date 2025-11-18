@@ -18,8 +18,8 @@ package com.grookage.leia.models.schema;
 
 public interface SchemaValidationVisitor<T> {
 
-    T strict();
+	T strict();
 
-    T matching();
+	T matching();
 
 }

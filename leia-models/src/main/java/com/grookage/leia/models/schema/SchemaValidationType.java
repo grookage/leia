@@ -19,19 +19,19 @@ package com.grookage.leia.models.schema;
 
 public enum SchemaValidationType {
 
-    STRICT {
-        @Override
-        public <T> T accept(SchemaValidationVisitor<T> eventVisitor) {
-            return eventVisitor.strict();
-        }
-    },
+	STRICT {
+		@Override
+		public <T> T accept(SchemaValidationVisitor<T> eventVisitor) {
+			return eventVisitor.strict();
+		}
+	},
 
-    MATCHING {
-        @Override
-        public <T> T accept(SchemaValidationVisitor<T> eventVisitor) {
-            return eventVisitor.matching();
-        }
-    };
+	MATCHING {
+		@Override
+		public <T> T accept(SchemaValidationVisitor<T> eventVisitor) {
+			return eventVisitor.matching();
+		}
+	};
 
-    public abstract <T> T accept(SchemaValidationVisitor<T> validationVisitor);
+	public abstract <T> T accept(SchemaValidationVisitor<T> validationVisitor);
 }

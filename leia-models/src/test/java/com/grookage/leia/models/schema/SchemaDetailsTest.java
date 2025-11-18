@@ -23,21 +23,21 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class SchemaDetailsTest {
-    @Test
-    @SneakyThrows
-    void testSchemaDetails() {
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        Assertions.assertNotNull(schemaDetails);
-        final var schemaKey = schemaDetails.getSchemaKey();
-        Assertions.assertNotNull(schemaKey);
-        Assertions.assertEquals("testNamespace", schemaKey.getNamespace());
-        Assertions.assertEquals("testSchema", schemaKey.getSchemaName());
-        Assertions.assertEquals("V1234", schemaKey.getVersion());
-        final var schemaAttributes = schemaDetails.getAttributes();
-        Assertions.assertNotNull(schemaAttributes);
-        Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
-        Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ENUM));
-        Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.INTEGER));
-    }
+	@Test
+	@SneakyThrows
+	void testSchemaDetails() {
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		Assertions.assertNotNull(schemaDetails);
+		final var schemaKey = schemaDetails.getSchemaKey();
+		Assertions.assertNotNull(schemaKey);
+		Assertions.assertEquals("testNamespace", schemaKey.getNamespace());
+		Assertions.assertEquals("testSchema", schemaKey.getSchemaName());
+		Assertions.assertEquals("V1234", schemaKey.getVersion());
+		final var schemaAttributes = schemaDetails.getAttributes();
+		Assertions.assertNotNull(schemaAttributes);
+		Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
+		Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ENUM));
+		Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.INTEGER));
+	}
 }

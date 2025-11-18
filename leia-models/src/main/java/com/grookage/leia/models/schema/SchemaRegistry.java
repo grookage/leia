@@ -29,17 +29,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor
 public class SchemaRegistry {
 
-    private final ConcurrentHashMap<SchemaKey, SchemaDetails> schemas = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<SchemaKey, SchemaDetails> schemas = new ConcurrentHashMap<>();
 
-    public void add(final SchemaDetails schemaDetails) {
-        schemas.putIfAbsent(schemaDetails.getSchemaKey(), schemaDetails);
-    }
+	public void add(final SchemaDetails schemaDetails) {
+		schemas.putIfAbsent(schemaDetails.getSchemaKey(), schemaDetails);
+	}
 
-    public Optional<SchemaDetails> getSchemaDetails(final SchemaKey schemaKey) {
-        return Optional.ofNullable(schemas.get(schemaKey));
-    }
+	public Optional<SchemaDetails> getSchemaDetails(final SchemaKey schemaKey) {
+		return Optional.ofNullable(schemas.get(schemaKey));
+	}
 
-    public Collection<SchemaDetails> getSchemaDetails() {
-        return schemas.values();
-    }
+	public Collection<SchemaDetails> getSchemaDetails() {
+		return schemas.values();
+	}
 }

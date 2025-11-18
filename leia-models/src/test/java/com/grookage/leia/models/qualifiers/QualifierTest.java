@@ -23,11 +23,11 @@ import org.junit.jupiter.api.Test;
 
 class QualifierTest {
 
-    @Test
-    @SneakyThrows
-    void testAttributeStructures() {
-        var qualifierInfo = ResourceHelper.getResource("qualifiers/piiQualifier.json", QualifierInfo.class);
-        Assertions.assertNotNull(qualifierInfo);
-        Assertions.assertSame(QualifierType.PII, qualifierInfo.getType());
-    }
+	@Test
+	@SneakyThrows
+	void testAttributeStructures() {
+		var qualifierInfo = ResourceHelper.getResource("qualifiers/piiQualifier.json", QualifierInfo.class);
+		Assertions.assertNotNull(qualifierInfo);
+		Assertions.assertSame(QualifierType.PII, qualifierInfo.getType());
+	}
 }

@@ -13,14 +13,14 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 public class CharacterAttribute extends SchemaAttribute {
-    public CharacterAttribute(final String name,
-                              final boolean optional,
-                              final Set<QualifierInfo> qualifiers) {
-        super(DataType.CHARACTER, name, optional, qualifiers);
-    }
+	public CharacterAttribute(final String name,
+	                          final boolean optional,
+	                          final Set<QualifierInfo> qualifiers) {
+		super(DataType.CHARACTER, name, optional, qualifiers);
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }

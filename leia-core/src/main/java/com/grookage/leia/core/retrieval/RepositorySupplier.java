@@ -27,25 +27,25 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public class RepositorySupplier implements KorgSupplier<SchemaRegistry> {
 
-    private final Supplier<SchemaRepository> rSupplier;
+	private final Supplier<SchemaRepository> rSupplier;
 
-    @Override
-    public void start() {
-        //NOOP
-    }
+	@Override
+	public void start() {
+		//NOOP
+	}
 
-    @Override
-    public void stop() {
-        //NOOP
-    }
+	@Override
+	public void stop() {
+		//NOOP
+	}
 
-    @Override
-    public SchemaRegistry get() {
-        final var schemaDetails = rSupplier.get().getSchemas(
-                SearchRequest.builder().build()
-        );
-        final var registry = new SchemaRegistry();
-        schemaDetails.forEach(registry::add);
-        return registry;
-    }
+	@Override
+	public SchemaRegistry get() {
+		final var schemaDetails = rSupplier.get().getSchemas(
+				SearchRequest.builder().build()
+		);
+		final var registry = new SchemaRegistry();
+		schemaDetails.forEach(registry::add);
+		return registry;
+	}
 }

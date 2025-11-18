@@ -18,8 +18,8 @@ package com.grookage.leia.dropwizard.bundle.lifecycle;
 
 public interface Lifecycle {
 
-    void start();
+	void start();
 
-    void stop();
+	void stop();
 
 }

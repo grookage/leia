@@ -23,7 +23,7 @@ import java.util.Collection;
 @UtilityClass
 public class CollectionUtils {
 
-    public boolean isNullOrEmpty(Collection<?> collection) {
-        return null == collection || collection.isEmpty();
-    }
+	public boolean isNullOrEmpty(Collection<?> collection) {
+		return null == collection || collection.isEmpty();
+	}
 }

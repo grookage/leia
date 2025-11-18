@@ -31,23 +31,23 @@ import java.util.Set;
 @NoArgsConstructor
 public class MapAttribute extends SchemaAttribute {
 
-    private SchemaAttribute keyAttribute;
-    private SchemaAttribute valueAttribute;
+	private SchemaAttribute keyAttribute;
+	private SchemaAttribute valueAttribute;
 
-    public MapAttribute(final String name,
-                        final boolean optional,
-                        final Set<QualifierInfo> qualifiers,
-                        SchemaAttribute keyAttribute,
-                        SchemaAttribute valueAttribute) {
-        super(DataType.MAP, name, optional, qualifiers);
-        Preconditions.checkArgument(keyAttribute == null || valueAttribute != null);
-        this.keyAttribute = keyAttribute;
-        this.valueAttribute = valueAttribute;
-    }
+	public MapAttribute(final String name,
+	                    final boolean optional,
+	                    final Set<QualifierInfo> qualifiers,
+	                    SchemaAttribute keyAttribute,
+	                    SchemaAttribute valueAttribute) {
+		super(DataType.MAP, name, optional, qualifiers);
+		Preconditions.checkArgument(keyAttribute == null || valueAttribute != null);
+		this.keyAttribute = keyAttribute;
+		this.valueAttribute = valueAttribute;
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }
 

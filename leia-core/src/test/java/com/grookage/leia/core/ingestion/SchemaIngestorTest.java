@@ -35,88 +35,88 @@ import java.util.Optional;
 
 class SchemaIngestorTest {
 
-    private static final StubbedSchemaUpdater schemaUpdater = new StubbedSchemaUpdater();
-    private static SchemaProcessorHub schemaProcessorHub;
-    private static SchemaIngestor<StubbedSchemaUpdater> schemaIngestor;
+	private static final StubbedSchemaUpdater schemaUpdater = new StubbedSchemaUpdater();
+	private static SchemaProcessorHub schemaProcessorHub;
+	private static SchemaIngestor<StubbedSchemaUpdater> schemaIngestor;
 
-    @BeforeEach
-    void setup() {
-        schemaProcessorHub = Mockito.mock(SchemaProcessorHub.class);
-        schemaIngestor = new SchemaIngestor<StubbedSchemaUpdater>()
-                .withProcessorHub(schemaProcessorHub).build();
+	@BeforeEach
+	void setup() {
+		schemaProcessorHub = Mockito.mock(SchemaProcessorHub.class);
+		schemaIngestor = new SchemaIngestor<StubbedSchemaUpdater>()
+				.withProcessorHub(schemaProcessorHub).build();
 
-    }
+	}
 
-    @Test
-    @SneakyThrows
-    void testCreateSchemaNoProcessor() {
-        Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
-                .thenReturn(Optional.empty());
-        final var createSchemaRequest = ResourceHelper.getResource(
-                "schema/createSchemaRequest.json",
-                CreateSchemaRequest.class
-        );
-        Assertions.assertNotNull(createSchemaRequest);
-        Assertions.assertThrows(LeiaException.class, () -> schemaIngestor.add(schemaUpdater, createSchemaRequest));
-    }
+	@Test
+	@SneakyThrows
+	void testCreateSchemaNoProcessor() {
+		Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
+				.thenReturn(Optional.empty());
+		final var createSchemaRequest = ResourceHelper.getResource(
+				"schema/createSchemaRequest.json",
+				CreateSchemaRequest.class
+		);
+		Assertions.assertNotNull(createSchemaRequest);
+		Assertions.assertThrows(LeiaException.class, () -> schemaIngestor.add(schemaUpdater, createSchemaRequest));
+	}
 
-    @Test
-    @SneakyThrows
-    void testCreateSchema() {
-        final var schemaProcessor = Mockito.mock(SchemaProcessor.class);
-        Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
-                .thenReturn(Optional.of(schemaProcessor));
-        final var createSchemaRequest = ResourceHelper.getResource(
-                "schema/createSchemaRequest.json",
-                CreateSchemaRequest.class
-        );
-        Assertions.assertNotNull(createSchemaRequest);
-        schemaIngestor.add(schemaUpdater, createSchemaRequest);
-        Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
-    }
+	@Test
+	@SneakyThrows
+	void testCreateSchema() {
+		final var schemaProcessor = Mockito.mock(SchemaProcessor.class);
+		Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
+				.thenReturn(Optional.of(schemaProcessor));
+		final var createSchemaRequest = ResourceHelper.getResource(
+				"schema/createSchemaRequest.json",
+				CreateSchemaRequest.class
+		);
+		Assertions.assertNotNull(createSchemaRequest);
+		schemaIngestor.add(schemaUpdater, createSchemaRequest);
+		Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
+	}
 
-    @Test
-    @SneakyThrows
-    void testUpdateSchema() {
-        final var schemaProcessor = Mockito.mock(SchemaProcessor.class);
-        Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
-                .thenReturn(Optional.of(schemaProcessor));
-        final var updateSchemaRequest = ResourceHelper.getResource(
-                "schema/updateSchemaRequest.json",
-                UpdateSchemaRequest.class
-        );
-        Assertions.assertNotNull(updateSchemaRequest);
-        schemaIngestor.update(schemaUpdater, updateSchemaRequest);
-        Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
-    }
+	@Test
+	@SneakyThrows
+	void testUpdateSchema() {
+		final var schemaProcessor = Mockito.mock(SchemaProcessor.class);
+		Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
+				.thenReturn(Optional.of(schemaProcessor));
+		final var updateSchemaRequest = ResourceHelper.getResource(
+				"schema/updateSchemaRequest.json",
+				UpdateSchemaRequest.class
+		);
+		Assertions.assertNotNull(updateSchemaRequest);
+		schemaIngestor.update(schemaUpdater, updateSchemaRequest);
+		Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
+	}
 
-    @Test
-    @SneakyThrows
-    void testApproveSchema() {
-        final var schemaProcessor = Mockito.mock(SchemaProcessor.class);
-        Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
-                .thenReturn(Optional.of(schemaProcessor));
-        final var schemaKey = ResourceHelper.getResource(
-                "schema/schemaKey.json",
-                SchemaKey.class
-        );
-        Assertions.assertNotNull(schemaKey);
-        schemaIngestor.approve(schemaUpdater, schemaKey);
-        Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
-    }
+	@Test
+	@SneakyThrows
+	void testApproveSchema() {
+		final var schemaProcessor = Mockito.mock(SchemaProcessor.class);
+		Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
+				.thenReturn(Optional.of(schemaProcessor));
+		final var schemaKey = ResourceHelper.getResource(
+				"schema/schemaKey.json",
+				SchemaKey.class
+		);
+		Assertions.assertNotNull(schemaKey);
+		schemaIngestor.approve(schemaUpdater, schemaKey);
+		Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
+	}
 
-    @Test
-    @SneakyThrows
-    void testRejectSchema() {
-        final var schemaProcessor = Mockito.mock(SchemaProcessor.class);
-        Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
-                .thenReturn(Optional.of(schemaProcessor));
-        final var schemaKey = ResourceHelper.getResource(
-                "schema/schemaKey.json",
-                SchemaKey.class
-        );
-        Assertions.assertNotNull(schemaKey);
-        schemaIngestor.reject(schemaUpdater, schemaKey);
-        Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
-    }
+	@Test
+	@SneakyThrows
+	void testRejectSchema() {
+		final var schemaProcessor = Mockito.mock(SchemaProcessor.class);
+		Mockito.when(schemaProcessorHub.getProcessor(Mockito.any(SchemaEvent.class)))
+				.thenReturn(Optional.of(schemaProcessor));
+		final var schemaKey = ResourceHelper.getResource(
+				"schema/schemaKey.json",
+				SchemaKey.class
+		);
+		Assertions.assertNotNull(schemaKey);
+		schemaIngestor.reject(schemaUpdater, schemaKey);
+		Mockito.verify(schemaProcessor, Mockito.times(1)).process(Mockito.any());
+	}
 }

@@ -33,41 +33,41 @@ import java.util.Set;
 
 class SchemaClientTest {
 
-    @Test
-    @SneakyThrows
-    void testSchemaClient() {
-        final var clientRefresher = Mockito.mock(LeiaClientRefresher.class);
-        final var schemaValidator = Mockito.mock(LeiaSchemaValidator.class);
-        final var schemaClient = TestableSchemaClient.builder()
-                .refresher(clientRefresher)
-                .schemaValidator(schemaValidator)
-                .build();
-        Assertions.assertNull(schemaClient.getSchemaDetails());
-        final var requestKey = SchemaKey.builder()
-                        .build();
-        Assertions.assertThrows(IllegalStateException.class, () -> schemaClient.getSchemaDetails(Set.of(requestKey)));
-        Assertions.assertFalse(schemaClient.valid(SchemaKey.builder().build()));
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        Assertions.assertNotNull(schemaDetails);
-        final var schemaKey = schemaDetails.getSchemaKey();
-        Mockito.when(clientRefresher.getData()).thenReturn(List.of(schemaDetails));
-        final var details = schemaClient.getSchemaDetails();
-        Assertions.assertNotNull(details);
-        Assertions.assertTrue(schemaClient.getSchemaDetails(Set.of()).isEmpty());
-        Assertions.assertFalse(schemaClient.valid(schemaKey));
-    }
+	@Test
+	@SneakyThrows
+	void testSchemaClient() {
+		final var clientRefresher = Mockito.mock(LeiaClientRefresher.class);
+		final var schemaValidator = Mockito.mock(LeiaSchemaValidator.class);
+		final var schemaClient = TestableSchemaClient.builder()
+				.refresher(clientRefresher)
+				.schemaValidator(schemaValidator)
+				.build();
+		Assertions.assertNull(schemaClient.getSchemaDetails());
+		final var requestKey = SchemaKey.builder()
+				.build();
+		Assertions.assertThrows(IllegalStateException.class, () -> schemaClient.getSchemaDetails(Set.of(requestKey)));
+		Assertions.assertFalse(schemaClient.valid(SchemaKey.builder().build()));
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		Assertions.assertNotNull(schemaDetails);
+		final var schemaKey = schemaDetails.getSchemaKey();
+		Mockito.when(clientRefresher.getData()).thenReturn(List.of(schemaDetails));
+		final var details = schemaClient.getSchemaDetails();
+		Assertions.assertNotNull(details);
+		Assertions.assertTrue(schemaClient.getSchemaDetails(Set.of()).isEmpty());
+		Assertions.assertFalse(schemaClient.valid(schemaKey));
+	}
 
-    static class TestableSchemaClient extends AbstractSchemaClient {
+	static class TestableSchemaClient extends AbstractSchemaClient {
 
-        @Builder
-        public TestableSchemaClient(LeiaClientRefresher refresher, LeiaSchemaValidator schemaValidator) {
-            super(new ObjectMapper(), refresher, schemaValidator);
-        }
+		@Builder
+		public TestableSchemaClient(LeiaClientRefresher refresher, LeiaSchemaValidator schemaValidator) {
+			super(new ObjectMapper(), refresher, schemaValidator);
+		}
 
-        @Override
-        public void start() {
-            //Noop
-        }
-    }
+		@Override
+		public void start() {
+			//Noop
+		}
+	}
 }

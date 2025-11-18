@@ -31,7 +31,7 @@ import javax.validation.constraints.NotEmpty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AttributeTransformer {
 
-    @NotEmpty String attributeName;
-    @NotEmpty String transformationPath;
-    boolean serialize;
+	@NotEmpty String attributeName;
+	@NotEmpty String transformationPath;
+	boolean serialize;
 }

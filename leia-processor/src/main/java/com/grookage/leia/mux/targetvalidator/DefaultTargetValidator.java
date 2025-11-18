@@ -24,10 +24,10 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class DefaultTargetValidator implements TargetValidator {
 
-    @Override
-    public boolean validate(TransformationTarget transformationTarget,
-                            MessageRequest messageRequest,
-                            SchemaDetails schemaDetails) {
-        return true;
-    }
+	@Override
+	public boolean validate(TransformationTarget transformationTarget,
+	                        MessageRequest messageRequest,
+	                        SchemaDetails schemaDetails) {
+		return true;
+	}
 }

@@ -18,9 +18,9 @@ package com.grookage.leia.models.qualifiers;
 
 public enum QualifierType {
 
-    STANDARD,
-    PII,
-    SHORT_LIVED,
+	STANDARD,
+	PII,
+	SHORT_LIVED,
 
-    ENCRYPTED
+	ENCRYPTED
 }

@@ -13,14 +13,14 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 public class ShortAttribute extends SchemaAttribute {
-    public ShortAttribute(final String name,
-                          final boolean optional,
-                          final Set<QualifierInfo> qualifiers) {
-        super(DataType.SHORT, name, optional, qualifiers);
-    }
+	public ShortAttribute(final String name,
+	                      final boolean optional,
+	                      final Set<QualifierInfo> qualifiers) {
+		super(DataType.SHORT, name, optional, qualifiers);
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }

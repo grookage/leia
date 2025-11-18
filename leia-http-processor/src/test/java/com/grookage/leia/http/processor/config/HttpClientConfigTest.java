@@ -22,19 +22,19 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class HttpClientConfigTest {
-    @Test
-    @SneakyThrows
-    void testHttpClientConfig() {
-        final var clientConfig = ResourceHelper.getResource("httpClientConfig.json", HttpClientConfig.class);
-        Assertions.assertNotNull(clientConfig);
-        Assertions.assertEquals("testClient", clientConfig.getClientId());
-        Assertions.assertEquals(10, clientConfig.getMaxConnPerRoute());
-        Assertions.assertEquals(1, clientConfig.getBackendConfigs().size());
-        final var backend = clientConfig.getBackendConfigs().stream().findFirst().orElse(null);
-        Assertions.assertNotNull(backend);
-        Assertions.assertEquals("backend1", backend.getBackendName());
-        Assertions.assertEquals("127.0.0.1", backend.getHost());
-        Assertions.assertEquals(8080, backend.getPort());
-        Assertions.assertSame(backend.getBackendType(), BackendType.SYNC);
-    }
+	@Test
+	@SneakyThrows
+	void testHttpClientConfig() {
+		final var clientConfig = ResourceHelper.getResource("httpClientConfig.json", HttpClientConfig.class);
+		Assertions.assertNotNull(clientConfig);
+		Assertions.assertEquals("testClient", clientConfig.getClientId());
+		Assertions.assertEquals(10, clientConfig.getMaxConnPerRoute());
+		Assertions.assertEquals(1, clientConfig.getBackendConfigs().size());
+		final var backend = clientConfig.getBackendConfigs().stream().findFirst().orElse(null);
+		Assertions.assertNotNull(backend);
+		Assertions.assertEquals("backend1", backend.getBackendName());
+		Assertions.assertEquals("127.0.0.1", backend.getHost());
+		Assertions.assertEquals(8080, backend.getPort());
+		Assertions.assertSame(backend.getBackendType(), BackendType.SYNC);
+	}
 }

@@ -22,6 +22,6 @@ import java.util.Set;
 
 public interface BackendNameResolver {
 
-    Set<String> getEligibleBackends(LeiaMessage leiaMessage);
+	Set<String> getEligibleBackends(LeiaMessage leiaMessage);
 
 }

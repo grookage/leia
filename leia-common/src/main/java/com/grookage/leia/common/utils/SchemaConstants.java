@@ -9,15 +9,15 @@ import java.util.Set;
 
 @UtilityClass
 public class SchemaConstants {
-    public static final Set<Class<?>> SUPPORTED_DATE_CLASSES = Set.of(
-            LocalDate.class, LocalTime.class, LocalDateTime.class,
-            ZonedDateTime.class, OffsetDateTime.class, OffsetTime.class,
-            Instant.class,
-            Date.class, Calendar.class
-    );
+	public static final Set<Class<?>> SUPPORTED_DATE_CLASSES = Set.of(
+			LocalDate.class, LocalTime.class, LocalDateTime.class,
+			ZonedDateTime.class, OffsetDateTime.class, OffsetTime.class,
+			Instant.class,
+			Date.class, Calendar.class
+	);
 
-    public static final Set<Class<?>> BOXED_PRIMITIVES = Set.of(
-            Integer.class, Boolean.class, Double.class, Long.class,
-            Float.class, Short.class, Character.class, Byte.class
-    );
+	public static final Set<Class<?>> BOXED_PRIMITIVES = Set.of(
+			Integer.class, Boolean.class, Double.class, Long.class,
+			Float.class, Short.class, Character.class, Byte.class
+	);
 }

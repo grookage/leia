@@ -19,33 +19,33 @@ package com.grookage.leia.models.schema.engine;
 
 public enum SchemaEvent {
 
-    CREATE_SCHEMA {
-        @Override
-        public <T> T accept(SchemaEventVisitor<T> eventVisitor) {
-            return eventVisitor.schemaCreate();
-        }
-    },
+	CREATE_SCHEMA {
+		@Override
+		public <T> T accept(SchemaEventVisitor<T> eventVisitor) {
+			return eventVisitor.schemaCreate();
+		}
+	},
 
-    UPDATE_SCHEMA {
-        @Override
-        public <T> T accept(SchemaEventVisitor<T> eventVisitor) {
-            return eventVisitor.schemaUpdate();
-        }
-    },
+	UPDATE_SCHEMA {
+		@Override
+		public <T> T accept(SchemaEventVisitor<T> eventVisitor) {
+			return eventVisitor.schemaUpdate();
+		}
+	},
 
-    APPROVE_SCHEMA {
-        @Override
-        public <T> T accept(SchemaEventVisitor<T> eventVisitor) {
-            return eventVisitor.schemaApprove();
-        }
-    },
+	APPROVE_SCHEMA {
+		@Override
+		public <T> T accept(SchemaEventVisitor<T> eventVisitor) {
+			return eventVisitor.schemaApprove();
+		}
+	},
 
-    REJECT_SCHEMA {
-        @Override
-        public <T> T accept(SchemaEventVisitor<T> eventVisitor) {
-            return eventVisitor.schemaReject();
-        }
-    };
+	REJECT_SCHEMA {
+		@Override
+		public <T> T accept(SchemaEventVisitor<T> eventVisitor) {
+			return eventVisitor.schemaReject();
+		}
+	};
 
-    public abstract <T> T accept(SchemaEventVisitor<T> eventVisitor);
+	public abstract <T> T accept(SchemaEventVisitor<T> eventVisitor);
 }

@@ -26,12 +26,12 @@ import java.util.Optional;
 @UtilityClass
 public class SchemaUtils {
 
-    public Optional<SchemaDetails> getMatchingSchema(
-            final List<SchemaDetails> allSchemas,
-            final SchemaKey schemaKey
-    ) {
-        return allSchemas.stream()
-                .filter(each -> each.getReferenceId().equals(schemaKey.getReferenceId()))
-                .findFirst();
-    }
+	public Optional<SchemaDetails> getMatchingSchema(
+			final List<SchemaDetails> allSchemas,
+			final SchemaKey schemaKey
+	) {
+		return allSchemas.stream()
+				.filter(each -> each.getReferenceId().equals(schemaKey.getReferenceId()))
+				.findFirst();
+	}
 }

@@ -16,9 +16,9 @@ import javax.validation.constraints.NotEmpty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AerospikeHost {
 
-    @NotEmpty
-    private String host;
-    @Min(1)
-    private int port;
-    private String tls;
+	@NotEmpty
+	private String host;
+	@Min(1)
+	private int port;
+	private String tls;
 }

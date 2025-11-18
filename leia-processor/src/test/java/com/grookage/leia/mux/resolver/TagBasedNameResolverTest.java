@@ -24,17 +24,17 @@ import org.junit.jupiter.api.Test;
 
 class TagBasedNameResolverTest {
 
-    @Test
-    @SneakyThrows
-    void testNameResolver() {
-        final var resolver = new TagBasedNameResolver();
-        final var leiaMessage = ResourceHelper.getResource("mux/leiaMessage.json", LeiaMessage.class);
-        Assertions.assertNotNull(leiaMessage);
-        final var eligibleBackends = resolver.getEligibleBackends(leiaMessage);
-        Assertions.assertFalse(eligibleBackends.isEmpty());
-        Assertions.assertEquals(2, eligibleBackends.size());
-        Assertions.assertTrue(eligibleBackends.contains("BACKEND1"));
-        Assertions.assertTrue(eligibleBackends.contains("BACKEND2"));
-        Assertions.assertFalse(eligibleBackends.contains("BACKEND3"));
-    }
+	@Test
+	@SneakyThrows
+	void testNameResolver() {
+		final var resolver = new TagBasedNameResolver();
+		final var leiaMessage = ResourceHelper.getResource("mux/leiaMessage.json", LeiaMessage.class);
+		Assertions.assertNotNull(leiaMessage);
+		final var eligibleBackends = resolver.getEligibleBackends(leiaMessage);
+		Assertions.assertFalse(eligibleBackends.isEmpty());
+		Assertions.assertEquals(2, eligibleBackends.size());
+		Assertions.assertTrue(eligibleBackends.contains("BACKEND1"));
+		Assertions.assertTrue(eligibleBackends.contains("BACKEND2"));
+		Assertions.assertFalse(eligibleBackends.contains("BACKEND3"));
+	}
 }

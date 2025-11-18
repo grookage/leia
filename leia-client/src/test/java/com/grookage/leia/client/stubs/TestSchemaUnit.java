@@ -29,6 +29,6 @@ import javax.validation.constraints.NotEmpty;
 @Builder
 public class TestSchemaUnit {
 
-    @NotEmpty
-    private String registeredName;
+	@NotEmpty
+	private String registeredName;
 }

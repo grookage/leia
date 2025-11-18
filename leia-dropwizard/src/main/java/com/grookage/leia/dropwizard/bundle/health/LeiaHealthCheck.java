@@ -22,9 +22,9 @@ import lombok.Getter;
 @Getter
 public abstract class LeiaHealthCheck extends HealthCheck {
 
-    private final String name;
+	private final String name;
 
-    protected LeiaHealthCheck(String name) {
-        this.name = name;
-    }
+	protected LeiaHealthCheck(String name) {
+		this.name = name;
+	}
 }

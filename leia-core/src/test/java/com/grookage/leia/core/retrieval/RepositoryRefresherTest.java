@@ -32,51 +32,51 @@ import org.mockito.Mockito;
 
 class RepositoryRefresherTest {
 
-    @Test
-    @SneakyThrows
-    void testRepositoryRefresher() {
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        final var supplier = Mockito.mock(RepositorySupplier.class);
-        final var registry = SchemaRegistry.builder()
-                .build();
-        Mockito.when(supplier.get()).thenReturn(registry);
-        final var refresher = new RepositoryRefresher(supplier, 5, true);
-        refresher.start();
-        Assertions.assertTrue(refresher.getData().getSchemas().isEmpty());
-        registry.add(schemaDetails);
-        LeiaUtils.sleepFor(6);
-        final var schemas = refresher.getData();
-        final var schema = schemas.getSchemaDetails(SchemaKey.builder()
-                .namespace("testNamespace")
-                .schemaName("testSchema")
-                .version("V1234")
-                .orgId("testOrg")
-                .type("default")
-                .tenantId("tenantId")
-                .build()).orElse(null);
-        Assertions.assertNotNull(schema);
-    }
+	@Test
+	@SneakyThrows
+	void testRepositoryRefresher() {
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		final var supplier = Mockito.mock(RepositorySupplier.class);
+		final var registry = SchemaRegistry.builder()
+				.build();
+		Mockito.when(supplier.get()).thenReturn(registry);
+		final var refresher = new RepositoryRefresher(supplier, 5, true);
+		refresher.start();
+		Assertions.assertTrue(refresher.getData().getSchemas().isEmpty());
+		registry.add(schemaDetails);
+		LeiaUtils.sleepFor(6);
+		final var schemas = refresher.getData();
+		final var schema = schemas.getSchemaDetails(SchemaKey.builder()
+				.namespace("testNamespace")
+				.schemaName("testSchema")
+				.version("V1234")
+				.orgId("testOrg")
+				.type("default")
+				.tenantId("tenantId")
+				.build()).orElse(null);
+		Assertions.assertNotNull(schema);
+	}
 
-    @Test
-    void testRepositoryRefresher_whenSupplierReturnNullAtStart() {
-        final var supplier = Mockito.mock(RepositorySupplier.class);
-        Mockito.doReturn(null).when(supplier).get();
-        val repositoryRefresher = new RepositoryRefresher(supplier, 5, true);
-        final var exception = Assertions.assertThrows(KorgException.class,
-                repositoryRefresher::start);
-        Assertions.assertNotNull(exception);
-        Assertions.assertEquals(KorgErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
-    }
+	@Test
+	void testRepositoryRefresher_whenSupplierReturnNullAtStart() {
+		final var supplier = Mockito.mock(RepositorySupplier.class);
+		Mockito.doReturn(null).when(supplier).get();
+		val repositoryRefresher = new RepositoryRefresher(supplier, 5, true);
+		final var exception = Assertions.assertThrows(KorgException.class,
+				repositoryRefresher::start);
+		Assertions.assertNotNull(exception);
+		Assertions.assertEquals(KorgErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
+	}
 
-    @Test
-    void testRepositoryRefresher_whenSupplierThrowExceptionAtStart() {
-        final var supplier = Mockito.mock(RepositorySupplier.class);
-        Mockito.doThrow(KorgException.error(KorgErrorCode.REFRESH_FAILED)).when(supplier).get();
-        val repositoryRefresher = new RepositoryRefresher(supplier, 5, true);
-        final var exception = Assertions.assertThrows(KorgException.class,
-                repositoryRefresher::start);
-        Assertions.assertNotNull(exception);
-        Assertions.assertEquals(KorgErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
-    }
+	@Test
+	void testRepositoryRefresher_whenSupplierThrowExceptionAtStart() {
+		final var supplier = Mockito.mock(RepositorySupplier.class);
+		Mockito.doThrow(KorgException.error(KorgErrorCode.REFRESH_FAILED)).when(supplier).get();
+		val repositoryRefresher = new RepositoryRefresher(supplier, 5, true);
+		final var exception = Assertions.assertThrows(KorgException.class,
+				repositoryRefresher::start);
+		Assertions.assertNotNull(exception);
+		Assertions.assertEquals(KorgErrorCode.REFRESH_FAILED.getStatus(), exception.getStatus());
+	}
 }

@@ -25,7 +25,7 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EncryptedQualifier extends QualifierInfo {
 
-    public EncryptedQualifier() {
-        super(QualifierType.ENCRYPTED);
-    }
+	public EncryptedQualifier() {
+		super(QualifierType.ENCRYPTED);
+	}
 }

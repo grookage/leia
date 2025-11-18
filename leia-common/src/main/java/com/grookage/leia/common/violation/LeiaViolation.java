@@ -21,14 +21,14 @@ package com.grookage.leia.common.violation;
  */
 public interface LeiaViolation {
 
-    /**
-     * @return Error message for the violation
-     */
-    String message();
+	/**
+	 * @return Error message for the violation
+	 */
+	String message();
 
-    /**
-     * @return Relative path of the field being validated
-     */
-    String fieldPath();
+	/**
+	 * @return Relative path of the field being validated
+	 */
+	String fieldPath();
 }
 

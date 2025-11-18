@@ -37,35 +37,35 @@ import java.security.cert.CertificateException;
 @UtilityClass
 public class ElasticClientUtils {
 
-    public static CredentialsProvider getAuthCredentials(ElasticConfig configuration) {
-        if (!configuration.getAuthConfig().isEnabled()) return null;
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(
-                AuthScope.ANY,
-                new UsernamePasswordCredentials(
-                        configuration.getAuthConfig().getUsername(),
-                        configuration.getAuthConfig().getPassword()
-                )
-        );
-        return credentialsProvider;
-    }
+	public static CredentialsProvider getAuthCredentials(ElasticConfig configuration) {
+		if (!configuration.getAuthConfig().isEnabled()) return null;
+		CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+		credentialsProvider.setCredentials(
+				AuthScope.ANY,
+				new UsernamePasswordCredentials(
+						configuration.getAuthConfig().getUsername(),
+						configuration.getAuthConfig().getPassword()
+				)
+		);
+		return credentialsProvider;
+	}
 
-    public static SSLContext getSslContext(ElasticConfig configuration)
-            throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, KeyManagementException {
-        if (!configuration.getAuthConfig().isTlsEnabled()) return null;
-        final var trustStorePath = Paths.get(configuration.getAuthConfig().getTrustStorePath());
-        final var truststore = KeyStore.getInstance(configuration.getAuthConfig().getKeyStoreType());
-        try (final var is = Files.newInputStream(trustStorePath)) {
-            truststore.load(is, configuration.getAuthConfig().getKeyStorePass().toCharArray());
-        }
-        return SSLContexts.custom()
-                .loadTrustMaterial(truststore, null)
-                .build();
-    }
+	public static SSLContext getSslContext(ElasticConfig configuration)
+			throws KeyStoreException, IOException, CertificateException, NoSuchAlgorithmException, KeyManagementException {
+		if (!configuration.getAuthConfig().isTlsEnabled()) return null;
+		final var trustStorePath = Paths.get(configuration.getAuthConfig().getTrustStorePath());
+		final var truststore = KeyStore.getInstance(configuration.getAuthConfig().getKeyStoreType());
+		try (final var is = Files.newInputStream(trustStorePath)) {
+			truststore.load(is, configuration.getAuthConfig().getKeyStorePass().toCharArray());
+		}
+		return SSLContexts.custom()
+				.loadTrustMaterial(truststore, null)
+				.build();
+	}
 
-    public static String getScheme(ElasticConfig configuration) {
-        if (null == configuration.getAuthConfig()) return "http";
-        return configuration.getAuthConfig().getScheme();
-    }
+	public static String getScheme(ElasticConfig configuration) {
+		if (null == configuration.getAuthConfig()) return "http";
+		return configuration.getAuthConfig().getScheme();
+	}
 
 }

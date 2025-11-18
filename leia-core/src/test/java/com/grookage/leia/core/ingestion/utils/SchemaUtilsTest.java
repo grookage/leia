@@ -25,20 +25,20 @@ import org.junit.jupiter.api.Test;
 
 class SchemaUtilsTest {
 
-    @Test
-    @SneakyThrows
-    void testSchemaUtils() {
-        final var createSchemaRequest = ResourceHelper.getResource(
-                "schema/createSchemaRequest.json",
-                CreateSchemaRequest.class
-        );
-        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest);
-        Assertions.assertNotNull(schemaDetails);
-        Assertions.assertEquals("testNamespace", schemaDetails.getSchemaKey().getNamespace());
-        Assertions.assertEquals("testSchema", schemaDetails.getSchemaKey().getSchemaName());
-        Assertions.assertEquals("V1234", schemaDetails.getSchemaKey().getVersion());
-        final var schemaAttributes = schemaDetails.getAttributes();
-        Assertions.assertNotNull(schemaAttributes);
-        Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
-    }
+	@Test
+	@SneakyThrows
+	void testSchemaUtils() {
+		final var createSchemaRequest = ResourceHelper.getResource(
+				"schema/createSchemaRequest.json",
+				CreateSchemaRequest.class
+		);
+		final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest);
+		Assertions.assertNotNull(schemaDetails);
+		Assertions.assertEquals("testNamespace", schemaDetails.getSchemaKey().getNamespace());
+		Assertions.assertEquals("testSchema", schemaDetails.getSchemaKey().getSchemaName());
+		Assertions.assertEquals("V1234", schemaDetails.getSchemaKey().getVersion());
+		final var schemaAttributes = schemaDetails.getAttributes();
+		Assertions.assertNotNull(schemaAttributes);
+		Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
+	}
 }

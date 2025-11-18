@@ -16,17 +16,13 @@
 
 package com.grookage.leia.mux.filter;
 
-import com.grookage.leia.models.mux.LeiaMessage;
-
-import java.util.List;
-
 /**
  * Default implementation that allows all backends to process messages.
  */
 public class NoOpBackendFilter implements BackendFilter {
 
-    @Override
-    public boolean shouldProcess(String backendName) {
-        return true;
-    }
+	@Override
+	public boolean shouldProcess(String backendName) {
+		return true;
+	}
 }

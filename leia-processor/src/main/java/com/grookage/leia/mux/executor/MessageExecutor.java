@@ -17,11 +17,42 @@
 package com.grookage.leia.mux.executor;
 
 import com.grookage.leia.models.mux.LeiaMessage;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Set;
 
-public interface MessageExecutor {
-    void send(List<LeiaMessage> messages);
+@Slf4j
+@NoArgsConstructor
+public abstract class MessageExecutor {
 
-    void handleException(List<LeiaMessage> messages, Exception exception);
+	public abstract String getName();
+
+	public Set<Class<?>> getDroppableExceptions() {
+		return Set.of();
+	}
+
+	public abstract void sendEnvelope(List<LeiaMessage> messages);
+
+	private boolean isExceptionIgnorable(Throwable t) {
+		return getDroppableExceptions().stream()
+				.anyMatch(exceptionType -> exceptionType.isAssignableFrom(t.getClass()));
+	}
+
+	public void send(List<LeiaMessage> messages) {
+		try {
+			sendEnvelope(messages);
+		} catch (Exception e) {
+			log.error("There is an error trying to send the messages to executor name {}. Trying the exception handler", getName());
+			final var exceptionIgnorable = isExceptionIgnorable(e);
+			if (exceptionIgnorable) {
+				log.debug("The exception occurred has been marked as ignorable, ignoring the exception processing", e);
+			} else {
+				handleException(messages, e);
+			}
+		}
+	}
+
+	public abstract void handleException(List<LeiaMessage> messages, Exception exception);
 }

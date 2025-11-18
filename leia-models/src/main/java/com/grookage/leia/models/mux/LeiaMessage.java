@@ -33,9 +33,9 @@ import java.util.Set;
 @NoArgsConstructor
 public class LeiaMessage {
 
-    @NotEmpty
-    private SchemaKey schemaKey;
-    private Set<String> tags = Set.of();
-    @NotNull
-    private JsonNode message;
+	@NotEmpty
+	private SchemaKey schemaKey;
+	private Set<String> tags = Set.of();
+	@NotNull
+	private JsonNode message;
 }

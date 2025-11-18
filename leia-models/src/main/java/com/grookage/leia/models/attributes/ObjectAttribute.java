@@ -29,18 +29,18 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 public class ObjectAttribute extends SchemaAttribute {
-    Set<SchemaAttribute> nestedAttributes;
+	Set<SchemaAttribute> nestedAttributes;
 
-    public ObjectAttribute(final String name,
-                           final boolean optional,
-                           final Set<QualifierInfo> qualifiers,
-                           Set<SchemaAttribute> nestedAttributes) {
-        super(DataType.OBJECT, name, optional, qualifiers);
-        this.nestedAttributes = nestedAttributes;
-    }
+	public ObjectAttribute(final String name,
+	                       final boolean optional,
+	                       final Set<QualifierInfo> qualifiers,
+	                       Set<SchemaAttribute> nestedAttributes) {
+		super(DataType.OBJECT, name, optional, qualifiers);
+		this.nestedAttributes = nestedAttributes;
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }

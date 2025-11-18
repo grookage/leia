@@ -25,17 +25,17 @@ import java.util.function.Supplier;
 
 public abstract class SchemaProcessorTest {
 
-    @Getter
-    private static Supplier<SchemaRepository> repositorySupplier;
-    private static SchemaProcessor schemaProcessor;
+	@Getter
+	private static Supplier<SchemaRepository> repositorySupplier;
+	private static SchemaProcessor schemaProcessor;
 
-    abstract SchemaProcessor getSchemaProcessor();
+	abstract SchemaProcessor getSchemaProcessor();
 
-    @BeforeEach
-    void setup() {
-        final var repository = Mockito.mock(SchemaRepository.class);
-        repositorySupplier = () -> repository;
-        schemaProcessor = getSchemaProcessor();
-    }
+	@BeforeEach
+	void setup() {
+		final var repository = Mockito.mock(SchemaRepository.class);
+		repositorySupplier = () -> repository;
+		schemaProcessor = getSchemaProcessor();
+	}
 
 }

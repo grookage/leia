@@ -6,13 +6,13 @@ import lombok.Getter;
 @Getter
 public enum LeiaAeroErrorCode implements LeiaErrorCode {
 
-    INDEX_CREATION_FAILED(412),
+	INDEX_CREATION_FAILED(412),
 
-    WRITE_FAILED(500);
+	WRITE_FAILED(500);
 
-    final int status;
+	final int status;
 
-    LeiaAeroErrorCode(int status) {
-        this.status = status;
-    }
+	LeiaAeroErrorCode(int status) {
+		this.status = status;
+	}
 }

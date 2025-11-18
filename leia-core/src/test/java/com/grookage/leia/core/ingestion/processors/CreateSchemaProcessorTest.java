@@ -34,89 +34,89 @@ import java.util.List;
 
 class CreateSchemaProcessorTest extends SchemaProcessorTest {
 
-    @Override
-    SchemaProcessor getSchemaProcessor() {
-        return CreateSchemaProcessor.builder()
-                .repositorySupplier(getRepositorySupplier())
-                .build();
-    }
+	@Override
+	SchemaProcessor getSchemaProcessor() {
+		return CreateSchemaProcessor.builder()
+				.repositorySupplier(getRepositorySupplier())
+				.build();
+	}
 
-    @Test
-    @SneakyThrows
-    void testCreateSchema() {
-        final var schemaProcessor = getSchemaProcessor();
-        final var schemaContext = new SchemaContext();
-        Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
-        final var createSchemaRequest = ResourceHelper.getResource(
-                "schema/createSchemaRequest.json",
-                CreateSchemaRequest.class
-        );
-        schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
+	@Test
+	@SneakyThrows
+	void testCreateSchema() {
+		final var schemaProcessor = getSchemaProcessor();
+		final var schemaContext = new SchemaContext();
+		Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
+		final var createSchemaRequest = ResourceHelper.getResource(
+				"schema/createSchemaRequest.json",
+				CreateSchemaRequest.class
+		);
+		schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
 
-        Mockito.when(getRepositorySupplier().get().getSchemas(Mockito.any(SearchRequest.class)))
-                .thenReturn(Collections.emptyList());
+		Mockito.when(getRepositorySupplier().get().getSchemas(Mockito.any(SearchRequest.class)))
+				.thenReturn(Collections.emptyList());
 
-        Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
-        schemaContext.addContext("USER", "testUser");
-        schemaContext.addContext("EMAIL", "testEmail");
-        schemaContext.addContext("USER_ID", "testUserId");
-        getSchemaProcessor().process(schemaContext);
-        Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).create(Mockito.any(SchemaDetails.class));
-    }
+		Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
+		schemaContext.addContext("USER", "testUser");
+		schemaContext.addContext("EMAIL", "testEmail");
+		schemaContext.addContext("USER_ID", "testUserId");
+		getSchemaProcessor().process(schemaContext);
+		Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).create(Mockito.any(SchemaDetails.class));
+	}
 
-    @Test
-    @SneakyThrows
-    void testCreateSchemaAlreadyExists_withDifferentVersion() {
-        final var schemaContext = new SchemaContext();
-        final var schemaProcessor = getSchemaProcessor();
-        final var createSchemaRequest = ResourceHelper.getResource(
-                "schema/createSchemaRequest.json",
-                CreateSchemaRequest.class
-        );
-        schemaContext.addContext("USER", "testUser");
-        schemaContext.addContext("EMAIL", "testEmail");
-        schemaContext.addContext("USER_ID", "testUserId");
-        schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
+	@Test
+	@SneakyThrows
+	void testCreateSchemaAlreadyExists_withDifferentVersion() {
+		final var schemaContext = new SchemaContext();
+		final var schemaProcessor = getSchemaProcessor();
+		final var createSchemaRequest = ResourceHelper.getResource(
+				"schema/createSchemaRequest.json",
+				CreateSchemaRequest.class
+		);
+		schemaContext.addContext("USER", "testUser");
+		schemaContext.addContext("EMAIL", "testEmail");
+		schemaContext.addContext("USER_ID", "testUserId");
+		schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
 
-        SchemaKey schemaKey = createSchemaRequest.getSchemaKey();
-        SchemaDetails existingSchema = new SchemaDetails();
-        existingSchema.setSchemaKey(SchemaKey.builder()
-                .orgId(schemaKey.getOrgId())
-                .namespace(schemaKey.getNamespace())
-                .tenantId(schemaKey.getTenantId())
-                .schemaName(schemaKey.getSchemaName())
-                .type(schemaKey.getType())
-                .version("random")
-                .build());
-        existingSchema.setSchemaState(SchemaState.CREATED);
+		SchemaKey schemaKey = createSchemaRequest.getSchemaKey();
+		SchemaDetails existingSchema = new SchemaDetails();
+		existingSchema.setSchemaKey(SchemaKey.builder()
+				.orgId(schemaKey.getOrgId())
+				.namespace(schemaKey.getNamespace())
+				.tenantId(schemaKey.getTenantId())
+				.schemaName(schemaKey.getSchemaName())
+				.type(schemaKey.getType())
+				.version("random")
+				.build());
+		existingSchema.setSchemaState(SchemaState.CREATED);
 
-        Mockito.when(getRepositorySupplier().get().getSchemas(Mockito.any(SearchRequest.class)))
-               .thenReturn(List.of(existingSchema));
+		Mockito.when(getRepositorySupplier().get().getSchemas(Mockito.any(SearchRequest.class)))
+				.thenReturn(List.of(existingSchema));
 
-        Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
-    }
+		Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
+	}
 
-    @Test
-    @SneakyThrows
-    void testCreateSchemaAlreadyExists() {
-        final var schemaContext = new SchemaContext();
-        final var schemaProcessor = getSchemaProcessor();
-        final var createSchemaRequest = ResourceHelper.getResource(
-                "schema/createSchemaRequest.json",
-                CreateSchemaRequest.class
-        );
-        schemaContext.addContext("USER", "testUser");
-        schemaContext.addContext("EMAIL", "testEmail");
-        schemaContext.addContext("USER_ID", "testUserId");
-        schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
+	@Test
+	@SneakyThrows
+	void testCreateSchemaAlreadyExists() {
+		final var schemaContext = new SchemaContext();
+		final var schemaProcessor = getSchemaProcessor();
+		final var createSchemaRequest = ResourceHelper.getResource(
+				"schema/createSchemaRequest.json",
+				CreateSchemaRequest.class
+		);
+		schemaContext.addContext("USER", "testUser");
+		schemaContext.addContext("EMAIL", "testEmail");
+		schemaContext.addContext("USER_ID", "testUserId");
+		schemaContext.addContext(CreateSchemaRequest.class.getSimpleName(), createSchemaRequest);
 
-        SchemaKey schemaKey = createSchemaRequest.getSchemaKey();
-        SchemaDetails existingSchema = new SchemaDetails();
-        existingSchema.setSchemaKey(schemaKey);  // Same key as the request
+		SchemaKey schemaKey = createSchemaRequest.getSchemaKey();
+		SchemaDetails existingSchema = new SchemaDetails();
+		existingSchema.setSchemaKey(schemaKey);  // Same key as the request
 
-        Mockito.when(getRepositorySupplier().get().getSchemas(Mockito.any(SearchRequest.class)))
-               .thenReturn(List.of(existingSchema));
+		Mockito.when(getRepositorySupplier().get().getSchemas(Mockito.any(SearchRequest.class)))
+				.thenReturn(List.of(existingSchema));
 
-        Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
-    }
+		Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
+	}
 }

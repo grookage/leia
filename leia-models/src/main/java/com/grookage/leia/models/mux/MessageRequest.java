@@ -15,9 +15,9 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 public class MessageRequest {
-    boolean includeSource;
-    @NotEmpty
-    private SchemaKey schemaKey;
-    @NotNull
-    private JsonNode message;
+	boolean includeSource;
+	@NotEmpty
+	private SchemaKey schemaKey;
+	@NotNull
+	private JsonNode message;
 }

@@ -22,6 +22,6 @@ import javax.ws.rs.core.HttpHeaders;
 
 public interface SchemaUpdaterResolver<U extends SchemaUpdater> {
 
-    U resolve(HttpHeaders httpHeaders);
+	U resolve(HttpHeaders httpHeaders);
 
 }

@@ -26,25 +26,25 @@ import static org.awaitility.Awaitility.await;
 @UtilityClass
 public class LeiaUtils {
 
-    /*
-       If we know the upper bound condition, please use the until with the upper bound.
-       Only for cases, where you have to wait till the refreshInterval periods, don't want to introduce
-       refreshed and other boolean flags throughout the code.
-    */
-    public static void sleepUntil(int numSeconds) {
-        await().pollDelay(Duration.ofSeconds(numSeconds)).until(() -> true);
-    }
+	/*
+	   If we know the upper bound condition, please use the until with the upper bound.
+	   Only for cases, where you have to wait till the refreshInterval periods, don't want to introduce
+	   refreshed and other boolean flags throughout the code.
+	*/
+	public static void sleepUntil(int numSeconds) {
+		await().pollDelay(Duration.ofSeconds(numSeconds)).until(() -> true);
+	}
 
-    public static void sleepFor(int numSeconds) {
-        await().atMost(Duration.ofSeconds(numSeconds)).until(() -> true);
-    }
+	public static void sleepFor(int numSeconds) {
+		await().atMost(Duration.ofSeconds(numSeconds)).until(() -> true);
+	}
 
-    /*
-        Use this when you have to alter the numSeconds in any of the specific assertions. For finder and hub, the values are appropriately coded
-        keeping the start intervals in mind.
-     */
-    public static void sleepUntil(int numSeconds, Callable<Boolean> conditionEvaluator) {
-        await().pollDelay(Duration.ofSeconds(numSeconds)).until(conditionEvaluator);
-    }
+	/*
+		Use this when you have to alter the numSeconds in any of the specific assertions. For finder and hub, the values are appropriately coded
+		keeping the start intervals in mind.
+	 */
+	public static void sleepUntil(int numSeconds, Callable<Boolean> conditionEvaluator) {
+		await().pollDelay(Duration.ofSeconds(numSeconds)).until(conditionEvaluator);
+	}
 
 }

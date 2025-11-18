@@ -38,10 +38,10 @@ import javax.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class HealthCheckResource {
 
-    @Path("healthcheck")
-    @GET
-    @Timed
-    public Response checkHealth() {
-        return Response.ok().build();
-    }
+	@Path("healthcheck")
+	@GET
+	@Timed
+	public Response checkHealth() {
+		return Response.ok().build();
+	}
 }

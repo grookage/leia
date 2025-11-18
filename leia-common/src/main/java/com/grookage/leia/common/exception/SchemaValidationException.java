@@ -25,46 +25,46 @@ import java.util.Map;
 @Getter
 public class SchemaValidationException extends RuntimeException {
 
-    private final int status;
-    private final String code;
-    private final transient Map<String, Object> context;
+	private final int status;
+	private final String code;
+	private final transient Map<String, Object> context;
 
-    @Builder
-    private SchemaValidationException(ValidationErrorCode errorCode, Map<String, Object> context) {
-        super();
+	@Builder
+	private SchemaValidationException(ValidationErrorCode errorCode, Map<String, Object> context) {
+		super();
 
-        this.status = errorCode.getStatus();
-        this.code = errorCode.name();
-        this.context = context;
-    }
+		this.status = errorCode.getStatus();
+		this.code = errorCode.name();
+		this.context = context;
+	}
 
-    private SchemaValidationException(ValidationErrorCode errorCode, Throwable cause) {
-        super(cause);
+	private SchemaValidationException(ValidationErrorCode errorCode, Throwable cause) {
+		super(cause);
 
-        this.code = errorCode.name();
-        this.status = errorCode.getStatus();
-        this.context = cause != null && cause.getLocalizedMessage() != null ?
-                Map.of("message", cause.getLocalizedMessage()) : new HashMap<>();
-    }
+		this.code = errorCode.name();
+		this.status = errorCode.getStatus();
+		this.context = cause != null && cause.getLocalizedMessage() != null ?
+				Map.of("message", cause.getLocalizedMessage()) : new HashMap<>();
+	}
 
-    private SchemaValidationException(ValidationErrorCode errorCode, String message) {
-        super(message);
+	private SchemaValidationException(ValidationErrorCode errorCode, String message) {
+		super(message);
 
-        this.code = errorCode.name();
-        this.status = errorCode.getStatus();
-        this.context = message != null ? Map.of("message", message) : new HashMap<>();
-    }
+		this.code = errorCode.name();
+		this.status = errorCode.getStatus();
+		this.context = message != null ? Map.of("message", message) : new HashMap<>();
+	}
 
-    public static SchemaValidationException error(ValidationErrorCode errorCode, Throwable t) {
-        return new SchemaValidationException(errorCode, t);
-    }
+	public static SchemaValidationException error(ValidationErrorCode errorCode, Throwable t) {
+		return new SchemaValidationException(errorCode, t);
+	}
 
-    public static SchemaValidationException error(ValidationErrorCode errorCode, String message) {
-        return new SchemaValidationException(errorCode, message);
-    }
+	public static SchemaValidationException error(ValidationErrorCode errorCode, String message) {
+		return new SchemaValidationException(errorCode, message);
+	}
 
-    public static SchemaValidationException error(ValidationErrorCode errorCode) {
-        return new SchemaValidationException(errorCode, new HashMap<>());
-    }
+	public static SchemaValidationException error(ValidationErrorCode errorCode) {
+		return new SchemaValidationException(errorCode, new HashMap<>());
+	}
 
 }

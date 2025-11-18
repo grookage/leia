@@ -24,11 +24,11 @@ import java.util.List;
 
 public class LeiaClientRefresher extends HttpKorgRefresher<List<SchemaDetails>> {
 
-    @Builder
-    public LeiaClientRefresher(LeiaClientSupplier supplier,
-                               int refreshTimeInSeconds,
-                               boolean periodicRefresh) {
-        super(supplier, refreshTimeInSeconds, periodicRefresh, null);
-    }
+	@Builder
+	public LeiaClientRefresher(LeiaClientSupplier supplier,
+	                           int refreshTimeInSeconds,
+	                           boolean periodicRefresh) {
+		super(supplier, refreshTimeInSeconds, periodicRefresh, null);
+	}
 
 }

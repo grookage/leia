@@ -36,63 +36,63 @@ import java.util.Set;
 
 class DefaultMessageProcessorTest {
 
-    @Test
-    @SneakyThrows
-    void testHttpMessageProcessor() {
-        final var resolver = new TagBasedNameResolver();
-        final var httpExecutor = Mockito.mock(MessageExecutor.class);
-        final var executorFactory = new MessageExecutorFactory() {
-            @Override
-            public Optional<MessageExecutor> getExecutor(String backendName) {
-                return backendName.equalsIgnoreCase("BACKEND1") ? Optional.of(httpExecutor) : Optional.empty();
-            }
-        };
-        final var leiaMessages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
-        });
-        final var messageProcessor = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
-            @Override
-            protected boolean validBackends(Set<String> backends) {
-                return false;
-            }
+	@Test
+	@SneakyThrows
+	void testHttpMessageProcessor() {
+		final var resolver = new TagBasedNameResolver();
+		final var httpExecutor = Mockito.mock(MessageExecutor.class);
+		final var executorFactory = new MessageExecutorFactory() {
+			@Override
+			public Optional<MessageExecutor> getExecutor(String backendName) {
+				return backendName.equalsIgnoreCase("BACKEND1") ? Optional.of(httpExecutor) : Optional.empty();
+			}
+		};
+		final var leiaMessages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
+		});
+		final var messageProcessor = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+			@Override
+			protected boolean validBackends(Set<String> backends) {
+				return false;
+			}
 
-            @Override
-            protected boolean validExecutor(MessageExecutor executor) {
-                return false;
-            }
-        };
-        Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages, new NoOpBackendFilter()));
-        leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1",
-                "importance-mild::extreme")));
-        final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
-            @Override
-            protected boolean validBackends(Set<String> backends) {
-                return true;
-            }
+			@Override
+			protected boolean validExecutor(MessageExecutor executor) {
+				return false;
+			}
+		};
+		Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages, new NoOpBackendFilter()));
+		leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1",
+				"importance-mild::extreme")));
+		final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+			@Override
+			protected boolean validBackends(Set<String> backends) {
+				return true;
+			}
 
-            @Override
-            protected boolean validExecutor(MessageExecutor executor) {
-                return true;
-            }
-        };
-        messageProcessor1.processMessages(leiaMessages, new NoOpBackendFilter());
-        Mockito.verify(httpExecutor, Mockito.times(1)).send(leiaMessages);
+			@Override
+			protected boolean validExecutor(MessageExecutor executor) {
+				return true;
+			}
+		};
+		messageProcessor1.processMessages(leiaMessages, new NoOpBackendFilter());
+		Mockito.verify(httpExecutor, Mockito.times(1)).send(leiaMessages);
 
-        leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1::backend2::backend3",
-                "importance-mild::extreme")));
-        final var messageProcessor2 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
-            @Override
-            protected boolean validBackends(Set<String> backends) {
-                return true;
-            }
-        };
-        messageProcessor2.processMessages(leiaMessages, new BackendFilter() {
-            public static final Set<String> WHITELISTED_BACKENDS = Set.of("BACKEND1");
+		leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1::backend2::backend3",
+				"importance-mild::extreme")));
+		final var messageProcessor2 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+			@Override
+			protected boolean validBackends(Set<String> backends) {
+				return true;
+			}
+		};
+		messageProcessor2.processMessages(leiaMessages, new BackendFilter() {
+			public static final Set<String> WHITELISTED_BACKENDS = Set.of("BACKEND1");
 
-            @Override
-            public boolean shouldProcess(String backendName) {
-                return WHITELISTED_BACKENDS.contains(backendName);
-            }
-        });
-        Mockito.verify(httpExecutor, Mockito.times(2)).send(leiaMessages);
-    }
+			@Override
+			public boolean shouldProcess(String backendName) {
+				return WHITELISTED_BACKENDS.contains(backendName);
+			}
+		});
+		Mockito.verify(httpExecutor, Mockito.times(2)).send(leiaMessages);
+	}
 }

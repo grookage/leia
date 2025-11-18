@@ -11,25 +11,25 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SchemaDefinition {
-    String name();
+	String name();
 
-    String namespace();
+	String namespace();
 
-    String version();
+	String version();
 
-    String orgId();
+	String orgId();
 
-    String tenantId();
+	String tenantId();
 
-    String type();
+	String type();
 
-    String description() default "";
+	String description() default "";
 
-    SchemaType schemaType() default SchemaType.JSON;
+	SchemaType schemaType() default SchemaType.JSON;
 
-    SchemaValidationType validation() default SchemaValidationType.MATCHING;
+	SchemaValidationType validation() default SchemaValidationType.MATCHING;
 
-    String[] tags() default {};
+	String[] tags() default {};
 
-    Class<?>[] transformationTargets() default {};
+	Class<?>[] transformationTargets() default {};
 }

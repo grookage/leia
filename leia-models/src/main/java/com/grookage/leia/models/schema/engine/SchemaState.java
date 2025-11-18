@@ -18,9 +18,9 @@ package com.grookage.leia.models.schema.engine;
 
 public enum SchemaState {
 
-    CREATED,
+	CREATED,
 
-    APPROVED,
+	APPROVED,
 
-    REJECTED
+	REJECTED
 }

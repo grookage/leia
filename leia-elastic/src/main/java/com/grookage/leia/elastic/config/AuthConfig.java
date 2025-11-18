@@ -31,35 +31,35 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AuthConfig {
 
-    private boolean enabled;
-    private String username;
-    private String password;
-    private boolean tlsEnabled;
-    private String trustStorePath;
-    private String keyStoreType;
-    private String keyStorePass;
+	private boolean enabled;
+	private String username;
+	private String password;
+	private boolean tlsEnabled;
+	private String trustStorePath;
+	private String keyStoreType;
+	private String keyStorePass;
 
-    public boolean valid() {
-        if (isEnabled() && invalidAuthConfiguration()) {
-            return false;
-        }
-        return !isTlsEnabled() || !invalidTlsConfiguration();
-    }
+	public boolean valid() {
+		if (isEnabled() && invalidAuthConfiguration()) {
+			return false;
+		}
+		return !isTlsEnabled() || !invalidTlsConfiguration();
+	}
 
-    @JsonIgnore
-    private boolean invalidAuthConfiguration() {
-        return Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password);
-    }
+	@JsonIgnore
+	private boolean invalidAuthConfiguration() {
+		return Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password);
+	}
 
-    @JsonIgnore
-    private boolean invalidTlsConfiguration() {
-        return Strings.isNullOrEmpty(trustStorePath) || Strings.isNullOrEmpty(keyStoreType)
-                || Strings.isNullOrEmpty(keyStorePass);
-    }
+	@JsonIgnore
+	private boolean invalidTlsConfiguration() {
+		return Strings.isNullOrEmpty(trustStorePath) || Strings.isNullOrEmpty(keyStoreType)
+				|| Strings.isNullOrEmpty(keyStorePass);
+	}
 
-    @JsonIgnore
-    public String getScheme() {
-        return isTlsEnabled() ? "https" : "http";
-    }
+	@JsonIgnore
+	public String getScheme() {
+		return isTlsEnabled() ? "https" : "http";
+	}
 
 }

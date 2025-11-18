@@ -24,12 +24,12 @@ import java.util.List;
 
 public interface MessageProcessor {
 
-    String getName();
+	String getName();
 
-    @Deprecated(forRemoval = true, since = "1.1.0")
-    default void processMessages(List<LeiaMessage> messages) {
-        processMessages(messages, new NoOpBackendFilter());
-    }
+	@Deprecated(forRemoval = true, since = "1.1.0")
+	default void processMessages(List<LeiaMessage> messages) {
+		processMessages(messages, new NoOpBackendFilter());
+	}
 
-    void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter);
+	void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter);
 }

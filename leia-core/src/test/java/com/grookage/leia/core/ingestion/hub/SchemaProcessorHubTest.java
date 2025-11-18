@@ -24,15 +24,15 @@ import org.mockito.Mockito;
 
 class SchemaProcessorHubTest {
 
-    @Test
-    void testSchemaProcessorHub() {
-        final var schemaRepository = Mockito.mock(SchemaRepository.class);
+	@Test
+	void testSchemaProcessorHub() {
+		final var schemaRepository = Mockito.mock(SchemaRepository.class);
 
-        final var hub = SchemaProcessorHub.of()
-                .withRepositoryResolver(() -> schemaRepository)
-                .build();
-        Assertions.assertNotNull(hub.getProcessor(SchemaEvent.CREATE_SCHEMA).orElse(null));
-        Assertions.assertThrows(NullPointerException.class, () -> SchemaProcessorHub.of()
-                .build());
-    }
+		final var hub = SchemaProcessorHub.of()
+				.withRepositoryResolver(() -> schemaRepository)
+				.build();
+		Assertions.assertNotNull(hub.getProcessor(SchemaEvent.CREATE_SCHEMA).orElse(null));
+		Assertions.assertThrows(NullPointerException.class, () -> SchemaProcessorHub.of()
+				.build());
+	}
 }

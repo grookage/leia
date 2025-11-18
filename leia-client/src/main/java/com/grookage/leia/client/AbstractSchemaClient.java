@@ -33,27 +33,27 @@ import java.util.Set;
 @Data
 public abstract class AbstractSchemaClient implements LeiaSchemaClient {
 
-    private final ObjectMapper mapper;
-    private final LeiaClientRefresher refresher;
-    private final LeiaSchemaValidator schemaValidator;
+	private final ObjectMapper mapper;
+	private final LeiaClientRefresher refresher;
+	private final LeiaSchemaValidator schemaValidator;
 
-    public List<SchemaDetails> getSchemaDetails() {
-        return refresher.getData();
-    }
+	public List<SchemaDetails> getSchemaDetails() {
+		return refresher.getData();
+	}
 
-    public List<SchemaDetails> getSchemaDetails(final Set<SchemaKey> schemas) {
-        if (null == refresher.getData()) {
-            throw new IllegalStateException("The configuration object has returned null data. Something gone wrong with refresher");
-        }
-        final var schemaKeys = schemas.stream().map(SchemaKey::getReferenceId).toList();
-        return refresher.getData().stream()
-                .filter(each -> schemaKeys.contains(each.getReferenceId())).toList();
-    }
+	public List<SchemaDetails> getSchemaDetails(final Set<SchemaKey> schemas) {
+		if (null == refresher.getData()) {
+			throw new IllegalStateException("The configuration object has returned null data. Something gone wrong with refresher");
+		}
+		final var schemaKeys = schemas.stream().map(SchemaKey::getReferenceId).toList();
+		return refresher.getData().stream()
+				.filter(each -> schemaKeys.contains(each.getReferenceId())).toList();
+	}
 
-    public boolean valid(SchemaKey schemaKey) {
-        return schemaValidator.valid(schemaKey);
-    }
+	public boolean valid(SchemaKey schemaKey) {
+		return schemaValidator.valid(schemaKey);
+	}
 
-    public abstract void start();
+	public abstract void start();
 }
 

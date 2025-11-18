@@ -40,228 +40,228 @@ import java.util.stream.Collectors;
 @UtilityClass
 @Slf4j
 public class SchemaValidationUtils {
-    private static final String TYPE_MISMATCH_MESSAGE = "Type mismatch, expected: %s, provided: %s";
-    static Function<Class<?>, Function<SchemaAttribute, Boolean>> assignableCheckFunction =
-            klass -> attribute -> ClassUtils.isAssignable(klass, attribute.getType().getAssignableClass());
+	private static final String TYPE_MISMATCH_MESSAGE = "Type mismatch, expected: %s, provided: %s";
+	static Function<Class<?>, Function<SchemaAttribute, Boolean>> assignableCheckFunction =
+			klass -> attribute -> ClassUtils.isAssignable(klass, attribute.getType().getAssignableClass());
 
-    public List<LeiaSchemaViolation> valid(final SchemaDetails schemaDetails,
-                                           final Class<?> klass) {
-        return valid(schemaDetails.getValidationType(), schemaDetails.getAttributes(), klass,
-                new ViolationContext(), new TypeVariableContext());
-    }
+	public List<LeiaSchemaViolation> valid(final SchemaDetails schemaDetails,
+	                                       final Class<?> klass) {
+		return valid(schemaDetails.getValidationType(), schemaDetails.getAttributes(), klass,
+				new ViolationContext(), new TypeVariableContext());
+	}
 
-    public List<LeiaSchemaViolation> valid(final SchemaValidationType validationType,
-                                           final Set<SchemaAttribute> attributes,
-                                           final Class<?> klass) {
-        return valid(validationType, attributes, klass, new ViolationContext(), new TypeVariableContext());
-    }
+	public List<LeiaSchemaViolation> valid(final SchemaValidationType validationType,
+	                                       final Set<SchemaAttribute> attributes,
+	                                       final Class<?> klass) {
+		return valid(validationType, attributes, klass, new ViolationContext(), new TypeVariableContext());
+	}
 
-    public List<LeiaSchemaViolation> valid(final SchemaValidationType validationType,
-                                           final Set<SchemaAttribute> attributes,
-                                           final Class<?> klass,
-                                           final ViolationContext violationContext,
-                                           final TypeVariableContext typeVariableContext) {
-        violationContext.pushClass(klass);
-        final var fields = FieldUtils.getAllFields(klass);
-        validateSchemaStructure(validationType, attributes, fields, violationContext);
-        attributes.forEach(each -> {
-            final var field = FieldUtils.filter(each.getName(), fields);
-            if (field.isEmpty()) {
-                violationContext.addViolation("Missing Field", each.getName());
-                return;
-            }
-            validateField(each, field.get(), validationType, violationContext, typeVariableContext);
-        });
-        violationContext.popClass();
-        return violationContext.getViolations();
-    }
+	public List<LeiaSchemaViolation> valid(final SchemaValidationType validationType,
+	                                       final Set<SchemaAttribute> attributes,
+	                                       final Class<?> klass,
+	                                       final ViolationContext violationContext,
+	                                       final TypeVariableContext typeVariableContext) {
+		violationContext.pushClass(klass);
+		final var fields = FieldUtils.getAllFields(klass);
+		validateSchemaStructure(validationType, attributes, fields, violationContext);
+		attributes.forEach(each -> {
+			final var field = FieldUtils.filter(each.getName(), fields);
+			if (field.isEmpty()) {
+				violationContext.addViolation("Missing Field", each.getName());
+				return;
+			}
+			validateField(each, field.get(), validationType, violationContext, typeVariableContext);
+		});
+		violationContext.popClass();
+		return violationContext.getViolations();
+	}
 
-    private void validateField(final SchemaAttribute attribute,
-                               final Field field,
-                               final SchemaValidationType validationType,
-                               final ViolationContext violationContext,
-                               final TypeVariableContext typeVariableContext) {
-        final var type = typeVariableContext.resolveType(field.getAnnotatedType());
-        validateType(validationType, attribute, type, violationContext,
-                typeVariableContext);
-    }
+	private void validateField(final SchemaAttribute attribute,
+	                           final Field field,
+	                           final SchemaValidationType validationType,
+	                           final ViolationContext violationContext,
+	                           final TypeVariableContext typeVariableContext) {
+		final var type = typeVariableContext.resolveType(field.getAnnotatedType());
+		validateType(validationType, attribute, type, violationContext,
+				typeVariableContext);
+	}
 
-    private void validateType(final SchemaValidationType validationType,
-                              final SchemaAttribute attribute,
-                              final AnnotatedType annotatedType,
-                              final ViolationContext violationContext,
-                              final TypeVariableContext typeVariableContext) {
-        final var type = annotatedType.getType();
-        if (type instanceof Class<?> klass) {
-            validateClass(validationType, attribute, klass, violationContext);
-        } else if (type instanceof ParameterizedType) {
-            validateParameterizedType(validationType, attribute, (AnnotatedParameterizedType)annotatedType, violationContext, typeVariableContext);
-        } else if (type instanceof GenericArrayType) {
-            validateGenericArrayType(validationType, attribute, (AnnotatedArrayType) annotatedType, violationContext, typeVariableContext);
-        } else {
-            violationContext.addViolation("Unsupported class type: " + type);
-        }
-    }
+	private void validateType(final SchemaValidationType validationType,
+	                          final SchemaAttribute attribute,
+	                          final AnnotatedType annotatedType,
+	                          final ViolationContext violationContext,
+	                          final TypeVariableContext typeVariableContext) {
+		final var type = annotatedType.getType();
+		if (type instanceof Class<?> klass) {
+			validateClass(validationType, attribute, klass, violationContext);
+		} else if (type instanceof ParameterizedType) {
+			validateParameterizedType(validationType, attribute, (AnnotatedParameterizedType) annotatedType, violationContext, typeVariableContext);
+		} else if (type instanceof GenericArrayType) {
+			validateGenericArrayType(validationType, attribute, (AnnotatedArrayType) annotatedType, violationContext, typeVariableContext);
+		} else {
+			violationContext.addViolation("Unsupported class type: " + type);
+		}
+	}
 
-    private void validateClass(final SchemaValidationType validationType,
-                               final SchemaAttribute schemaAttribute,
-                               final Class<?> klass,
-                               final ViolationContext violationContext) {
-        if (!isMatchingType(klass, schemaAttribute)) {
-            violationContext.addViolation(String.format(TYPE_MISMATCH_MESSAGE, schemaAttribute.getType(), klass.getSimpleName()),
-                    schemaAttribute.getName());
-            return;
-        }
+	private void validateClass(final SchemaValidationType validationType,
+	                           final SchemaAttribute schemaAttribute,
+	                           final Class<?> klass,
+	                           final ViolationContext violationContext) {
+		if (!isMatchingType(klass, schemaAttribute)) {
+			violationContext.addViolation(String.format(TYPE_MISMATCH_MESSAGE, schemaAttribute.getType(), klass.getSimpleName()),
+					schemaAttribute.getName());
+			return;
+		}
 
-        schemaAttribute.accept(new SchemaAttributeHandler<Void>(a -> null) {
-            @Override
-            public Void accept(EnumAttribute attribute) {
-                final var providedValues = BuilderUtils.getEnumValues(klass);
-                if (!attribute.getValues().equals(providedValues)) {
-                    violationContext.addViolation(String.format("Enum values mismatch, expected: %s, provided: %s",
-                            attribute.getValues(), providedValues), attribute.getName());
-                }
-                return null;
-            }
+		schemaAttribute.accept(new SchemaAttributeHandler<Void>(a -> null) {
+			@Override
+			public Void accept(EnumAttribute attribute) {
+				final var providedValues = BuilderUtils.getEnumValues(klass);
+				if (!attribute.getValues().equals(providedValues)) {
+					violationContext.addViolation(String.format("Enum values mismatch, expected: %s, provided: %s",
+							attribute.getValues(), providedValues), attribute.getName());
+				}
+				return null;
+			}
 
-            @Override
-            public Void accept(ArrayAttribute attribute) {
-                if (Objects.nonNull(attribute.getElementAttribute())) {
-                    if (klass.isArray()) {
-                        validateClass(validationType, attribute.getElementAttribute(), klass.getComponentType(), violationContext);
-                        return null;
-                    }
-                    // Provided List, Set expected List<?>, Set<?>
-                    violationContext.addViolation(String.format("Missing Type arguments, expected ParameterizedType:%s",
-                            attribute.getElementAttribute().getType()), attribute.getName());
-                }
-                return null;
-            }
+			@Override
+			public Void accept(ArrayAttribute attribute) {
+				if (Objects.nonNull(attribute.getElementAttribute())) {
+					if (klass.isArray()) {
+						validateClass(validationType, attribute.getElementAttribute(), klass.getComponentType(), violationContext);
+						return null;
+					}
+					// Provided List, Set expected List<?>, Set<?>
+					violationContext.addViolation(String.format("Missing Type arguments, expected ParameterizedType:%s",
+							attribute.getElementAttribute().getType()), attribute.getName());
+				}
+				return null;
+			}
 
-            @Override
-            public Void accept(MapAttribute attribute) {
-                if (Objects.nonNull(attribute.getKeyAttribute()) || Objects.nonNull(attribute.getValueAttribute())) {
-                    // Provided Map, expected Map<?,?>
-                    violationContext.addViolation(String.format("Missing Type Arguments, expected parameterized Types key:%s value:%s",
-                            attribute.getKeyAttribute().getType(), attribute.getValueAttribute().getType()), attribute.getName());
-                }
-                return null;
-            }
+			@Override
+			public Void accept(MapAttribute attribute) {
+				if (Objects.nonNull(attribute.getKeyAttribute()) || Objects.nonNull(attribute.getValueAttribute())) {
+					// Provided Map, expected Map<?,?>
+					violationContext.addViolation(String.format("Missing Type Arguments, expected parameterized Types key:%s value:%s",
+							attribute.getKeyAttribute().getType(), attribute.getValueAttribute().getType()), attribute.getName());
+				}
+				return null;
+			}
 
-            @Override
-            public Void accept(ObjectAttribute attribute) {
-                if (Objects.nonNull(attribute.getNestedAttributes())) {
-                    valid(validationType, attribute.getNestedAttributes(), klass, violationContext, new TypeVariableContext());
-                }
-                return null;
-            }
-        });
-    }
+			@Override
+			public Void accept(ObjectAttribute attribute) {
+				if (Objects.nonNull(attribute.getNestedAttributes())) {
+					valid(validationType, attribute.getNestedAttributes(), klass, violationContext, new TypeVariableContext());
+				}
+				return null;
+			}
+		});
+	}
 
-    private void validateParameterizedType(final SchemaValidationType validationType,
-                                           final SchemaAttribute attribute,
-                                           final AnnotatedParameterizedType annotatedParameterizedType,
-                                           final ViolationContext violationContext,
-                                           final TypeVariableContext typeVariableContext) {
-        final var parameterizedType = (ParameterizedType) annotatedParameterizedType.getType();
-        final var rawType = (Class<?>) parameterizedType.getRawType();
-        if (attribute instanceof ArrayAttribute arrayAttribute) {
-            if (arrayAttribute.getElementAttribute() == null) {
-                return;
-            }
-            final var elementType = typeVariableContext.resolveType(annotatedParameterizedType.getAnnotatedActualTypeArguments()[0]);
-            validateType(validationType, arrayAttribute.getElementAttribute(), elementType, violationContext, typeVariableContext);
-        } else if (attribute instanceof MapAttribute mapAttribute) {
-            if (Objects.isNull(mapAttribute.getKeyAttribute()) || Objects.isNull(mapAttribute.getValueAttribute())) {
-                return;
-            }
-            final var keyType = typeVariableContext.resolveType(annotatedParameterizedType.getAnnotatedActualTypeArguments()[0]);
-            final var valueType = typeVariableContext.resolveType(annotatedParameterizedType.getAnnotatedActualTypeArguments()[1]);
-            validateType(validationType, mapAttribute.getKeyAttribute(), keyType, violationContext, typeVariableContext);
-            validateType(validationType, mapAttribute.getValueAttribute(), valueType, violationContext, typeVariableContext);
-        } else if (attribute instanceof ObjectAttribute objectAttribute) {
-            if (CollectionUtils.isNullOrEmpty(objectAttribute.getNestedAttributes())) {
-                return;
-            }
-            final var newContext = TypeVariableContext.from(rawType, annotatedParameterizedType, typeVariableContext);
-            valid(validationType, objectAttribute.getNestedAttributes(), rawType, violationContext, newContext);
-        } else {
-            violationContext.addViolation(String.format(TYPE_MISMATCH_MESSAGE, attribute.getType(), parameterizedType), attribute.getName());
-        }
-    }
+	private void validateParameterizedType(final SchemaValidationType validationType,
+	                                       final SchemaAttribute attribute,
+	                                       final AnnotatedParameterizedType annotatedParameterizedType,
+	                                       final ViolationContext violationContext,
+	                                       final TypeVariableContext typeVariableContext) {
+		final var parameterizedType = (ParameterizedType) annotatedParameterizedType.getType();
+		final var rawType = (Class<?>) parameterizedType.getRawType();
+		if (attribute instanceof ArrayAttribute arrayAttribute) {
+			if (arrayAttribute.getElementAttribute() == null) {
+				return;
+			}
+			final var elementType = typeVariableContext.resolveType(annotatedParameterizedType.getAnnotatedActualTypeArguments()[0]);
+			validateType(validationType, arrayAttribute.getElementAttribute(), elementType, violationContext, typeVariableContext);
+		} else if (attribute instanceof MapAttribute mapAttribute) {
+			if (Objects.isNull(mapAttribute.getKeyAttribute()) || Objects.isNull(mapAttribute.getValueAttribute())) {
+				return;
+			}
+			final var keyType = typeVariableContext.resolveType(annotatedParameterizedType.getAnnotatedActualTypeArguments()[0]);
+			final var valueType = typeVariableContext.resolveType(annotatedParameterizedType.getAnnotatedActualTypeArguments()[1]);
+			validateType(validationType, mapAttribute.getKeyAttribute(), keyType, violationContext, typeVariableContext);
+			validateType(validationType, mapAttribute.getValueAttribute(), valueType, violationContext, typeVariableContext);
+		} else if (attribute instanceof ObjectAttribute objectAttribute) {
+			if (CollectionUtils.isNullOrEmpty(objectAttribute.getNestedAttributes())) {
+				return;
+			}
+			final var newContext = TypeVariableContext.from(rawType, annotatedParameterizedType, typeVariableContext);
+			valid(validationType, objectAttribute.getNestedAttributes(), rawType, violationContext, newContext);
+		} else {
+			violationContext.addViolation(String.format(TYPE_MISMATCH_MESSAGE, attribute.getType(), parameterizedType), attribute.getName());
+		}
+	}
 
-    private void validateGenericArrayType(final SchemaValidationType validationType,
-                                          final SchemaAttribute attribute,
-                                          final AnnotatedArrayType annotatedArrayType,
-                                          final ViolationContext violationContext,
-                                          final TypeVariableContext typeVariableContext) {
-        if (attribute instanceof ArrayAttribute arrayAttribute) {
-            final var elementType = typeVariableContext.resolveType(annotatedArrayType.getAnnotatedGenericComponentType());
-            validateType(validationType, arrayAttribute.getElementAttribute(), elementType, violationContext, typeVariableContext);
-            return;
-        }
-        violationContext.addViolation(String.format(TYPE_MISMATCH_MESSAGE, attribute.getType(), annotatedArrayType), attribute.getName());
-    }
+	private void validateGenericArrayType(final SchemaValidationType validationType,
+	                                      final SchemaAttribute attribute,
+	                                      final AnnotatedArrayType annotatedArrayType,
+	                                      final ViolationContext violationContext,
+	                                      final TypeVariableContext typeVariableContext) {
+		if (attribute instanceof ArrayAttribute arrayAttribute) {
+			final var elementType = typeVariableContext.resolveType(annotatedArrayType.getAnnotatedGenericComponentType());
+			validateType(validationType, arrayAttribute.getElementAttribute(), elementType, violationContext, typeVariableContext);
+			return;
+		}
+		violationContext.addViolation(String.format(TYPE_MISMATCH_MESSAGE, attribute.getType(), annotatedArrayType), attribute.getName());
+	}
 
-    private boolean isMatchingType(final Class<?> klass,
-                                   final SchemaAttribute attribute) {
-        return attribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {
-            @Override
-            public Boolean accept(StringAttribute attribute) {
-                // String attributes in the schema can also correspond to Enum types
-                return klass.isEnum() || ClassUtils.isAssignable(klass, String.class);
-            }
+	private boolean isMatchingType(final Class<?> klass,
+	                               final SchemaAttribute attribute) {
+		return attribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {
+			@Override
+			public Boolean accept(StringAttribute attribute) {
+				// String attributes in the schema can also correspond to Enum types
+				return klass.isEnum() || ClassUtils.isAssignable(klass, String.class);
+			}
 
-            @Override
-            public Boolean accept(ArrayAttribute attribute) {
-                return klass.isArray() || ClassUtils.isAssignable(klass, Collection.class);
-            }
+			@Override
+			public Boolean accept(ArrayAttribute attribute) {
+				return klass.isArray() || ClassUtils.isAssignable(klass, Collection.class);
+			}
 
-            @Override
-            public Boolean accept(ObjectAttribute attribute) {
-                return !klass.equals(Object.class) || !Objects.nonNull(attribute.getNestedAttributes());
-            }
-        });
-    }
+			@Override
+			public Boolean accept(ObjectAttribute attribute) {
+				return !klass.equals(Object.class) || !Objects.nonNull(attribute.getNestedAttributes());
+			}
+		});
+	}
 
-    private void validateSchemaStructure(final SchemaValidationType validationType,
-                                         final Set<SchemaAttribute> attributes,
-                                         final List<Field> fields,
-                                         final ViolationContext violationContext) {
-        final var fieldNames = fields.stream()
-                .map(Field::getName)
-                .map(String::toUpperCase)
-                .collect(Collectors.toSet());
-        final var attributesListed = attributes.stream()
-                .map(SchemaAttribute::getName)
-                .map(String::toUpperCase)
-                .collect(Collectors.toSet());
+	private void validateSchemaStructure(final SchemaValidationType validationType,
+	                                     final Set<SchemaAttribute> attributes,
+	                                     final List<Field> fields,
+	                                     final ViolationContext violationContext) {
+		final var fieldNames = fields.stream()
+				.map(Field::getName)
+				.map(String::toUpperCase)
+				.collect(Collectors.toSet());
+		final var attributesListed = attributes.stream()
+				.map(SchemaAttribute::getName)
+				.map(String::toUpperCase)
+				.collect(Collectors.toSet());
 
-        validationType.accept(new SchemaValidationVisitor<>() {
-            @Override
-            public Void strict() {
-                final var mismatchedAttributes = Sets.symmetricDifference(fieldNames, attributesListed);
-                if (!mismatchedAttributes.isEmpty()) {
-                    violationContext.addViolation(String.format("[STRICT] Validation: attributes not found or extra attributes :%s", mismatchedAttributes));
-                }
-                return null;
-            }
+		validationType.accept(new SchemaValidationVisitor<>() {
+			@Override
+			public Void strict() {
+				final var mismatchedAttributes = Sets.symmetricDifference(fieldNames, attributesListed);
+				if (!mismatchedAttributes.isEmpty()) {
+					violationContext.addViolation(String.format("[STRICT] Validation: attributes not found or extra attributes :%s", mismatchedAttributes));
+				}
+				return null;
+			}
 
-            @Override
-            public Void matching() {
-                final var attributesMissing = Sets.difference(attributesListed, fieldNames);
-                if (!attributesMissing.isEmpty()) {
-                    violationContext.addViolation(String.format("[MATCHING] Validation: Missing attributes found :%s", attributesMissing));
-                }
-                return null;
-            }
-        });
-    }
+			@Override
+			public Void matching() {
+				final var attributesMissing = Sets.difference(attributesListed, fieldNames);
+				if (!attributesMissing.isEmpty()) {
+					violationContext.addViolation(String.format("[MATCHING] Validation: Missing attributes found :%s", attributesMissing));
+				}
+				return null;
+			}
+		});
+	}
 
-    public boolean valid(final Class<?> klass,
-                         final SchemaAttribute schemaAttribute) {
-        return schemaAttribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {
-        });
-    }
+	public boolean valid(final Class<?> klass,
+	                     final SchemaAttribute schemaAttribute) {
+		return schemaAttribute.accept(new SchemaAttributeHandler<>(assignableCheckFunction.apply(klass)) {
+		});
+	}
 
 }

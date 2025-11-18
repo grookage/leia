@@ -25,33 +25,33 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public enum DataType {
-    INTEGER(Integer.class),
+	INTEGER(Integer.class),
 
-    STRING(String.class),
+	STRING(String.class),
 
-    FLOAT(Float.class),
+	FLOAT(Float.class),
 
-    DOUBLE(Double.class),
+	DOUBLE(Double.class),
 
-    LONG(Long.class),
+	LONG(Long.class),
 
-    SHORT(Short.class),
+	SHORT(Short.class),
 
-    BOOLEAN(Boolean.class),
+	BOOLEAN(Boolean.class),
 
-    BYTES(Byte.class),
+	BYTES(Byte.class),
 
-    CHARACTER(Character.class),
+	CHARACTER(Character.class),
 
-    DATE(Object.class),
+	DATE(Object.class),
 
-    ARRAY(Collection.class),
+	ARRAY(Collection.class),
 
-    OBJECT(Object.class),
+	OBJECT(Object.class),
 
-    MAP(Map.class),
+	MAP(Map.class),
 
-    ENUM(Enum.class);
+	ENUM(Enum.class);
 
-    private final Class<?> assignableClass;
+	private final Class<?> assignableClass;
 }

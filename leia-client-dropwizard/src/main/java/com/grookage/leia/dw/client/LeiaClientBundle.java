@@ -25,7 +25,6 @@ import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.refresher.LeiaClientSupplier;
 import com.grookage.leia.common.validation.DefaultLeiaMessageValidator;
 import com.grookage.leia.common.validation.LeiaMessageValidator;
-import com.grookage.leia.common.validation.NoOpLeiaMessageValidator;
 import com.grookage.leia.mux.MessageProcessor;
 import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
 import com.grookage.leia.mux.targetvalidator.TargetValidator;
@@ -44,105 +43,105 @@ import java.util.function.Supplier;
 @Getter
 public abstract class LeiaClientBundle<T extends Configuration> implements ConfiguredBundle<T> {
 
-    private LeiaMessageProduceClient producerClient;
-    private LeiaSchemaValidator validator;
+	private LeiaMessageProduceClient producerClient;
+	private LeiaSchemaValidator validator;
 
-    protected abstract Supplier<LeiaClientRequest> getClientRequestSupplier(T configuration);
+	protected abstract Supplier<LeiaClientRequest> getClientRequestSupplier(T configuration);
 
-    protected int getRefreshIntervalSeconds(T configuration) {
-        return 30;
-    }
+	protected int getRefreshIntervalSeconds(T configuration) {
+		return 30;
+	}
 
-    protected boolean refreshEnabled(T configuration) {
-        return false;
-    }
+	protected boolean refreshEnabled(T configuration) {
+		return false;
+	}
 
-    protected abstract boolean withProducerClient(T configuration);
+	protected abstract boolean withProducerClient(T configuration);
 
-    protected abstract KorgHttpConfiguration getHttpConfiguration(T configuration);
+	protected abstract KorgHttpConfiguration getHttpConfiguration(T configuration);
 
-    protected abstract KorgEndPointProvider getEndpointProvider(T configuration);
+	protected abstract KorgEndPointProvider getEndpointProvider(T configuration);
 
-    protected abstract Set<String> getPackageRoots(T configuration);
+	protected abstract Set<String> getPackageRoots(T configuration);
 
-    protected Supplier<String> getAuthHeaderSupplier(T configuration) {
-        return () -> null;
-    }
+	protected Supplier<String> getAuthHeaderSupplier(T configuration) {
+		return () -> null;
+	}
 
-    protected LeiaSchemaValidator getSchemaValidator(T configuration,
-                                                     LeiaClientRefresher clientRefresher) {
-        return StaticSchemaValidator.builder()
-                .supplier(clientRefresher::getData)
-                .packageRoots(getPackageRoots(configuration))
-                .build();
-    }
+	protected LeiaSchemaValidator getSchemaValidator(T configuration,
+	                                                 LeiaClientRefresher clientRefresher) {
+		return StaticSchemaValidator.builder()
+				.supplier(clientRefresher::getData)
+				.packageRoots(getPackageRoots(configuration))
+				.build();
+	}
 
-    protected abstract Supplier<MessageProcessor> getMessageProcessor(T configuration);
+	protected abstract Supplier<MessageProcessor> getMessageProcessor(T configuration);
 
-    protected Supplier<TargetValidator> getTargetRetriever(T configuration) {
-        return DefaultTargetValidator::new;
-    }
+	protected Supplier<TargetValidator> getTargetRetriever(T configuration) {
+		return DefaultTargetValidator::new;
+	}
 
-    protected LeiaMessageValidator getMessageValidator(T configuration) {
-        return new DefaultLeiaMessageValidator();
-    }
+	protected LeiaMessageValidator getMessageValidator(T configuration) {
+		return new DefaultLeiaMessageValidator();
+	}
 
-    @Override
-    public void run(T configuration, Environment environment) {
-        final var clientRequestSupplier = getClientRequestSupplier(configuration);
-        Preconditions.checkNotNull(clientRequestSupplier, "Request Supplier can't be null");
-        final var httpConfiguration = getHttpConfiguration(configuration);
-        Preconditions.checkNotNull(httpConfiguration, "Http Configuration can't be null");
-        final var packageRoots = getPackageRoots(configuration);
-        Preconditions.checkArgument(null != packageRoots && !packageRoots.isEmpty(), "Package Roots can't be null or empty");
-        final var withProducerClient = withProducerClient(configuration);
-        final var dataRefreshSeconds = getRefreshIntervalSeconds(configuration);
+	@Override
+	public void run(T configuration, Environment environment) {
+		final var clientRequestSupplier = getClientRequestSupplier(configuration);
+		Preconditions.checkNotNull(clientRequestSupplier, "Request Supplier can't be null");
+		final var httpConfiguration = getHttpConfiguration(configuration);
+		Preconditions.checkNotNull(httpConfiguration, "Http Configuration can't be null");
+		final var packageRoots = getPackageRoots(configuration);
+		Preconditions.checkArgument(null != packageRoots && !packageRoots.isEmpty(), "Package Roots can't be null or empty");
+		final var withProducerClient = withProducerClient(configuration);
+		final var dataRefreshSeconds = getRefreshIntervalSeconds(configuration);
 
-        final var clientRefresher = LeiaClientRefresher.builder()
-                .supplier(
-                        LeiaClientSupplier.builder()
-                                .httpConfiguration(httpConfiguration)
-                                .endPointProvider(getEndpointProvider(configuration))
-                                .clientRequestSupplier(clientRequestSupplier)
-                                .authHeaderSupplier(getAuthHeaderSupplier(configuration))
-                                .build()
-                )
-                .refreshTimeInSeconds(dataRefreshSeconds)
-                .periodicRefresh(refreshEnabled(configuration))
-                .build();
-        this.validator = getSchemaValidator(configuration, clientRefresher);
-        environment.lifecycle().manage(new Managed() {
-            @Override
-            public void start() {
-                clientRefresher.start();
-                validator.start();
-            }
+		final var clientRefresher = LeiaClientRefresher.builder()
+				.supplier(
+						LeiaClientSupplier.builder()
+								.httpConfiguration(httpConfiguration)
+								.endPointProvider(getEndpointProvider(configuration))
+								.clientRequestSupplier(clientRequestSupplier)
+								.authHeaderSupplier(getAuthHeaderSupplier(configuration))
+								.build()
+				)
+				.refreshTimeInSeconds(dataRefreshSeconds)
+				.periodicRefresh(refreshEnabled(configuration))
+				.build();
+		this.validator = getSchemaValidator(configuration, clientRefresher);
+		environment.lifecycle().manage(new Managed() {
+			@Override
+			public void start() {
+				clientRefresher.start();
+				validator.start();
+			}
 
-            @Override
-            public void stop() {
-                validator.stop();
-            }
-        });
-        if (withProducerClient) {
-            producerClient = LeiaMessageProduceClient.builder()
-                    .refresher(clientRefresher)
-                    .schemaValidator(validator)
-                    .mapper(environment.getObjectMapper())
-                    .processorSupplier(getMessageProcessor(configuration))
-                    .targetValidator(getTargetRetriever(configuration))
-                    .leiaMessageValidator(getMessageValidator(configuration))
-                    .build();
-            environment.lifecycle().manage(new Managed() {
-                @Override
-                public void start() {
-                    producerClient.start();
-                }
+			@Override
+			public void stop() {
+				validator.stop();
+			}
+		});
+		if (withProducerClient) {
+			producerClient = LeiaMessageProduceClient.builder()
+					.refresher(clientRefresher)
+					.schemaValidator(validator)
+					.mapper(environment.getObjectMapper())
+					.processorSupplier(getMessageProcessor(configuration))
+					.targetValidator(getTargetRetriever(configuration))
+					.leiaMessageValidator(getMessageValidator(configuration))
+					.build();
+			environment.lifecycle().manage(new Managed() {
+				@Override
+				public void start() {
+					producerClient.start();
+				}
 
-                @Override
-                public void stop() {
-                    // No op
-                }
-            });
-        }
-    }
+				@Override
+				public void stop() {
+					// No op
+				}
+			});
+		}
+	}
 }

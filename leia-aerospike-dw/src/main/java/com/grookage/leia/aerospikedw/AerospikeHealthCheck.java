@@ -22,22 +22,22 @@ import com.grookage.leia.dropwizard.bundle.health.LeiaHealthCheck;
 import lombok.SneakyThrows;
 
 public class AerospikeHealthCheck extends LeiaHealthCheck {
-    private final AerospikeManager aerospikeManager;
+	private final AerospikeManager aerospikeManager;
 
-    public AerospikeHealthCheck(AerospikeManager aerospikeManager) {
-        super("aerospike-health-check");
-        Preconditions.checkNotNull(aerospikeManager, "Aerospike Manager can't be null");
-        this.aerospikeManager = aerospikeManager;
-    }
+	public AerospikeHealthCheck(AerospikeManager aerospikeManager) {
+		super("aerospike-health-check");
+		Preconditions.checkNotNull(aerospikeManager, "Aerospike Manager can't be null");
+		this.aerospikeManager = aerospikeManager;
+	}
 
-    @Override
-    @SneakyThrows
-    protected Result check() {
-        final var healthStatus = aerospikeManager.getClient().isConnected();
-        if (!healthStatus) {
-            return Result.unhealthy("Last status: %s", "Not Connected");
-        } else {
-            return Result.healthy("Last status: %s", "Connected");
-        }
-    }
+	@Override
+	@SneakyThrows
+	protected Result check() {
+		final var healthStatus = aerospikeManager.getClient().isConnected();
+		if (!healthStatus) {
+			return Result.unhealthy("Last status: %s", "Not Connected");
+		} else {
+			return Result.healthy("Last status: %s", "Connected");
+		}
+	}
 }

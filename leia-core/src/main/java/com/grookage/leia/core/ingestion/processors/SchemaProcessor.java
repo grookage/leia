@@ -34,28 +34,28 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public abstract class SchemaProcessor {
 
-    private final Supplier<SchemaRepository> repositorySupplier;
+	private final Supplier<SchemaRepository> repositorySupplier;
 
-    public abstract SchemaEvent name();
+	public abstract SchemaEvent name();
 
-    @SneakyThrows
-    public void addHistory(SchemaContext context, SchemaDetails schemaDetails) {
-        final var userName = ContextUtils.getUser(context);
-        final var email = ContextUtils.getEmail(context);
-        final var userId = ContextUtils.getUserId(context);
-        final var configHistoryItem = SchemaHistoryItem.builder()
-                .configUpdaterId(userId)
-                .configUpdaterEmail(email)
-                .configUpdaterName(userName)
-                .timestamp(System.currentTimeMillis())
-                .schemaEvent(name())
-                .build();
-        schemaDetails.addHistory(configHistoryItem);
-    }
+	@SneakyThrows
+	public void addHistory(SchemaContext context, SchemaDetails schemaDetails) {
+		final var userName = ContextUtils.getUser(context);
+		final var email = ContextUtils.getEmail(context);
+		final var userId = ContextUtils.getUserId(context);
+		final var configHistoryItem = SchemaHistoryItem.builder()
+				.configUpdaterId(userId)
+				.configUpdaterEmail(email)
+				.configUpdaterName(userName)
+				.timestamp(System.currentTimeMillis())
+				.schemaEvent(name())
+				.build();
+		schemaDetails.addHistory(configHistoryItem);
+	}
 
-    public abstract void process(final SchemaContext schemaContext);
+	public abstract void process(final SchemaContext schemaContext);
 
-    public void fire(SchemaContext context) {
-        process(context);
-    }
+	public void fire(SchemaContext context) {
+		process(context);
+	}
 }

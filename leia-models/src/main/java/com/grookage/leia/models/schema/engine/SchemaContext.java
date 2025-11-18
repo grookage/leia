@@ -26,25 +26,25 @@ import java.util.Optional;
 
 @NoArgsConstructor
 public class SchemaContext {
-    private final ContextData data = new ContextData();
+	private final ContextData data = new ContextData();
 
-    @JsonIgnore
-    public <V> void addContext(String key, V value) {
-        if (Strings.isNullOrEmpty(key.toUpperCase())) {
-            throw new IllegalArgumentException("Invalid key for context data. Key cannot be null/empty");
-        }
-        this.data.put(key.toUpperCase(), value);
-    }
+	@JsonIgnore
+	public <V> void addContext(String key, V value) {
+		if (Strings.isNullOrEmpty(key.toUpperCase())) {
+			throw new IllegalArgumentException("Invalid key for context data. Key cannot be null/empty");
+		}
+		this.data.put(key.toUpperCase(), value);
+	}
 
-    @SneakyThrows
-    public <T> Optional<T> getContext(Class<T> klass) {
-        var value = this.data.get(klass.getSimpleName().toUpperCase());
-        return Optional.ofNullable(MapperUtils.mapper().convertValue(value, klass));
-    }
+	@SneakyThrows
+	public <T> Optional<T> getContext(Class<T> klass) {
+		var value = this.data.get(klass.getSimpleName().toUpperCase());
+		return Optional.ofNullable(MapperUtils.mapper().convertValue(value, klass));
+	}
 
-    @SneakyThrows
-    public Optional<String> getValue(String key) {
-        var value = this.data.get(key.toUpperCase());
-        return Optional.ofNullable((String) value);
-    }
+	@SneakyThrows
+	public Optional<String> getValue(String key) {
+		var value = this.data.get(key.toUpperCase());
+		return Optional.ofNullable((String) value);
+	}
 }

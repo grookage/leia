@@ -32,42 +32,42 @@ import org.elasticsearch.client.RestClient;
 @Getter
 public class ElasticClientManager {
 
-    private final ElasticConfig elasticConfig;
-    private ElasticsearchClient elasticClient;
+	private final ElasticConfig elasticConfig;
+	private ElasticsearchClient elasticClient;
 
-    public ElasticClientManager(ElasticConfig elasticConfig) {
-        this.elasticConfig = elasticConfig;
-        this.start();
-    }
+	public ElasticClientManager(ElasticConfig elasticConfig) {
+		this.elasticConfig = elasticConfig;
+		this.start();
+	}
 
-    @SneakyThrows
-    public void start() {
-        log.info("Starting the elastic client");
-        Preconditions.checkNotNull(elasticConfig, "ElasticConfig can't be null");
-        final var hosts = elasticConfig.getServers().stream()
-                .map(serverConfig -> new HttpHost(serverConfig.getHost(),
-                        serverConfig.getPort(), ElasticClientUtils.getScheme(elasticConfig))).toArray(HttpHost[]::new);
-        final var restClientBuilder = RestClient.builder(hosts);
-        if (null != elasticConfig.getAuthConfig()) {
-            final var sslContext = ElasticClientUtils.getSslContext(elasticConfig);
-            final var credentialsProvider = ElasticClientUtils.getAuthCredentials(elasticConfig);
-            restClientBuilder.setHttpClientConfigCallback(httpAsyncClientBuilder -> {
-                if (null != credentialsProvider) {
-                    httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-                }
+	@SneakyThrows
+	public void start() {
+		log.info("Starting the elastic client");
+		Preconditions.checkNotNull(elasticConfig, "ElasticConfig can't be null");
+		final var hosts = elasticConfig.getServers().stream()
+				.map(serverConfig -> new HttpHost(serverConfig.getHost(),
+						serverConfig.getPort(), ElasticClientUtils.getScheme(elasticConfig))).toArray(HttpHost[]::new);
+		final var restClientBuilder = RestClient.builder(hosts);
+		if (null != elasticConfig.getAuthConfig()) {
+			final var sslContext = ElasticClientUtils.getSslContext(elasticConfig);
+			final var credentialsProvider = ElasticClientUtils.getAuthCredentials(elasticConfig);
+			restClientBuilder.setHttpClientConfigCallback(httpAsyncClientBuilder -> {
+				if (null != credentialsProvider) {
+					httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+				}
 
-                if (null != sslContext) {
-                    httpAsyncClientBuilder.setSSLContext(sslContext);
-                }
+				if (null != sslContext) {
+					httpAsyncClientBuilder.setSSLContext(sslContext);
+				}
 
-                return httpAsyncClientBuilder;
-            });
-        }
-        this.elasticClient = new ElasticsearchClient(new RestClientTransport(
-                restClientBuilder.build(),
-                new JacksonJsonpMapper()
-        ));
-        log.info("Started the elastic client");
-    }
+				return httpAsyncClientBuilder;
+			});
+		}
+		this.elasticClient = new ElasticsearchClient(new RestClientTransport(
+				restClientBuilder.build(),
+				new JacksonJsonpMapper()
+		));
+		log.info("Started the elastic client");
+	}
 
 }

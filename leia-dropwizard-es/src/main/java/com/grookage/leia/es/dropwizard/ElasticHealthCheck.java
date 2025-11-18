@@ -25,26 +25,26 @@ import lombok.SneakyThrows;
 
 public class ElasticHealthCheck extends LeiaHealthCheck {
 
-    private final ElasticConfig elasticConfig;
-    private final ElasticsearchClient elasticClient;
+	private final ElasticConfig elasticConfig;
+	private final ElasticsearchClient elasticClient;
 
-    public ElasticHealthCheck(ElasticConfig elasticConfig,
-                              ElasticsearchClient elasticClient) {
-        super("elastic-health-check");
-        Preconditions.checkNotNull(elasticConfig, "Elastic config can't be null");
-        Preconditions.checkNotNull(elasticClient, "Elastic Client can't be null");
-        this.elasticConfig = elasticConfig;
-        this.elasticClient = elasticClient;
-    }
+	public ElasticHealthCheck(ElasticConfig elasticConfig,
+	                          ElasticsearchClient elasticClient) {
+		super("elastic-health-check");
+		Preconditions.checkNotNull(elasticConfig, "Elastic config can't be null");
+		Preconditions.checkNotNull(elasticClient, "Elastic Client can't be null");
+		this.elasticConfig = elasticConfig;
+		this.elasticClient = elasticClient;
+	}
 
-    @Override
-    @SneakyThrows
-    protected Result check() {
-        final var healthStatus = elasticClient.cluster().health().status();
-        if (healthStatus == HealthStatus.Red || (elasticConfig.isFailOnYellow() && healthStatus == HealthStatus.Yellow)) {
-            return Result.unhealthy("Last status: %s", healthStatus.name());
-        } else {
-            return Result.healthy("Last status: %s", healthStatus.name());
-        }
-    }
+	@Override
+	@SneakyThrows
+	protected Result check() {
+		final var healthStatus = elasticClient.cluster().health().status();
+		if (healthStatus == HealthStatus.Red || (elasticConfig.isFailOnYellow() && healthStatus == HealthStatus.Yellow)) {
+			return Result.unhealthy("Last status: %s", healthStatus.name());
+		} else {
+			return Result.healthy("Last status: %s", healthStatus.name());
+		}
+	}
 }

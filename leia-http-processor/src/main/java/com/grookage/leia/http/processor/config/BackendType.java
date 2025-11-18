@@ -18,23 +18,23 @@ package com.grookage.leia.http.processor.config;
 
 public enum BackendType {
 
-    SYNC {
-        public void apply(BackendTypeVisitor visitor) {
-            visitor.sync();
-        }
-    },
+	SYNC {
+		public void apply(BackendTypeVisitor visitor) {
+			visitor.sync();
+		}
+	},
 
-    QUEUED {
-        public void apply(BackendTypeVisitor visitor) {
-            visitor.queued();
-        }
-    };
+	QUEUED {
+		public void apply(BackendTypeVisitor visitor) {
+			visitor.queued();
+		}
+	};
 
-    public abstract void apply(BackendTypeVisitor var1);
+	public abstract void apply(BackendTypeVisitor var1);
 
-    public interface BackendTypeVisitor {
-        void sync();
+	public interface BackendTypeVisitor {
+		void sync();
 
-        void queued();
-    }
+		void queued();
+	}
 }

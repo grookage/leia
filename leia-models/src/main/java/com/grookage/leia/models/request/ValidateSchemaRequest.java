@@ -17,9 +17,9 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ValidateSchemaRequest {
-    @Valid
-    @NotNull
-    private SchemaKey schemaKey;
-    @NotNull
-    private JsonNode jsonNode;
+	@Valid
+	@NotNull
+	private SchemaKey schemaKey;
+	@NotNull
+	private JsonNode jsonNode;
 }

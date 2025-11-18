@@ -4,41 +4,49 @@ All notable changes to this project will be documented in this file.
 
 ## [1.1.0]
 
-- Minor Upgrade. Changed contract in LeiaMessageProduceClient, needs to take in a MessageRequest, instead of List<LeiaMessages>
+- Minor Upgrade. Changed contract in LeiaMessageProduceClient, needs to take in a MessageRequest, instead of
+  List<LeiaMessages>
 
 ## [1.0.3]
+
 - Added support for exception handling at message executor level
 - LeiaMessageProduceClient:
-  - Added support for sending messages to specific backends on the basis of runtime backendFilter predicate
-  - Introduced LeiaMessageValidator to validate message payloads against target schema before sending to backends
-  - Refactored SchemaPayloadValidator to be used as an implementation of LeiaMessageValidator
+    - Added support for sending messages to specific backends on the basis of runtime backendFilter predicate
+    - Introduced LeiaMessageValidator to validate message payloads against target schema before sending to backends
+    - Refactored SchemaPayloadValidator to be used as an implementation of LeiaMessageValidator
 - Removed logging of entire backendConfig to avoid logging hashing key
 
 ## [1.0.2]
+
 - Added support for Korg Endpoint provider to be passed from the client
 - Added optional configuration to disable creating aerospike indexes on startup
 
 ## [1.0.1]
+
 - Added support for request data resolver in `HttpMessageExecutor`
 
 ## [1.0.0]
+
 - Added missing enum values validation in `SchemaValidationUtils`
 - Upgrading json-rules library for performance improvements
 
 ## [0.0.1-RC27]
-- `TagBasedNameResolver`: Bug Fix: Use the tags from LeiaMessage to arrive at backends without any contextual eligibility
+
+- `TagBasedNameResolver`: Bug Fix: Use the tags from LeiaMessage to arrive at backends without any contextual
+  eligibility
 
 ## [0.0.1-RC26]
 
 - SchemaDetails: Use set for tags
 - LeiaMessageProduceClient: Append schema tags for multiplexed messages
 - TagBasedNameResolver: Bug Fix: Transform backend name to uppercase before comparison
-- Added approver validation to prevent self-approval for schemas 
+- Added approver validation to prevent self-approval for schemas
 - Added validation to prevent schema creation when it already exists
 - Added missing validation checks in SchemaRetriever during matching SchemaDetails
 - Renamed `orgs` to `orgId` in SearchRequest & LeiaClientRequest for consistency
 - Removed unused `createdRecordExists` method in repository layer and corresponding implementations in ES & AS
-- Removed equals and hashCode methods from `SchemaHistoryItem` class for maintaining histories of same type in SchemaDetails
+- Removed equals and hashCode methods from `SchemaHistoryItem` class for maintaining histories of same type in
+  SchemaDetails
 
 ## [0.0.1-RC25]
 
@@ -49,7 +57,8 @@ All notable changes to this project will be documented in this file.
 
 - Removed leia-refresher and replaced it with [korg](github.com/grookage/korg)
 - Fixed an AS client bug for expression evaluation - [MR](https://github.com/grookage/leia/pull/35)
-- Added orgId and tenant to schemaKey and has removed random flattened out structures, but instead maintaining storageRecord separately from application model.
+- Added orgId and tenant to schemaKey and has removed random flattened out structures, but instead maintaining
+  storageRecord separately from application model.
 
 ## [0.0.1-RC22]
 

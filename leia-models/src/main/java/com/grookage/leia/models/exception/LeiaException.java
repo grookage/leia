@@ -25,34 +25,34 @@ import java.util.Map;
 @Getter
 public class LeiaException extends RuntimeException {
 
-    private final int status;
-    private final String code;
-    private final transient Map<String, Object> context;
+	private final int status;
+	private final String code;
+	private final transient Map<String, Object> context;
 
-    @Builder
-    private LeiaException(LeiaErrorCode errorCode, Map<String, Object> context) {
-        super();
+	@Builder
+	private LeiaException(LeiaErrorCode errorCode, Map<String, Object> context) {
+		super();
 
-        this.status = errorCode.getStatus();
-        this.code = errorCode.name();
-        this.context = context;
-    }
+		this.status = errorCode.getStatus();
+		this.code = errorCode.name();
+		this.context = context;
+	}
 
-    private LeiaException(LeiaErrorCode errorCode, Throwable cause) {
-        super(cause);
+	private LeiaException(LeiaErrorCode errorCode, Throwable cause) {
+		super(cause);
 
-        this.code = errorCode.name();
-        this.status = errorCode.getStatus();
-        this.context = cause != null && cause.getLocalizedMessage() != null ?
-                Map.of("message", cause.getLocalizedMessage()) : new HashMap<>();
-    }
+		this.code = errorCode.name();
+		this.status = errorCode.getStatus();
+		this.context = cause != null && cause.getLocalizedMessage() != null ?
+				Map.of("message", cause.getLocalizedMessage()) : new HashMap<>();
+	}
 
-    public static LeiaException error(LeiaErrorCode errorCode, Throwable t) {
-        return new LeiaException(errorCode, t);
-    }
+	public static LeiaException error(LeiaErrorCode errorCode, Throwable t) {
+		return new LeiaException(errorCode, t);
+	}
 
-    public static LeiaException error(LeiaErrorCode errorCode) {
-        return new LeiaException(errorCode, new HashMap<>());
-    }
+	public static LeiaException error(LeiaErrorCode errorCode) {
+		return new LeiaException(errorCode, new HashMap<>());
+	}
 
 }

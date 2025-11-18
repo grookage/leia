@@ -30,14 +30,14 @@ import java.util.Set;
 @NoArgsConstructor
 public class StringAttribute extends SchemaAttribute {
 
-    public StringAttribute(final String name,
-                           final boolean optional,
-                           final Set<QualifierInfo> qualifiers) {
-        super(DataType.STRING, name, optional, qualifiers);
-    }
+	public StringAttribute(final String name,
+	                       final boolean optional,
+	                       final Set<QualifierInfo> qualifiers) {
+		super(DataType.STRING, name, optional, qualifiers);
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }

@@ -25,20 +25,20 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class StubbedSchemaUpdater implements SchemaUpdater {
-    @Override
-    public String name() {
-        return "name";
-    }
+	@Override
+	public String name() {
+		return "name";
+	}
 
-    @Override
-    public String email() {
-        return "name@grookage.com";
-    }
+	@Override
+	public String email() {
+		return "name@grookage.com";
+	}
 
-    @Override
-    public String userId() {
-        return "nameId";
-    }
+	@Override
+	public String userId() {
+		return "nameId";
+	}
 
 
 }

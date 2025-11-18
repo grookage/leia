@@ -19,13 +19,13 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AerospikeRecord {
 
-    @NotNull SchemaKey schemaKey;
-    @NotNull SchemaState schemaState;
-    SchemaType schemaType;
-    @NotNull byte[] data;
+	@NotNull SchemaKey schemaKey;
+	@NotNull SchemaState schemaState;
+	SchemaType schemaType;
+	@NotNull byte[] data;
 
-    @JsonIgnore
-    public String getReferenceId() {
-        return schemaKey.getReferenceId();
-    }
+	@JsonIgnore
+	public String getReferenceId() {
+		return schemaKey.getReferenceId();
+	}
 }

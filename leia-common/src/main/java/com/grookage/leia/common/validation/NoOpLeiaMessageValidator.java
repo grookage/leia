@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class NoOpLeiaMessageValidator implements LeiaMessageValidator {
-    @Override
-    public List<LeiaMessageViolation> validate(final SchemaDetails schemaDetails, final JsonNode message) {
-        return Collections.emptyList();
-    }
+	@Override
+	public List<LeiaMessageViolation> validate(final SchemaDetails schemaDetails, final JsonNode message) {
+		return Collections.emptyList();
+	}
 }

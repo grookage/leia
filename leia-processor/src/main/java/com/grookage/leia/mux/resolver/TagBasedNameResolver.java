@@ -29,24 +29,24 @@ import java.util.stream.Collectors;
 @Data
 public class TagBasedNameResolver implements BackendNameResolver {
 
-    private static final String BACKEND_TAG = "backend";
-    private static final String TAG_SEPARATOR = "-";
+	private static final String BACKEND_TAG = "backend";
+	private static final String TAG_SEPARATOR = "-";
 
-    @Override
-    public Set<String> getEligibleBackends(LeiaMessage leiaMessage) {
-        final var tags = leiaMessage.getTags();
-        if (null == tags || tags.isEmpty()) {
-            return Set.of();
-        }
-        final var backendTag = tags.stream()
-                .filter(each -> each.contains(BACKEND_TAG)).findFirst().orElse(null);
-        if (null == backendTag) {
-            return Set.of();
-        }
-        return Arrays.stream(
-                backendTag.toUpperCase(Locale.ROOT)
-                        .substring(backendTag.lastIndexOf(TAG_SEPARATOR) + 1)
-                        .split("\\s*::\\s*"))
-                .collect(Collectors.toSet());
-    }
+	@Override
+	public Set<String> getEligibleBackends(LeiaMessage leiaMessage) {
+		final var tags = leiaMessage.getTags();
+		if (null == tags || tags.isEmpty()) {
+			return Set.of();
+		}
+		final var backendTag = tags.stream()
+				.filter(each -> each.contains(BACKEND_TAG)).findFirst().orElse(null);
+		if (null == backendTag) {
+			return Set.of();
+		}
+		return Arrays.stream(
+						backendTag.toUpperCase(Locale.ROOT)
+								.substring(backendTag.lastIndexOf(TAG_SEPARATOR) + 1)
+								.split("\\s*::\\s*"))
+				.collect(Collectors.toSet());
+	}
 }

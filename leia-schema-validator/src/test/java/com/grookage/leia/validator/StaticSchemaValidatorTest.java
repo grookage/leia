@@ -18,74 +18,74 @@ import java.util.List;
 import java.util.Set;
 
 class StaticSchemaValidatorTest {
-    private static final String PACKAGE = "com.grookage.leia.validator.stubs";
+	private static final String PACKAGE = "com.grookage.leia.validator.stubs";
 
-    @Test
-    void testSchemaValidator() {
-        final var recordStubDetails = toSchemaDetails(TestRecordStub.class);
-        final var nestedStubDetails = toSchemaDetails(TestNestedRecordStub.class);
-        final var schemaValidator = StaticSchemaValidator.builder()
-                .packageRoots(Set.of(PACKAGE))
-                .supplier(() -> List.of(recordStubDetails, nestedStubDetails))
-                .build();
-        Assertions.assertDoesNotThrow(schemaValidator::start);
-        Assertions.assertTrue(schemaValidator.valid(schemaKey(TestRecordStub.class)));
-        Assertions.assertTrue(schemaValidator.valid(schemaKey(TestNestedRecordStub.class)));
-    }
+	@Test
+	void testSchemaValidator() {
+		final var recordStubDetails = toSchemaDetails(TestRecordStub.class);
+		final var nestedStubDetails = toSchemaDetails(TestNestedRecordStub.class);
+		final var schemaValidator = StaticSchemaValidator.builder()
+				.packageRoots(Set.of(PACKAGE))
+				.supplier(() -> List.of(recordStubDetails, nestedStubDetails))
+				.build();
+		Assertions.assertDoesNotThrow(schemaValidator::start);
+		Assertions.assertTrue(schemaValidator.valid(schemaKey(TestRecordStub.class)));
+		Assertions.assertTrue(schemaValidator.valid(schemaKey(TestNestedRecordStub.class)));
+	}
 
-    @Test
-    void testSchemaValidator_withMissingSchemaDetails() {
-        final var recordStubDetails = toSchemaDetails(TestRecordStub.class);
-        final var schemaValidator = StaticSchemaValidator.builder()
-                .packageRoots(Set.of(PACKAGE))
-                .supplier(() -> List.of(recordStubDetails))
-                .build();
-        final var schemaValidationException = Assertions.assertThrows(SchemaValidationException.class, schemaValidator::start);
-        Assertions.assertEquals(ValidationErrorCode.NO_SCHEMA_FOUND.name(), schemaValidationException.getCode());
-    }
+	@Test
+	void testSchemaValidator_withMissingSchemaDetails() {
+		final var recordStubDetails = toSchemaDetails(TestRecordStub.class);
+		final var schemaValidator = StaticSchemaValidator.builder()
+				.packageRoots(Set.of(PACKAGE))
+				.supplier(() -> List.of(recordStubDetails))
+				.build();
+		final var schemaValidationException = Assertions.assertThrows(SchemaValidationException.class, schemaValidator::start);
+		Assertions.assertEquals(ValidationErrorCode.NO_SCHEMA_FOUND.name(), schemaValidationException.getCode());
+	}
 
-    @SneakyThrows
-    @Test
-    void testSchemaValidator_withInvalidSchema() {
-        final var recordStubDetails = ResourceHelper.getResource("InvalidRecordStubSchema.json", SchemaDetails.class);
-        final var nestedStubDetails = ResourceHelper.getResource("InvalidNestedRecordStubSchema.json", SchemaDetails.class);
-        final var schemaValidator = StaticSchemaValidator.builder()
-                .packageRoots(Set.of(PACKAGE))
-                .supplier(() -> List.of(recordStubDetails, nestedStubDetails))
-                .build();
-        final var schemaValidationException = Assertions.assertThrows(SchemaValidationException.class, schemaValidator::start);
-        Assertions.assertEquals(ValidationErrorCode.INVALID_SCHEMAS.name(), schemaValidationException.getCode());
-        Assertions.assertFalse(schemaValidator.valid(schemaKey(TestRecordStub.class)));
-        Assertions.assertFalse(schemaValidator.valid(schemaKey(TestNestedRecordStub.class)));
-    }
+	@SneakyThrows
+	@Test
+	void testSchemaValidator_withInvalidSchema() {
+		final var recordStubDetails = ResourceHelper.getResource("InvalidRecordStubSchema.json", SchemaDetails.class);
+		final var nestedStubDetails = ResourceHelper.getResource("InvalidNestedRecordStubSchema.json", SchemaDetails.class);
+		final var schemaValidator = StaticSchemaValidator.builder()
+				.packageRoots(Set.of(PACKAGE))
+				.supplier(() -> List.of(recordStubDetails, nestedStubDetails))
+				.build();
+		final var schemaValidationException = Assertions.assertThrows(SchemaValidationException.class, schemaValidator::start);
+		Assertions.assertEquals(ValidationErrorCode.INVALID_SCHEMAS.name(), schemaValidationException.getCode());
+		Assertions.assertFalse(schemaValidator.valid(schemaKey(TestRecordStub.class)));
+		Assertions.assertFalse(schemaValidator.valid(schemaKey(TestNestedRecordStub.class)));
+	}
 
 
-    private SchemaDetails toSchemaDetails(final Class<?> schemaKlass) {
-        final var schemaDefinition = schemaKlass.getAnnotation(SchemaDefinition.class);
-        final var createSchemaRequest = SchemaBuilder.buildSchemaRequest(schemaKlass)
-                .orElse(null);
-        Assertions.assertNotNull(createSchemaRequest);
-        return SchemaDetails.builder()
-                .schemaKey(createSchemaRequest.getSchemaKey())
-                .schemaState(SchemaState.CREATED)
-                .schemaType(createSchemaRequest.getSchemaType())
-                .description(createSchemaRequest.getDescription())
-                .attributes(createSchemaRequest.getAttributes())
-                .validationType(createSchemaRequest.getValidationType())
-                .transformationTargets(createSchemaRequest.getTransformationTargets())
-                .tags(createSchemaRequest.getTags())
-                .build();
-    }
+	private SchemaDetails toSchemaDetails(final Class<?> schemaKlass) {
+		final var schemaDefinition = schemaKlass.getAnnotation(SchemaDefinition.class);
+		final var createSchemaRequest = SchemaBuilder.buildSchemaRequest(schemaKlass)
+				.orElse(null);
+		Assertions.assertNotNull(createSchemaRequest);
+		return SchemaDetails.builder()
+				.schemaKey(createSchemaRequest.getSchemaKey())
+				.schemaState(SchemaState.CREATED)
+				.schemaType(createSchemaRequest.getSchemaType())
+				.description(createSchemaRequest.getDescription())
+				.attributes(createSchemaRequest.getAttributes())
+				.validationType(createSchemaRequest.getValidationType())
+				.transformationTargets(createSchemaRequest.getTransformationTargets())
+				.tags(createSchemaRequest.getTags())
+				.build();
+	}
 
-    private SchemaKey schemaKey(final Class<?> schemaKlass) {
-        final var schemaDefinition = schemaKlass.getAnnotation(SchemaDefinition.class);
-        return SchemaKey.builder()
-                .schemaName(schemaDefinition.name())
-                .namespace(schemaDefinition.namespace())
-                .version(schemaDefinition.version())
-                .orgId(schemaDefinition.orgId())
-                .tenantId(schemaDefinition.tenantId())
-                .type(schemaDefinition.type())
-                .build();
-    }
+	private SchemaKey schemaKey(final Class<?> schemaKlass) {
+		final var schemaDefinition = schemaKlass.getAnnotation(SchemaDefinition.class);
+		return SchemaKey.builder()
+				.schemaName(schemaDefinition.name())
+				.namespace(schemaDefinition.namespace())
+				.version(schemaDefinition.version())
+				.orgId(schemaDefinition.orgId())
+				.tenantId(schemaDefinition.tenantId())
+				.type(schemaDefinition.type())
+				.build();
+	}
 }

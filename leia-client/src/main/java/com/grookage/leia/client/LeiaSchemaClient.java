@@ -24,10 +24,10 @@ import java.util.Set;
 
 public interface LeiaSchemaClient {
 
-    List<SchemaDetails> getSchemaDetails();
+	List<SchemaDetails> getSchemaDetails();
 
-    List<SchemaDetails> getSchemaDetails(final Set<SchemaKey> schemas);
+	List<SchemaDetails> getSchemaDetails(final Set<SchemaKey> schemas);
 
-    boolean valid(SchemaKey schemaKey);
+	boolean valid(SchemaKey schemaKey);
 
 }
