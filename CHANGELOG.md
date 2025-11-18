@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0]
+
+- Minor Upgrade. Changed contract in LeiaMessageProduceClient, needs to take in a MessageRequest, instead of List<LeiaMessages>
+
 ## [1.0.3]
 - Added support for exception handling at message executor level
 - LeiaMessageProduceClient:

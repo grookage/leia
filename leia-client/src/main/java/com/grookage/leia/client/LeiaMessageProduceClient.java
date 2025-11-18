@@ -26,6 +26,7 @@ import com.grookage.leia.models.schema.transformer.TransformationTarget;
 import com.grookage.leia.models.utils.SchemaUtils;
 import com.grookage.leia.mux.MessageProcessor;
 import com.grookage.leia.mux.filter.BackendFilter;
+import com.grookage.leia.mux.filter.NoOpBackendFilter;
 import com.grookage.leia.mux.targetvalidator.DefaultTargetValidator;
 import com.grookage.leia.mux.targetvalidator.TargetValidator;
 import com.jayway.jsonpath.Configuration;
@@ -147,26 +148,23 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
         return validator.validate(transformationTarget, messageRequest, schemaDetails);
     }
 
+    @Deprecated(forRemoval = true, since = "1.1.0")
     public void processMessages(MessageRequest messageRequest,
                                 MessageProcessor messageProcessor,
                                 TargetValidator targetValidator) {
-        final var processor = null != messageProcessor ? messageProcessor : processorSupplier.get();
-        if (null == processor) {
-            log.error("No message processor hub supplied to process messages, call getMessages instead");
-            throw new UnsupportedOperationException("No message processor hub found");
-        }
-        final var messages = getMessages(messageRequest, targetValidator).values().stream().toList();
-        processor.processMessages(messages);
+       processMessages(messageRequest, messageProcessor, targetValidator, new NoOpBackendFilter());
     }
 
-    public void processMessages(List<LeiaMessage> messages,
+    public void processMessages(MessageRequest messageRequest,
                                 MessageProcessor messageProcessor,
+                                TargetValidator targetValidator,
                                 BackendFilter backendFilter) {
         final var processor = null != messageProcessor ? messageProcessor : processorSupplier.get();
         if (null == processor) {
             log.error("No message processor hub supplied to process messages, call getMessages instead");
             throw new UnsupportedOperationException("No message processor hub found");
         }
+        final var messages = getMessages(messageRequest, targetValidator).values().stream().toList();
         processor.processMessages(messages, backendFilter);
     }
 

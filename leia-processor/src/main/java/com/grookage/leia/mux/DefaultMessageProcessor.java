@@ -91,10 +91,6 @@ public class DefaultMessageProcessor implements MessageProcessor {
         return executorMapping;
     }
 
-    public void processMessages(List<LeiaMessage> messages) {
-        processMessages(messages, new NoOpBackendFilter());
-    }
-
     public void processMessages(List<LeiaMessage> messages,
                                 BackendFilter backendFilter) {
         final var executorMapping = getExecutorMapping(messages, backendFilter);

@@ -55,7 +55,6 @@ class LeiaMessageProduceClientTest {
     private static final MessageExecutorFactory executorFactory = Mockito.mock(MessageExecutorFactory.class);
     private LeiaMessageProduceClient schemaClient;
     private SchemaKey sourceSchema;
-    private SchemaKey targetSchema;
     private SchemaDetails schemaDetails;
     private SchemaDetails targetSchemaDetails;
 
@@ -72,7 +71,7 @@ class LeiaMessageProduceClientTest {
                 .type("default")
                 .tenantId("tenantId")
                 .build();
-        targetSchema = SchemaKey.builder()
+        final var targetSchema = SchemaKey.builder()
                 .namespace("testNamespace")
                 .schemaName("testSchema")
                 .version("v")
@@ -121,7 +120,7 @@ class LeiaMessageProduceClientTest {
             }
 
             @Override
-            public void processMessages(List<LeiaMessage> messages) {
+            public void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter) {
                 Assertions.assertFalse(messages.isEmpty());
                 Assertions.assertEquals(2, messages.size());
                 final var testMessage = messages.stream()
@@ -156,7 +155,7 @@ class LeiaMessageProduceClientTest {
             }
 
             @Override
-            public void processMessages(List<LeiaMessage> messages) {
+            public void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter) {
                 Assertions.assertFalse(messages.isEmpty());
                 Assertions.assertEquals(1, messages.size());
                 Assertions.assertEquals("testUser", messages.get(0).getMessage().get("name").asText());
@@ -230,7 +229,7 @@ class LeiaMessageProduceClientTest {
             }
 
             @Override
-            public void processMessages(List<LeiaMessage> messages) {
+            public void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter) {
                 Assertions.assertFalse(messages.isEmpty());
                 Assertions.assertEquals(2, messages.size());
             }
@@ -252,7 +251,7 @@ class LeiaMessageProduceClientTest {
             }
 
             @Override
-            public void processMessages(List<LeiaMessage> messages) {
+            public void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter) {
                 Assertions.assertFalse(messages.isEmpty());
                 Assertions.assertEquals(1, messages.size());
             }
@@ -279,13 +278,8 @@ class LeiaMessageProduceClientTest {
         Assertions.assertFalse(leiaMessages.isEmpty());
         Assertions.assertEquals(1, leiaMessages.size());
 
-        schemaClient.processMessages(leiaMessages,
-                new DefaultMessageProcessor("test", 10_000L, new TagBasedNameResolver(), executorFactory) {}, new BackendFilter() {
-                    @Override
-                    public boolean shouldProcess(String backendName) {
-                        return backendName.equals("TRANSFORMATION_BACKEND");
-                    }
-                });
+        schemaClient.processMessages(messageRequest,
+                new DefaultMessageProcessor("test", 10_000L, new TagBasedNameResolver(), executorFactory) {}, null, backendName -> backendName.equals("TRANSFORMATION_BACKEND"));
         Mockito.verify(httpExecutor, Mockito.times(1)).send(leiaMessages);
     }
 }

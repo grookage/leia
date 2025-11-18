@@ -23,6 +23,7 @@ import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
 import com.grookage.leia.mux.filter.BackendFilter;
+import com.grookage.leia.mux.filter.NoOpBackendFilter;
 import com.grookage.leia.mux.resolver.TagBasedNameResolver;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
@@ -59,7 +60,7 @@ class DefaultMessageProcessorTest {
                 return false;
             }
         };
-        Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages));
+        Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages, new NoOpBackendFilter()));
         leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1",
                 "importance-mild::extreme")));
         final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
@@ -73,7 +74,7 @@ class DefaultMessageProcessorTest {
                 return true;
             }
         };
-        messageProcessor1.processMessages(leiaMessages);
+        messageProcessor1.processMessages(leiaMessages, new NoOpBackendFilter());
         Mockito.verify(httpExecutor, Mockito.times(1)).send(leiaMessages);
 
         leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1::backend2::backend3",
