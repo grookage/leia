@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Minor Upgrade. Changed contract in LeiaMessageProduceClient, needs to take in a MessageRequest, instead of
   List<LeiaMessages>
+- Added a handleException to be called natively if message send fails, should the clients want to extend. 
 
 ## [1.0.3]
 
