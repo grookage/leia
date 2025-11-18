@@ -31,7 +31,7 @@
     <artifactId>leia-common</artifactId>
 
     <properties>
-        <lang3.version>3.11</lang3.version>
+        <lang3.version>[3.18.0,)</lang3.version>
         <maven.deploy.skip>false</maven.deploy.skip>
     </properties>
 

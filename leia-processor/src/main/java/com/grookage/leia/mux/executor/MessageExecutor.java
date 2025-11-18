@@ -35,7 +35,7 @@ public abstract class MessageExecutor {
 
 	public abstract void sendEnvelope(List<LeiaMessage> messages);
 
-	private boolean isExceptionIgnorable(Throwable t) {
+	public boolean isExceptionIgnorable(Throwable t) {
 		return getDroppableExceptions().stream()
 				.anyMatch(exceptionType -> exceptionType.isAssignableFrom(t.getClass()));
 	}
