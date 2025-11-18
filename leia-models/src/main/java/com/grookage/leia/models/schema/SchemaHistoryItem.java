@@ -32,12 +32,12 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaHistoryItem {
-    @NotNull
-    SchemaEvent schemaEvent;
-    @NotNull
-    long timestamp;
-    @NotBlank
-    String configUpdaterName;
-    String configUpdaterId;
-    String configUpdaterEmail;
+	@NotNull
+	SchemaEvent schemaEvent;
+	@NotNull
+	long timestamp;
+	@NotBlank
+	String configUpdaterName;
+	String configUpdaterId;
+	String configUpdaterEmail;
 }

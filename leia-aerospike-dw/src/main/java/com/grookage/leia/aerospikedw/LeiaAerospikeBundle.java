@@ -20,25 +20,25 @@ import java.util.function.Supplier;
 public abstract class LeiaAerospikeBundle<T extends Configuration, U extends SchemaUpdater> extends LeiaBundle<T, U> {
 
 
-    private AerospikeRepository aerospikeRepository;
+	private AerospikeRepository aerospikeRepository;
 
-    protected abstract AerospikeConfig getAerospikeConfig(T configuration);
+	protected abstract AerospikeConfig getAerospikeConfig(T configuration);
 
-    @Override
-    protected Supplier<SchemaRepository> getRepositorySupplier(T configuration) {
-        return () -> aerospikeRepository;
-    }
+	@Override
+	protected Supplier<SchemaRepository> getRepositorySupplier(T configuration) {
+		return () -> aerospikeRepository;
+	}
 
-    @Override
-    protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
-        return List.of(new AerospikeHealthCheck(aerospikeRepository.getAerospikeManager()));
-    }
+	@Override
+	protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
+		return List.of(new AerospikeHealthCheck(aerospikeRepository.getAerospikeManager()));
+	}
 
-    @Override
-    public void run(T configuration, Environment environment) {
-        final var aerospikeConfig = getAerospikeConfig(configuration);
-        Preconditions.checkNotNull(aerospikeConfig, "Aerospike Config can't be null");
-        this.aerospikeRepository = new AerospikeRepository(aerospikeConfig);
-        super.run(configuration, environment);
-    }
+	@Override
+	public void run(T configuration, Environment environment) {
+		final var aerospikeConfig = getAerospikeConfig(configuration);
+		Preconditions.checkNotNull(aerospikeConfig, "Aerospike Config can't be null");
+		this.aerospikeRepository = new AerospikeRepository(aerospikeConfig);
+		super.run(configuration, environment);
+	}
 }

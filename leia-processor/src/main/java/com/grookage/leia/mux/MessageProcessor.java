@@ -18,14 +18,18 @@ package com.grookage.leia.mux;
 
 import com.grookage.leia.models.mux.LeiaMessage;
 import com.grookage.leia.mux.filter.BackendFilter;
+import com.grookage.leia.mux.filter.NoOpBackendFilter;
 
 import java.util.List;
 
 public interface MessageProcessor {
 
-    String getName();
+	String getName();
 
-    void processMessages(List<LeiaMessage> messages);
+	@Deprecated(forRemoval = true, since = "1.1.0")
+	default void processMessages(List<LeiaMessage> messages) {
+		processMessages(messages, new NoOpBackendFilter());
+	}
 
-    void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter);
+	void processMessages(List<LeiaMessage> messages, BackendFilter backendFilter);
 }

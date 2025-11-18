@@ -26,8 +26,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class GenericResponse<T> {
-    private boolean success;
-    private String code;
-    private String message;
-    private T data;
+	private boolean success;
+	private String code;
+	private String message;
+	private T data;
 }

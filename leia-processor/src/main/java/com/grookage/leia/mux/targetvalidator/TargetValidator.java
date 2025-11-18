@@ -21,7 +21,7 @@ import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
 
 public interface TargetValidator {
-    boolean validate(TransformationTarget transformationTarget,
-                     MessageRequest messageRequest,
-                     SchemaDetails schemaDetails);
+	boolean validate(TransformationTarget transformationTarget,
+	                 MessageRequest messageRequest,
+	                 SchemaDetails schemaDetails);
 }

@@ -13,8 +13,8 @@ import java.util.Map;
 @Builder
 @Jacksonized
 public class TestParameterizedStub {
-    String[] values;
-    List<@PII PIIData> piiDataList;
-    @Encrypted
-    Map<TestEnum, String> map;
+	String[] values;
+	List<@PII PIIData> piiDataList;
+	@Encrypted
+	Map<TestEnum, String> map;
 }

@@ -18,260 +18,260 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 class SchemaValidationUtilsTest {
-    @Test
-    @SneakyThrows
-    void testSchemaValidator() {
-        final var schemaDetails = ResourceHelper
-                .getResource("validSchema.json", SchemaDetails.class);
-        Assertions.assertNotNull(schemaDetails);
-        Assertions.assertTrue(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
-        schemaDetails.setValidationType(SchemaValidationType.STRICT);
-        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
-    }
+	@Test
+	@SneakyThrows
+	void testSchemaValidator() {
+		final var schemaDetails = ResourceHelper
+				.getResource("validSchema.json", SchemaDetails.class);
+		Assertions.assertNotNull(schemaDetails);
+		Assertions.assertTrue(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
+		schemaDetails.setValidationType(SchemaValidationType.STRICT);
+		Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, ValidTestClass.class).isEmpty());
+	}
 
-    @SneakyThrows
-    @Test
-    void testGenericClass() {
-        final var schemaDetails = ResourceHelper
-                .getResource("validGenericSchema.json", SchemaDetails.class);
-        Assertions.assertNotNull(schemaDetails);
-        final var violations = SchemaValidationUtils.valid(schemaDetails, TestGenericStub.class);
-        Assertions.assertTrue(violations.isEmpty());
-    }
-
-
-    @Test
-    @SneakyThrows
-    void testInvalidMatchingSchema() {
-        final var schemaDetails = ResourceHelper
-                .getResource("validSchema.json", SchemaDetails.class);
-        schemaDetails.setValidationType(SchemaValidationType.MATCHING);
-        Assertions.assertNotNull(schemaDetails);
-        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, InvalidTestClass.class).isEmpty());
-    }
-
-    @Test
-    void testAllFields() {
-        final var booleanAttribute = new BooleanAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Boolean.class, booleanAttribute));
-
-        final var byteAttribute = new ByteAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Byte.class, byteAttribute));
-
-        final var characterAttribute = new CharacterAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Character.class, characterAttribute));
-
-        final var doubleAttribute = new DoubleAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Double.class, doubleAttribute));
-
-        final var enumAttribute = new EnumAttribute("testAttribute", true, null, Set.of());
-        Assertions.assertTrue(SchemaValidationUtils.valid(ValidationErrorCode.class, enumAttribute));
-
-        final var floatAttribute = new FloatAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Float.class, floatAttribute));
-
-        final var integerAttribute = new IntegerAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Integer.class, integerAttribute));
-
-        final var longAttribute = new LongAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Long.class, longAttribute));
-
-        final var shortAttribute = new ShortAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Short.class, shortAttribute));
-
-        final var stringAttribute = new StringAttribute("testAttribute", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(String.class, stringAttribute));
-
-        final var arrayAttribute = new ArrayAttribute("testAttribute", true, null, stringAttribute);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Set.class, arrayAttribute));
-
-        final var mapAttribute = new MapAttribute("testAttribute", true, null, stringAttribute, stringAttribute);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Map.class, mapAttribute));
-
-        final var plainObjectAttribute = new ObjectAttribute("testAttribute", true, null, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(Object.class, plainObjectAttribute));
-
-        final var objectAttribute = new ObjectAttribute("testAttribute", true, null, Set.of(stringAttribute));
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaDetails.class, objectAttribute));
-
-        Assertions.assertFalse(SchemaValidationUtils.valid(Long.class, integerAttribute));
-        Assertions.assertTrue(SchemaValidationUtils.valid(Long.class, objectAttribute));
+	@SneakyThrows
+	@Test
+	void testGenericClass() {
+		final var schemaDetails = ResourceHelper
+				.getResource("validGenericSchema.json", SchemaDetails.class);
+		Assertions.assertNotNull(schemaDetails);
+		final var violations = SchemaValidationUtils.valid(schemaDetails, TestGenericStub.class);
+		Assertions.assertTrue(violations.isEmpty());
+	}
 
 
-    }
+	@Test
+	@SneakyThrows
+	void testInvalidMatchingSchema() {
+		final var schemaDetails = ResourceHelper
+				.getResource("validSchema.json", SchemaDetails.class);
+		schemaDetails.setValidationType(SchemaValidationType.MATCHING);
+		Assertions.assertNotNull(schemaDetails);
+		Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, InvalidTestClass.class).isEmpty());
+	}
 
-    @Test
-    void testParametrizedArray() {
-        final var stringAttribute = new StringAttribute("stringAttribute", true, null);
-        final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, stringAttribute);
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                SetTestClass.class).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                ListTestClass.class).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                ArrayTestClass.class).isEmpty());
-        Assertions.assertFalse(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                RawSetTestClass.class).isEmpty());
-    }
+	@Test
+	void testAllFields() {
+		final var booleanAttribute = new BooleanAttribute("testAttribute", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Boolean.class, booleanAttribute));
 
-    @Test
-    void testRawArray() {
-        final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                RawSetTestClass.class).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                SetTestClass.class).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                ListTestClass.class).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                ArrayTestClass.class).isEmpty());
-    }
+		final var byteAttribute = new ByteAttribute("testAttribute", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Byte.class, byteAttribute));
 
-    @Test
-    void testParametrizedMap() {
-        final var keyAttribute = new StringAttribute("keyAttribute", true, null);
-        final var valueAttribute = new StringAttribute("valueAttribute", true, null);
-        final var mapAttribute = new MapAttribute("mapAttribute", true, null, keyAttribute, valueAttribute);
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                MapTestClass.class).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                ConcurrentMapTestClass.class).isEmpty());
-        Assertions.assertFalse(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                RawMapTestClass.class).isEmpty());
-    }
+		final var characterAttribute = new CharacterAttribute("testAttribute", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Character.class, characterAttribute));
 
-    @Test
-    void testRawMap() {
-        final var mapAttribute = new MapAttribute("mapAttribute", true, null, null, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                RawMapTestClass.class).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                MapTestClass.class).isEmpty());
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
-                ConcurrentMapTestClass.class).isEmpty());
-    }
+		final var doubleAttribute = new DoubleAttribute("testAttribute", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Double.class, doubleAttribute));
 
-    @Test
-    @SneakyThrows
-    void testNestedObject() {
-        final var schemaDetails = ResourceHelper
-                .getResource("validNestedSchema.json", SchemaDetails.class);
-        schemaDetails.setValidationType(SchemaValidationType.MATCHING);
-        Assertions.assertTrue(SchemaValidationUtils.valid(schemaDetails, ValidObjectTestClass.class).isEmpty());
-        Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, InvalidObjectTestClass.class).isEmpty());
-    }
+		final var enumAttribute = new EnumAttribute("testAttribute", true, null, Set.of());
+		Assertions.assertTrue(SchemaValidationUtils.valid(ValidationErrorCode.class, enumAttribute));
 
-    @Test
-    void testGenericArrayType() {
-        final var stringAttribute = new StringAttribute("stringAttribute", true, null);
-        final var listAttribute = new ArrayAttribute("listAttribute", true, null, stringAttribute);
-        final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, listAttribute);
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
-                GenericArrayTestClass.class).isEmpty());
-    }
+		final var floatAttribute = new FloatAttribute("testAttribute", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Float.class, floatAttribute));
 
-    @SneakyThrows
-    @Test
-    void testInvalidNestedStubSchema() {
-        final var schemaDetails = ResourceHelper.getResource("invalidNestedStubSchema.json", SchemaDetails.class);
-        final var violations = SchemaValidationUtils.valid(schemaDetails, NestedStub.class);
-        Assertions.assertFalse(violations.isEmpty());
-        Assertions.assertEquals(4, violations.size());
-        final var nestedStubViolations = violations.stream()
-                .filter(leiaSchemaViolation -> leiaSchemaViolation.rootKlass().equals(NestedStub.class))
-                .toList();
-        Assertions.assertEquals(3, nestedStubViolations.size());
-        final var piiDataViolations = violations.stream()
-                .filter(leiaSchemaViolation -> leiaSchemaViolation.rootKlass().equals(PIIData.class))
-                .toList();
-        Assertions.assertEquals(1, piiDataViolations.size());
-    }
+		final var integerAttribute = new IntegerAttribute("testAttribute", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Integer.class, integerAttribute));
 
-    @SneakyThrows
-    @Test
-    void testEnumAttribute() {
-        final var enumAttribute = new EnumAttribute("testEnum", true, null, Set.of("TEST_ENUM"));
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(enumAttribute),
-                EnumTestClass.class).isEmpty());
+		final var longAttribute = new LongAttribute("testAttribute", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Long.class, longAttribute));
 
-        // Enum as String attribute should pass the validation
-        final var stringAttribute = new StringAttribute("testEnum", true, null);
-        Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(stringAttribute),
-                EnumTestClass.class).isEmpty());
+		final var shortAttribute = new ShortAttribute("testAttribute", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Short.class, shortAttribute));
 
-        // Adding a new value to the enum should fail the validation
-        final var updatedEnumAttribute = new EnumAttribute("testEnum", true, null, Set.of("TEST_ENUM", "NEW_ENUM"));
-        final var violations = SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(updatedEnumAttribute),
-                EnumTestClass.class);
-        Assertions.assertFalse(violations.isEmpty());
-    }
+		final var stringAttribute = new StringAttribute("testAttribute", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(String.class, stringAttribute));
 
-    enum TestEnum {
-        TEST_ENUM
-    }
+		final var arrayAttribute = new ArrayAttribute("testAttribute", true, null, stringAttribute);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Set.class, arrayAttribute));
 
-    static class EnumTestClass {
-        TestEnum testEnum;
-    }
+		final var mapAttribute = new MapAttribute("testAttribute", true, null, stringAttribute, stringAttribute);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Map.class, mapAttribute));
 
-    static class ValidTestClass {
-        Set<String> testAttribute;
-        TestEnum testAttribute2;
-        String testAttribute3;
-    }
+		final var plainObjectAttribute = new ObjectAttribute("testAttribute", true, null, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(Object.class, plainObjectAttribute));
 
-    static class InvalidTestClass {
-        Set<String> testAttribute;
-    }
+		final var objectAttribute = new ObjectAttribute("testAttribute", true, null, Set.of(stringAttribute));
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaDetails.class, objectAttribute));
 
-    static class SetTestClass {
-        Set<String> arrayAttribute;
-    }
+		Assertions.assertFalse(SchemaValidationUtils.valid(Long.class, integerAttribute));
+		Assertions.assertTrue(SchemaValidationUtils.valid(Long.class, objectAttribute));
 
-    static class ListTestClass {
-        List<String> arrayAttribute;
-    }
 
-    static class ArrayTestClass {
-        String[] arrayAttribute;
-    }
+	}
 
-    static class RawSetTestClass {
-        Set arrayAttribute;
-    }
+	@Test
+	void testParametrizedArray() {
+		final var stringAttribute = new StringAttribute("stringAttribute", true, null);
+		final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, stringAttribute);
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+				SetTestClass.class).isEmpty());
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+				ListTestClass.class).isEmpty());
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+				ArrayTestClass.class).isEmpty());
+		Assertions.assertFalse(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+				RawSetTestClass.class).isEmpty());
+	}
 
-    static class MapTestClass {
-        Map<String, String> mapAttribute;
-    }
+	@Test
+	void testRawArray() {
+		final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+				RawSetTestClass.class).isEmpty());
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+				SetTestClass.class).isEmpty());
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+				ListTestClass.class).isEmpty());
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+				ArrayTestClass.class).isEmpty());
+	}
 
-    static class ConcurrentMapTestClass {
-        ConcurrentHashMap<String, String> mapAttribute;
-    }
+	@Test
+	void testParametrizedMap() {
+		final var keyAttribute = new StringAttribute("keyAttribute", true, null);
+		final var valueAttribute = new StringAttribute("valueAttribute", true, null);
+		final var mapAttribute = new MapAttribute("mapAttribute", true, null, keyAttribute, valueAttribute);
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
+				MapTestClass.class).isEmpty());
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
+				ConcurrentMapTestClass.class).isEmpty());
+		Assertions.assertFalse(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
+				RawMapTestClass.class).isEmpty());
+	}
 
-    static class RawMapTestClass {
-        Map mapAttribute;
-    }
+	@Test
+	void testRawMap() {
+		final var mapAttribute = new MapAttribute("mapAttribute", true, null, null, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
+				RawMapTestClass.class).isEmpty());
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
+				MapTestClass.class).isEmpty());
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(mapAttribute),
+				ConcurrentMapTestClass.class).isEmpty());
+	}
 
-    static class ValidObjectTestClass {
-        String stringAttribute;
-        ValidNestedObjectTestClass nestedObjectAttribute;
-    }
+	@Test
+	@SneakyThrows
+	void testNestedObject() {
+		final var schemaDetails = ResourceHelper
+				.getResource("validNestedSchema.json", SchemaDetails.class);
+		schemaDetails.setValidationType(SchemaValidationType.MATCHING);
+		Assertions.assertTrue(SchemaValidationUtils.valid(schemaDetails, ValidObjectTestClass.class).isEmpty());
+		Assertions.assertFalse(SchemaValidationUtils.valid(schemaDetails, InvalidObjectTestClass.class).isEmpty());
+	}
 
-    static class ValidNestedObjectTestClass {
-        Integer integerAttribute;
-    }
+	@Test
+	void testGenericArrayType() {
+		final var stringAttribute = new StringAttribute("stringAttribute", true, null);
+		final var listAttribute = new ArrayAttribute("listAttribute", true, null, stringAttribute);
+		final var arrayAttribute = new ArrayAttribute("arrayAttribute", true, null, listAttribute);
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(arrayAttribute),
+				GenericArrayTestClass.class).isEmpty());
+	}
 
-    static class InvalidObjectTestClass {
-        String stringAttribute;
-        InvalidNestedObjectTestClass nestedObjectAttribute;
-    }
+	@SneakyThrows
+	@Test
+	void testInvalidNestedStubSchema() {
+		final var schemaDetails = ResourceHelper.getResource("invalidNestedStubSchema.json", SchemaDetails.class);
+		final var violations = SchemaValidationUtils.valid(schemaDetails, NestedStub.class);
+		Assertions.assertFalse(violations.isEmpty());
+		Assertions.assertEquals(4, violations.size());
+		final var nestedStubViolations = violations.stream()
+				.filter(leiaSchemaViolation -> leiaSchemaViolation.rootKlass().equals(NestedStub.class))
+				.toList();
+		Assertions.assertEquals(3, nestedStubViolations.size());
+		final var piiDataViolations = violations.stream()
+				.filter(leiaSchemaViolation -> leiaSchemaViolation.rootKlass().equals(PIIData.class))
+				.toList();
+		Assertions.assertEquals(1, piiDataViolations.size());
+	}
 
-    static class InvalidNestedObjectTestClass {
-        String integerAttribute;
-    }
+	@SneakyThrows
+	@Test
+	void testEnumAttribute() {
+		final var enumAttribute = new EnumAttribute("testEnum", true, null, Set.of("TEST_ENUM"));
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(enumAttribute),
+				EnumTestClass.class).isEmpty());
 
-    static class GenericArrayTestClass {
-        List<String>[] arrayAttribute;
-    }
+		// Enum as String attribute should pass the validation
+		final var stringAttribute = new StringAttribute("testEnum", true, null);
+		Assertions.assertTrue(SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(stringAttribute),
+				EnumTestClass.class).isEmpty());
+
+		// Adding a new value to the enum should fail the validation
+		final var updatedEnumAttribute = new EnumAttribute("testEnum", true, null, Set.of("TEST_ENUM", "NEW_ENUM"));
+		final var violations = SchemaValidationUtils.valid(SchemaValidationType.MATCHING, Set.of(updatedEnumAttribute),
+				EnumTestClass.class);
+		Assertions.assertFalse(violations.isEmpty());
+	}
+
+	enum TestEnum {
+		TEST_ENUM
+	}
+
+	static class EnumTestClass {
+		TestEnum testEnum;
+	}
+
+	static class ValidTestClass {
+		Set<String> testAttribute;
+		TestEnum testAttribute2;
+		String testAttribute3;
+	}
+
+	static class InvalidTestClass {
+		Set<String> testAttribute;
+	}
+
+	static class SetTestClass {
+		Set<String> arrayAttribute;
+	}
+
+	static class ListTestClass {
+		List<String> arrayAttribute;
+	}
+
+	static class ArrayTestClass {
+		String[] arrayAttribute;
+	}
+
+	static class RawSetTestClass {
+		Set arrayAttribute;
+	}
+
+	static class MapTestClass {
+		Map<String, String> mapAttribute;
+	}
+
+	static class ConcurrentMapTestClass {
+		ConcurrentHashMap<String, String> mapAttribute;
+	}
+
+	static class RawMapTestClass {
+		Map mapAttribute;
+	}
+
+	static class ValidObjectTestClass {
+		String stringAttribute;
+		ValidNestedObjectTestClass nestedObjectAttribute;
+	}
+
+	static class ValidNestedObjectTestClass {
+		Integer integerAttribute;
+	}
+
+	static class InvalidObjectTestClass {
+		String stringAttribute;
+		InvalidNestedObjectTestClass nestedObjectAttribute;
+	}
+
+	static class InvalidNestedObjectTestClass {
+		String integerAttribute;
+	}
+
+	static class GenericArrayTestClass {
+		List<String>[] arrayAttribute;
+	}
 
 }

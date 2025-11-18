@@ -28,28 +28,28 @@ import java.util.Optional;
 
 @UtilityClass
 public class FieldUtils {
-    public List<Field> getAllFields(final Class<?> type) {
-        List<Field> fields = new ArrayList<>();
-        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-            Arrays.stream(c.getDeclaredFields())
-                    .filter(field -> !isNonSerializable(field))
-                    .forEach(fields::add);
-        }
-        return fields;
-    }
+	public List<Field> getAllFields(final Class<?> type) {
+		List<Field> fields = new ArrayList<>();
+		for (Class<?> c = type; c != null; c = c.getSuperclass()) {
+			Arrays.stream(c.getDeclaredFields())
+					.filter(field -> !isNonSerializable(field))
+					.forEach(fields::add);
+		}
+		return fields;
+	}
 
-    private boolean isNonSerializable(final Field field) {
-        if (field.isAnnotationPresent(JsonIgnore.class)) {
-            return true;
-        }
-        int modifiers = field.getModifiers();
-        return Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers);
-    }
+	private boolean isNonSerializable(final Field field) {
+		if (field.isAnnotationPresent(JsonIgnore.class)) {
+			return true;
+		}
+		int modifiers = field.getModifiers();
+		return Modifier.isStatic(modifiers) || Modifier.isTransient(modifiers);
+	}
 
-    public Optional<Field> filter(final String name,
-                                   final List<Field> fields) {
-        return fields.stream()
-                .filter(each -> each.getName().equals(name))
-                .findFirst();
-    }
+	public Optional<Field> filter(final String name,
+	                              final List<Field> fields) {
+		return fields.stream()
+				.filter(each -> each.getName().equals(name))
+				.findFirst();
+	}
 }

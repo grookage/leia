@@ -34,12 +34,12 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LeiaMessageEntity {
 
-    @NotEmpty
-    private String signature;
-    @NotEmpty
-    private String backendName;
-    @NotNull
-    @Valid
-    private LeiaMessage messageEnvelope;
+	@NotEmpty
+	private String signature;
+	@NotEmpty
+	private String backendName;
+	@NotNull
+	@Valid
+	private LeiaMessage messageEnvelope;
 
 }

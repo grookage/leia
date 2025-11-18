@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CacheConfig {
 
-    private boolean enabled;
-    private int refreshCacheSeconds;
+	private boolean enabled;
+	private int refreshCacheSeconds;
 
 }

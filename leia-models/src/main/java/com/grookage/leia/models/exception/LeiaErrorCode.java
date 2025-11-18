@@ -18,7 +18,7 @@ package com.grookage.leia.models.exception;
 
 public interface LeiaErrorCode {
 
-    String name();
+	String name();
 
-    int getStatus();
+	int getStatus();
 }

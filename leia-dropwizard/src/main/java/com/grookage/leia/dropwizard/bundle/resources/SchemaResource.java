@@ -52,52 +52,52 @@ import java.util.List;
 @PermitAll
 public class SchemaResource {
 
-    private final SchemaRetriever schemaRetriever;
-    private final LeiaMessageValidator messageValidator;
+	private final SchemaRetriever schemaRetriever;
+	private final LeiaMessageValidator messageValidator;
 
-    private LeiaRequestContext toRequestContext(final boolean ignoreCache) {
-        return LeiaRequestContext.builder()
-                .ignoreCache(ignoreCache)
-                .build();
-    }
+	private LeiaRequestContext toRequestContext(final boolean ignoreCache) {
+		return LeiaRequestContext.builder()
+				.ignoreCache(ignoreCache)
+				.build();
+	}
 
-    @POST
-    @Timed
-    @ExceptionMetered
-    @Path("/details")
-    public GenericResponse<SchemaDetails> getSchemaDetails(@QueryParam("ignoreCache") boolean ignoreCache,
-                                                           @Valid final SchemaKey schemaKey) {
-        return GenericResponse.<SchemaDetails>builder()
-                .success(true)
-                .data(schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), schemaKey).orElse(null))
-                .build();
-    }
+	@POST
+	@Timed
+	@ExceptionMetered
+	@Path("/details")
+	public GenericResponse<SchemaDetails> getSchemaDetails(@QueryParam("ignoreCache") boolean ignoreCache,
+	                                                       @Valid final SchemaKey schemaKey) {
+		return GenericResponse.<SchemaDetails>builder()
+				.success(true)
+				.data(schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), schemaKey).orElse(null))
+				.build();
+	}
 
-    @POST
-    @Timed
-    @ExceptionMetered
-    @Path("/details/all")
-    public List<SchemaDetails> getAllSchemaDetails(@QueryParam("ignoreCache") boolean ignoreCache,
-                                                   @Valid final SearchRequest searchRequest) {
-        return schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), searchRequest);
-    }
+	@POST
+	@Timed
+	@ExceptionMetered
+	@Path("/details/all")
+	public List<SchemaDetails> getAllSchemaDetails(@QueryParam("ignoreCache") boolean ignoreCache,
+	                                               @Valid final SearchRequest searchRequest) {
+		return schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), searchRequest);
+	}
 
-    @POST
-    @Timed
-    @ExceptionMetered
-    @Path("/details/validate")
-    public GenericResponse<List<LeiaMessageViolation>> validateSchema(@QueryParam("ignoreCache") boolean ignoreCache,
-                                                                      @Valid final ValidateSchemaRequest validateSchemaRequest) {
-        final var schemaDetails = schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), validateSchemaRequest.getSchemaKey())
-                .orElseThrow(() -> LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND));
-        final var validationErrors = messageValidator.validate(schemaDetails, validateSchemaRequest.getJsonNode());
-        if (validationErrors.isEmpty()) {
-            return GenericResponse.<List<LeiaMessageViolation>>builder()
-                    .success(true)
-                    .build();
-        }
-        return GenericResponse.<List<LeiaMessageViolation>>builder()
-                .data(validationErrors)
-                .build();
-    }
+	@POST
+	@Timed
+	@ExceptionMetered
+	@Path("/details/validate")
+	public GenericResponse<List<LeiaMessageViolation>> validateSchema(@QueryParam("ignoreCache") boolean ignoreCache,
+	                                                                  @Valid final ValidateSchemaRequest validateSchemaRequest) {
+		final var schemaDetails = schemaRetriever.getSchemaDetails(toRequestContext(ignoreCache), validateSchemaRequest.getSchemaKey())
+				.orElseThrow(() -> LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND));
+		final var validationErrors = messageValidator.validate(schemaDetails, validateSchemaRequest.getJsonNode());
+		if (validationErrors.isEmpty()) {
+			return GenericResponse.<List<LeiaMessageViolation>>builder()
+					.success(true)
+					.build();
+		}
+		return GenericResponse.<List<LeiaMessageViolation>>builder()
+				.data(validationErrors)
+				.build();
+	}
 }

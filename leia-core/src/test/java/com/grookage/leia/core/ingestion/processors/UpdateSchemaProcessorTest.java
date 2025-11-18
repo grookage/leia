@@ -32,47 +32,47 @@ import java.util.Optional;
 
 class UpdateSchemaProcessorTest extends SchemaProcessorTest {
 
-    @Test
-    @SneakyThrows
-    void testUpdateSchemas() {
-        final var schemaContext = new SchemaContext();
-        final var schemaProcessor = getSchemaProcessor();
-        final var schemaRequest = ResourceHelper.getResource(
-                "schema/updateSchemaRequest.json",
-                UpdateSchemaRequest.class
-        );
-        schemaContext.addContext("USER", "testUser");
-        schemaContext.addContext("EMAIL", "testEmail");
-        schemaContext.addContext("USER_ID", "testUserId");
-        schemaContext.addContext(UpdateSchemaRequest.class.getSimpleName(), schemaRequest);
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
-        schemaProcessor.process(schemaContext);
-        Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
-    }
+	@Test
+	@SneakyThrows
+	void testUpdateSchemas() {
+		final var schemaContext = new SchemaContext();
+		final var schemaProcessor = getSchemaProcessor();
+		final var schemaRequest = ResourceHelper.getResource(
+				"schema/updateSchemaRequest.json",
+				UpdateSchemaRequest.class
+		);
+		schemaContext.addContext("USER", "testUser");
+		schemaContext.addContext("EMAIL", "testEmail");
+		schemaContext.addContext("USER_ID", "testUserId");
+		schemaContext.addContext(UpdateSchemaRequest.class.getSimpleName(), schemaRequest);
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
+		schemaProcessor.process(schemaContext);
+		Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
+	}
 
-    @Test
-    @SneakyThrows
-    void testUpdateSchemasNoDetails() {
-        final var schemaContext = new SchemaContext();
-        final var schemaProcessor = getSchemaProcessor();
-        final var schemaRequest = ResourceHelper.getResource(
-                "schema/updateSchemaRequest.json",
-                UpdateSchemaRequest.class
-        );
-        schemaContext.addContext("USER", "testUser");
-        schemaContext.addContext("EMAIL", "testEmail");
-        schemaContext.addContext("USER_ID", "testUserId");
-        schemaContext.addContext(UpdateSchemaRequest.class.getSimpleName(), schemaRequest);
-        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.empty());
-        Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
-    }
+	@Test
+	@SneakyThrows
+	void testUpdateSchemasNoDetails() {
+		final var schemaContext = new SchemaContext();
+		final var schemaProcessor = getSchemaProcessor();
+		final var schemaRequest = ResourceHelper.getResource(
+				"schema/updateSchemaRequest.json",
+				UpdateSchemaRequest.class
+		);
+		schemaContext.addContext("USER", "testUser");
+		schemaContext.addContext("EMAIL", "testEmail");
+		schemaContext.addContext("USER_ID", "testUserId");
+		schemaContext.addContext(UpdateSchemaRequest.class.getSimpleName(), schemaRequest);
+		Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.empty());
+		Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
+	}
 
-    @Override
-    SchemaProcessor getSchemaProcessor() {
-        return UpdateSchemaProcessor.builder()
-                .repositorySupplier(getRepositorySupplier())
-                .build();
-    }
+	@Override
+	SchemaProcessor getSchemaProcessor() {
+		return UpdateSchemaProcessor.builder()
+				.repositorySupplier(getRepositorySupplier())
+				.build();
+	}
 }

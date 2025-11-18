@@ -16,28 +16,28 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AerospikeConfig {
 
-    @NotEmpty
-    private List<AerospikeHost> hosts;
-    private String namespace;
-    private String username;
-    private String password;
-    private boolean tlsEnabled = false;
-    private boolean indexCreationDisabled = false;
+	@NotEmpty
+	private List<AerospikeHost> hosts;
+	private String namespace;
+	private String username;
+	private String password;
+	private boolean tlsEnabled = false;
+	private boolean indexCreationDisabled = false;
 
-    @Builder.Default
-    private int maxConnectionsPerNode = 10;
-    @Builder.Default
-    private int scanMaxConcurrentNodes = 1;
-    @Builder.Default
-    private int batchMaxConcurrentNodes = 1;
-    @Builder.Default
-    private int timeout = 60;
-    @Builder.Default
-    private int retries = 3;
-    @Builder.Default
-    private int sleepBetweenRetries = 10;
-    @Builder.Default
-    private int threadPoolSize = 10;
-    @Builder.Default
-    private int maxSocketIdle = 10;
+	@Builder.Default
+	private int maxConnectionsPerNode = 10;
+	@Builder.Default
+	private int scanMaxConcurrentNodes = 1;
+	@Builder.Default
+	private int batchMaxConcurrentNodes = 1;
+	@Builder.Default
+	private int timeout = 60;
+	@Builder.Default
+	private int retries = 3;
+	@Builder.Default
+	private int sleepBetweenRetries = 10;
+	@Builder.Default
+	private int threadPoolSize = 10;
+	@Builder.Default
+	private int maxSocketIdle = 10;
 }

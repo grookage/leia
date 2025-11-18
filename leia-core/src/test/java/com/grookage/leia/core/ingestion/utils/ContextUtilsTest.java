@@ -25,30 +25,30 @@ import org.junit.jupiter.api.Test;
 
 class ContextUtilsTest {
 
-    @Test
-    @SneakyThrows
-    void testContextUtils() {
-        Assertions.assertThrows(LeiaException.class, () -> ContextUtils.getEmail(new SchemaContext()));
-        Assertions.assertThrows(LeiaException.class, () -> ContextUtils.getUser(new SchemaContext()));
-        final var schemaContext = new SchemaContext();
-        ContextUtils.addSchemaUpdaterContext(schemaContext, new SchemaUpdater() {
-            @Override
-            public String name() {
-                return "name";
-            }
+	@Test
+	@SneakyThrows
+	void testContextUtils() {
+		Assertions.assertThrows(LeiaException.class, () -> ContextUtils.getEmail(new SchemaContext()));
+		Assertions.assertThrows(LeiaException.class, () -> ContextUtils.getUser(new SchemaContext()));
+		final var schemaContext = new SchemaContext();
+		ContextUtils.addSchemaUpdaterContext(schemaContext, new SchemaUpdater() {
+			@Override
+			public String name() {
+				return "name";
+			}
 
-            @Override
-            public String email() {
-                return "email";
-            }
+			@Override
+			public String email() {
+				return "email";
+			}
 
-            @Override
-            public String userId() {
-                return "nameId";
-            }
+			@Override
+			public String userId() {
+				return "nameId";
+			}
 
-        });
-        Assertions.assertNotNull(ContextUtils.getEmail(schemaContext));
-        Assertions.assertNotNull(ContextUtils.getUser(schemaContext));
-    }
+		});
+		Assertions.assertNotNull(ContextUtils.getEmail(schemaContext));
+		Assertions.assertNotNull(ContextUtils.getUser(schemaContext));
+	}
 }

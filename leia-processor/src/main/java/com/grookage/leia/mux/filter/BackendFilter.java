@@ -23,11 +23,11 @@ package com.grookage.leia.mux.filter;
  */
 public interface BackendFilter {
 
-    /**
-     * Determine if a backend should process messages
-     *
-     * @param backendName Name of the backend to evaluate
-     * @return true if the backend should process messages, false otherwise
-     */
-    boolean shouldProcess(String backendName);
+	/**
+	 * Determine if a backend should process messages
+	 *
+	 * @param backendName Name of the backend to evaluate
+	 * @return true if the backend should process messages, false otherwise
+	 */
+	boolean shouldProcess(String backendName);
 }

@@ -27,46 +27,46 @@ import org.junit.jupiter.api.Test;
 
 class IngestionRequestTest {
 
-    @Test
-    @SneakyThrows
-    void testIngestionRequests() {
-        final var createSchemaRequest = ResourceHelper.getResource(
-                "schema/createSchemaRequest.json",
-                CreateSchemaRequest.class
-        );
-        Assertions.assertNotNull(createSchemaRequest);
-        var schemaAttributes = createSchemaRequest.getAttributes();
-        Assertions.assertNotNull(schemaAttributes);
-        Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
-        Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.ENUM));
-        Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.INTEGER));
-        Assertions.assertEquals("testNamespace", createSchemaRequest.getSchemaKey().getNamespace());
-        Assertions.assertEquals("testSchema", createSchemaRequest.getSchemaKey().getSchemaName());
-        Assertions.assertSame(SchemaValidationType.MATCHING, createSchemaRequest.getValidationType());
-        Assertions.assertSame(SchemaType.JSON, createSchemaRequest.getSchemaType());
+	@Test
+	@SneakyThrows
+	void testIngestionRequests() {
+		final var createSchemaRequest = ResourceHelper.getResource(
+				"schema/createSchemaRequest.json",
+				CreateSchemaRequest.class
+		);
+		Assertions.assertNotNull(createSchemaRequest);
+		var schemaAttributes = createSchemaRequest.getAttributes();
+		Assertions.assertNotNull(schemaAttributes);
+		Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
+		Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.ENUM));
+		Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.INTEGER));
+		Assertions.assertEquals("testNamespace", createSchemaRequest.getSchemaKey().getNamespace());
+		Assertions.assertEquals("testSchema", createSchemaRequest.getSchemaKey().getSchemaName());
+		Assertions.assertSame(SchemaValidationType.MATCHING, createSchemaRequest.getValidationType());
+		Assertions.assertSame(SchemaType.JSON, createSchemaRequest.getSchemaType());
 
-        final var updateSchemaRequest = ResourceHelper.getResource(
-                "schema/updateSchemaRequest.json",
-                UpdateSchemaRequest.class
-        );
-        Assertions.assertNotNull(updateSchemaRequest);
-        schemaAttributes = updateSchemaRequest.getAttributes();
-        Assertions.assertNotNull(schemaAttributes);
-        Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
-        Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ENUM));
-        Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.INTEGER));
-        Assertions.assertEquals("testNamespace", updateSchemaRequest.getSchemaKey().getNamespace());
-        Assertions.assertEquals("testSchema", updateSchemaRequest.getSchemaKey().getSchemaName());
-        Assertions.assertSame(SchemaValidationType.STRICT, updateSchemaRequest.getValidationType());
-        Assertions.assertSame(SchemaType.JSON, updateSchemaRequest.getSchemaType());
+		final var updateSchemaRequest = ResourceHelper.getResource(
+				"schema/updateSchemaRequest.json",
+				UpdateSchemaRequest.class
+		);
+		Assertions.assertNotNull(updateSchemaRequest);
+		schemaAttributes = updateSchemaRequest.getAttributes();
+		Assertions.assertNotNull(schemaAttributes);
+		Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ARRAY));
+		Assertions.assertTrue(schemaAttributes.stream().anyMatch(each -> each.getType() == DataType.ENUM));
+		Assertions.assertTrue(schemaAttributes.stream().noneMatch(each -> each.getType() == DataType.INTEGER));
+		Assertions.assertEquals("testNamespace", updateSchemaRequest.getSchemaKey().getNamespace());
+		Assertions.assertEquals("testSchema", updateSchemaRequest.getSchemaKey().getSchemaName());
+		Assertions.assertSame(SchemaValidationType.STRICT, updateSchemaRequest.getValidationType());
+		Assertions.assertSame(SchemaType.JSON, updateSchemaRequest.getSchemaType());
 
-        final var schemaKey = ResourceHelper.getResource(
-                "schema/schemaKey.json",
-                SchemaKey.class
-        );
-        Assertions.assertNotNull(schemaKey);
-        Assertions.assertEquals("testNamespace", schemaKey.getNamespace());
-        Assertions.assertEquals("testSchema", schemaKey.getSchemaName());
-        Assertions.assertEquals("V1234", schemaKey.getVersion());
-    }
+		final var schemaKey = ResourceHelper.getResource(
+				"schema/schemaKey.json",
+				SchemaKey.class
+		);
+		Assertions.assertNotNull(schemaKey);
+		Assertions.assertEquals("testNamespace", schemaKey.getNamespace());
+		Assertions.assertEquals("testSchema", schemaKey.getSchemaName());
+		Assertions.assertEquals("V1234", schemaKey.getVersion());
+	}
 }

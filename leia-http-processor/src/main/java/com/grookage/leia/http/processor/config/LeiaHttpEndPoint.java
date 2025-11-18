@@ -30,17 +30,17 @@ import javax.validation.constraints.NotEmpty;
 @Jacksonized
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LeiaHttpEndPoint {
-    @NotEmpty
-    String host;
-    @Min(1)
-    int port;
-    boolean secure;
-    String uri;
+	@NotEmpty
+	String host;
+	@Min(1)
+	int port;
+	boolean secure;
+	String uri;
 
-    @JsonIgnore
-    public int defaultPort() {
-        return this.isSecure()
-                ? 443
-                : 80;
-    }
+	@JsonIgnore
+	public int defaultPort() {
+		return this.isSecure()
+				? 443
+				: 80;
+	}
 }

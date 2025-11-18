@@ -13,12 +13,12 @@ import java.util.Map;
 @Builder
 @Jacksonized
 public class GenericStub<R, U> {
-    GenericResponse<R> rGenericResponse;
-    U data;
-    R key;
-    Range<R> tRange;
-    List<R> rList;
-    Map<U,R> urMap;
-    R[] rArray;
+	GenericResponse<R> rGenericResponse;
+	U data;
+	R key;
+	Range<R> tRange;
+	List<R> rList;
+	Map<U, R> urMap;
+	R[] rArray;
 
 }

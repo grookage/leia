@@ -23,9 +23,9 @@ import com.grookage.leia.models.schema.SchemaKey;
  */
 public interface LeiaMessageViolation extends LeiaViolation {
 
-    /**
-     * @return SchemaKey against which the message was validated
-     */
-    SchemaKey schemaKey();
+	/**
+	 * @return SchemaKey against which the message was validated
+	 */
+	SchemaKey schemaKey();
 }
 

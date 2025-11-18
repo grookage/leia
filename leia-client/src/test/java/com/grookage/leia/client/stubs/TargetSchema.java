@@ -25,6 +25,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class TargetSchema {
 
-    private String name;
-    private String officialName;
+	private String name;
+	private String officialName;
 }

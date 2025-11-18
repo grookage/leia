@@ -30,14 +30,14 @@ import java.util.Set;
 @NoArgsConstructor
 public class BooleanAttribute extends SchemaAttribute {
 
-    public BooleanAttribute(final String name,
-                            final boolean optional,
-                            final Set<QualifierInfo> qualifiers) {
-        super(DataType.BOOLEAN, name, optional, qualifiers);
-    }
+	public BooleanAttribute(final String name,
+	                        final boolean optional,
+	                        final Set<QualifierInfo> qualifiers) {
+		super(DataType.BOOLEAN, name, optional, qualifiers);
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }

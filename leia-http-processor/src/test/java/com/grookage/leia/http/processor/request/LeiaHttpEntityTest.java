@@ -29,17 +29,17 @@ import java.util.List;
 
 class LeiaHttpEntityTest {
 
-    @Test
-    @SneakyThrows
-    void testLeiaHttpEntity() {
-        final var clientConfig = ResourceHelper.getResource("httpClientConfig.json", HttpClientConfig.class);
-        final var backend = clientConfig.getBackendConfigs().stream().findFirst().orElse(null);
-        Assertions.assertNotNull(backend);
+	@Test
+	@SneakyThrows
+	void testLeiaHttpEntity() {
+		final var clientConfig = ResourceHelper.getResource("httpClientConfig.json", HttpClientConfig.class);
+		final var backend = clientConfig.getBackendConfigs().stream().findFirst().orElse(null);
+		Assertions.assertNotNull(backend);
 
-        final var leiaMessages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
-        });
-        final var httpEntity = HttpRequestUtils.toHttpEntity(leiaMessages, backend);
-        Assertions.assertEquals(1, httpEntity.getEntities().size());
-        httpEntity.getEntities().stream().findFirst().ifPresent(leiaMessageEntity -> Assertions.assertEquals("5aed308f0de68dc585bbd09581e5ddca", leiaMessageEntity.getSignature()));
-    }
+		final var leiaMessages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
+		});
+		final var httpEntity = HttpRequestUtils.toHttpEntity(leiaMessages, backend);
+		Assertions.assertEquals(1, httpEntity.getEntities().size());
+		httpEntity.getEntities().stream().findFirst().ifPresent(leiaMessageEntity -> Assertions.assertEquals("5aed308f0de68dc585bbd09581e5ddca", leiaMessageEntity.getSignature()));
+	}
 }

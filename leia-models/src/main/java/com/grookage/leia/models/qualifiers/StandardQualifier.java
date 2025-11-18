@@ -25,8 +25,8 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StandardQualifier extends QualifierInfo {
 
-    public StandardQualifier() {
-        super(QualifierType.STANDARD);
-    }
+	public StandardQualifier() {
+		super(QualifierType.STANDARD);
+	}
 
 }

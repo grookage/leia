@@ -5,8 +5,8 @@ package com.grookage.leia.common.violation;
  */
 public interface LeiaSchemaViolation extends LeiaViolation {
 
-    /**
-     * @return Class of the field being validated
-     */
-    Class<?> rootKlass();
+	/**
+	 * @return Class of the field being validated
+	 */
+	Class<?> rootKlass();
 }

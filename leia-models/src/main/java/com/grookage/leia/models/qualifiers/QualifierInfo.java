@@ -29,13 +29,13 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = PIIQualifier.class, name = "PII"),
-        @JsonSubTypes.Type(value = ShortLivedQualifier.class, name = "SHORT_LIVED"),
-        @JsonSubTypes.Type(value = StandardQualifier.class, name = "STANDARD"),
-        @JsonSubTypes.Type(value = EncryptedQualifier.class, name = "ENCRYPTED")
+		@JsonSubTypes.Type(value = PIIQualifier.class, name = "PII"),
+		@JsonSubTypes.Type(value = ShortLivedQualifier.class, name = "SHORT_LIVED"),
+		@JsonSubTypes.Type(value = StandardQualifier.class, name = "STANDARD"),
+		@JsonSubTypes.Type(value = EncryptedQualifier.class, name = "ENCRYPTED")
 })
 public abstract class QualifierInfo {
 
-    private QualifierType type;
+	private QualifierType type;
 
 }

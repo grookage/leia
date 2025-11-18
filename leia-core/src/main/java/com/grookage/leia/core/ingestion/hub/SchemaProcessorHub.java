@@ -32,63 +32,63 @@ import java.util.function.Supplier;
 @Slf4j
 public class SchemaProcessorHub {
 
-    private final Map<SchemaEvent, SchemaProcessor> processors = Maps.newHashMap();
-    private Supplier<SchemaRepository> repositorySupplier;
+	private final Map<SchemaEvent, SchemaProcessor> processors = Maps.newHashMap();
+	private Supplier<SchemaRepository> repositorySupplier;
 
-    private SchemaProcessorHub() {
+	private SchemaProcessorHub() {
 
-    }
+	}
 
-    public static SchemaProcessorHub of() {
-        return new SchemaProcessorHub();
-    }
+	public static SchemaProcessorHub of() {
+		return new SchemaProcessorHub();
+	}
 
-    public SchemaProcessorHub withRepositoryResolver(Supplier<SchemaRepository> repositorySupplier) {
-        this.repositorySupplier = repositorySupplier;
-        return this;
-    }
+	public SchemaProcessorHub withRepositoryResolver(Supplier<SchemaRepository> repositorySupplier) {
+		this.repositorySupplier = repositorySupplier;
+		return this;
+	}
 
-    public SchemaProcessorHub build() {
-        Preconditions.checkNotNull(repositorySupplier, "Schema Repository can't be null");
-        Arrays.stream(SchemaEvent.values()).forEach(this::buildProcessor);
-        return this;
-    }
+	public SchemaProcessorHub build() {
+		Preconditions.checkNotNull(repositorySupplier, "Schema Repository can't be null");
+		Arrays.stream(SchemaEvent.values()).forEach(this::buildProcessor);
+		return this;
+	}
 
-    public void buildProcessor(final SchemaEvent event) {
-        processors.putIfAbsent(event, event.accept(new SchemaEventVisitor<>() {
-            @Override
-            public SchemaProcessor schemaCreate() {
-                return CreateSchemaProcessor.builder()
-                        .repositorySupplier(repositorySupplier)
-                        .build();
-            }
+	public void buildProcessor(final SchemaEvent event) {
+		processors.putIfAbsent(event, event.accept(new SchemaEventVisitor<>() {
+			@Override
+			public SchemaProcessor schemaCreate() {
+				return CreateSchemaProcessor.builder()
+						.repositorySupplier(repositorySupplier)
+						.build();
+			}
 
-            @Override
-            public SchemaProcessor schemaUpdate() {
-                return UpdateSchemaProcessor.builder()
-                        .repositorySupplier(repositorySupplier)
-                        .build();
-            }
+			@Override
+			public SchemaProcessor schemaUpdate() {
+				return UpdateSchemaProcessor.builder()
+						.repositorySupplier(repositorySupplier)
+						.build();
+			}
 
-            @Override
-            public SchemaProcessor schemaApprove() {
-                return ApproveSchemaProcessor.builder()
-                        .repositorySupplier(repositorySupplier)
-                        .build();
-            }
+			@Override
+			public SchemaProcessor schemaApprove() {
+				return ApproveSchemaProcessor.builder()
+						.repositorySupplier(repositorySupplier)
+						.build();
+			}
 
-            @Override
-            public SchemaProcessor schemaReject() {
-                return RejectSchemaProcessor.builder()
-                        .repositorySupplier(repositorySupplier)
-                        .build();
-            }
-        }));
-    }
+			@Override
+			public SchemaProcessor schemaReject() {
+				return RejectSchemaProcessor.builder()
+						.repositorySupplier(repositorySupplier)
+						.build();
+			}
+		}));
+	}
 
 
-    public Optional<SchemaProcessor> getProcessor(final SchemaEvent event) {
-        return Optional.ofNullable(processors.get(event));
-    }
+	public Optional<SchemaProcessor> getProcessor(final SchemaEvent event) {
+		return Optional.ofNullable(processors.get(event));
+	}
 
 }

@@ -17,45 +17,45 @@ import java.util.Optional;
 @Getter
 public class AerospikeRepository implements SchemaRepository {
 
-    private final AerospikeManager aerospikeManager;
+	private final AerospikeManager aerospikeManager;
 
-    public AerospikeRepository(AerospikeConfig aerospikeConfig) {
-        this.aerospikeManager = new AerospikeManager(aerospikeConfig);
-    }
+	public AerospikeRepository(AerospikeConfig aerospikeConfig) {
+		this.aerospikeManager = new AerospikeManager(aerospikeConfig);
+	}
 
-    @SneakyThrows
-    private AerospikeRecord toStorageRecord(SchemaDetails schemaDetails) {
-        return AerospikeRecord.builder()
-                .data(MapperUtils.mapper().writeValueAsBytes(schemaDetails))
-                .schemaState(schemaDetails.getSchemaState())
-                .schemaKey(schemaDetails.getSchemaKey())
-                .build();
-    }
+	@SneakyThrows
+	private AerospikeRecord toStorageRecord(SchemaDetails schemaDetails) {
+		return AerospikeRecord.builder()
+				.data(MapperUtils.mapper().writeValueAsBytes(schemaDetails))
+				.schemaState(schemaDetails.getSchemaState())
+				.schemaKey(schemaDetails.getSchemaKey())
+				.build();
+	}
 
-    @SneakyThrows
-    private SchemaDetails toSchemaDetails(AerospikeRecord aerospikeRecord) {
-        return MapperUtils.mapper().readValue(aerospikeRecord.getData(), SchemaDetails.class);
-    }
+	@SneakyThrows
+	private SchemaDetails toSchemaDetails(AerospikeRecord aerospikeRecord) {
+		return MapperUtils.mapper().readValue(aerospikeRecord.getData(), SchemaDetails.class);
+	}
 
-    @Override
-    public void create(SchemaDetails schemaDetails) {
-        aerospikeManager.save(toStorageRecord(schemaDetails));
-    }
+	@Override
+	public void create(SchemaDetails schemaDetails) {
+		aerospikeManager.save(toStorageRecord(schemaDetails));
+	}
 
-    @Override
-    public void update(SchemaDetails schemaDetails) {
-        aerospikeManager.save(toStorageRecord(schemaDetails));
-    }
+	@Override
+	public void update(SchemaDetails schemaDetails) {
+		aerospikeManager.save(toStorageRecord(schemaDetails));
+	}
 
-    @Override
-    public Optional<SchemaDetails> get(SchemaKey schemaKey) {
-        return aerospikeManager.getRecord(schemaKey.getReferenceId())
-                .map(this::toSchemaDetails);
-    }
+	@Override
+	public Optional<SchemaDetails> get(SchemaKey schemaKey) {
+		return aerospikeManager.getRecord(schemaKey.getReferenceId())
+				.map(this::toSchemaDetails);
+	}
 
-    @Override
-    public List<SchemaDetails> getSchemas(SearchRequest searchRequest) {
-        return aerospikeManager.getRecords(searchRequest)
-                .stream().map(this::toSchemaDetails).toList();
-    }
+	@Override
+	public List<SchemaDetails> getSchemas(SearchRequest searchRequest) {
+		return aerospikeManager.getRecords(searchRequest)
+				.stream().map(this::toSchemaDetails).toList();
+	}
 }

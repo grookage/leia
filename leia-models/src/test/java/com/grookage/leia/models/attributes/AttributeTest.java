@@ -26,39 +26,39 @@ import org.junit.jupiter.api.Test;
 
 class AttributeTest {
 
-    @Test
-    @SneakyThrows
-    void testAttributeStructures() {
-        var attribute = ResourceHelper.getResource("attributes/attribute.json", SchemaAttribute.class);
-        Assertions.assertNotNull(attribute);
-        Assertions.assertEquals("testAttribute", attribute.getName());
-        Assertions.assertSame(DataType.ARRAY, attribute.getType());
-        attribute = ResourceHelper.getResource("attributes/enumAttribute.json", SchemaAttribute.class);
-        Assertions.assertNotNull(attribute);
-        Assertions.assertEquals("testAttribute", attribute.getName());
-        Assertions.assertSame(DataType.ENUM, attribute.getType());
-        Assertions.assertTrue(((EnumAttribute) attribute).getValues().contains("TEST_ENUM"));
-        attribute = ResourceHelper.getResource("attributes/attributeWithQualifier.json", SchemaAttribute.class);
-        Assertions.assertNotNull(attribute);
-        Assertions.assertEquals("testAttribute", attribute.getName());
-        Assertions.assertSame(DataType.ARRAY, attribute.getType());
-        Assertions.assertEquals(1, attribute.getQualifiers().size());
-        Assertions.assertEquals(QualifierType.PII, attribute.getQualifiers().stream().findFirst().get().getType());
-        attribute = ResourceHelper.getResource("attributes/attributeWithMultipleQualifiers.json", SchemaAttribute.class);
-        Assertions.assertNotNull(attribute);
-        Assertions.assertEquals("testAttribute", attribute.getName());
-        Assertions.assertSame(DataType.ARRAY, attribute.getType());
-        Assertions.assertEquals(2, attribute.getQualifiers().size());
-        final var shortLivedQualifier = (ShortLivedQualifier) attribute.getQualifiers().stream()
-                .filter(qualifierInfo -> qualifierInfo.getType().equals(QualifierType.SHORT_LIVED))
-                .findFirst().orElse(null);
-        Assertions.assertNotNull(shortLivedQualifier);
-        Assertions.assertEquals(100, shortLivedQualifier.getTtlSeconds());
-        final var encryptedQualifier = (EncryptedQualifier) attribute.getQualifiers().stream()
-                .filter(qualifierInfo -> qualifierInfo.getType().equals(QualifierType.ENCRYPTED))
-                .findFirst()
-                .orElse(null);
-        Assertions.assertNotNull(encryptedQualifier);
+	@Test
+	@SneakyThrows
+	void testAttributeStructures() {
+		var attribute = ResourceHelper.getResource("attributes/attribute.json", SchemaAttribute.class);
+		Assertions.assertNotNull(attribute);
+		Assertions.assertEquals("testAttribute", attribute.getName());
+		Assertions.assertSame(DataType.ARRAY, attribute.getType());
+		attribute = ResourceHelper.getResource("attributes/enumAttribute.json", SchemaAttribute.class);
+		Assertions.assertNotNull(attribute);
+		Assertions.assertEquals("testAttribute", attribute.getName());
+		Assertions.assertSame(DataType.ENUM, attribute.getType());
+		Assertions.assertTrue(((EnumAttribute) attribute).getValues().contains("TEST_ENUM"));
+		attribute = ResourceHelper.getResource("attributes/attributeWithQualifier.json", SchemaAttribute.class);
+		Assertions.assertNotNull(attribute);
+		Assertions.assertEquals("testAttribute", attribute.getName());
+		Assertions.assertSame(DataType.ARRAY, attribute.getType());
+		Assertions.assertEquals(1, attribute.getQualifiers().size());
+		Assertions.assertEquals(QualifierType.PII, attribute.getQualifiers().stream().findFirst().get().getType());
+		attribute = ResourceHelper.getResource("attributes/attributeWithMultipleQualifiers.json", SchemaAttribute.class);
+		Assertions.assertNotNull(attribute);
+		Assertions.assertEquals("testAttribute", attribute.getName());
+		Assertions.assertSame(DataType.ARRAY, attribute.getType());
+		Assertions.assertEquals(2, attribute.getQualifiers().size());
+		final var shortLivedQualifier = (ShortLivedQualifier) attribute.getQualifiers().stream()
+				.filter(qualifierInfo -> qualifierInfo.getType().equals(QualifierType.SHORT_LIVED))
+				.findFirst().orElse(null);
+		Assertions.assertNotNull(shortLivedQualifier);
+		Assertions.assertEquals(100, shortLivedQualifier.getTtlSeconds());
+		final var encryptedQualifier = (EncryptedQualifier) attribute.getQualifiers().stream()
+				.filter(qualifierInfo -> qualifierInfo.getType().equals(QualifierType.ENCRYPTED))
+				.findFirst()
+				.orElse(null);
+		Assertions.assertNotNull(encryptedQualifier);
 
-    }
+	}
 }

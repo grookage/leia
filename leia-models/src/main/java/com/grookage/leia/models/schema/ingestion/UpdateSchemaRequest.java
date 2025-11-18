@@ -39,13 +39,13 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateSchemaRequest {
 
-    @NotNull
-    private SchemaKey schemaKey;
-    private String description;
-    private SchemaValidationType validationType;
-    private SchemaType schemaType;
-    @NotEmpty
-    private Set<SchemaAttribute> attributes;
-    private Set<TransformationTarget> transformationTargets;
-    private JsonNode data;
+	@NotNull
+	private SchemaKey schemaKey;
+	private String description;
+	private SchemaValidationType validationType;
+	private SchemaType schemaType;
+	@NotEmpty
+	private Set<SchemaAttribute> attributes;
+	private Set<TransformationTarget> transformationTargets;
+	private JsonNode data;
 }

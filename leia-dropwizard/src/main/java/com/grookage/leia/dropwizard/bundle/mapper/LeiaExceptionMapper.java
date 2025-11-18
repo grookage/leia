@@ -24,17 +24,17 @@ import javax.ws.rs.ext.ExceptionMapper;
 
 public class LeiaExceptionMapper implements ExceptionMapper<LeiaException> {
 
-    @Override
-    public Response toResponse(LeiaException e) {
-        return Response.status(e.getStatus())
-                .entity(
-                        GenericResponse.builder()
-                                .success(false)
-                                .code(e.getCode())
-                                .message(e.getMessage())
-                                .data(e.getContext())
-                                .build()
-                )
-                .build();
-    }
+	@Override
+	public Response toResponse(LeiaException e) {
+		return Response.status(e.getStatus())
+				.entity(
+						GenericResponse.builder()
+								.success(false)
+								.code(e.getCode())
+								.message(e.getMessage())
+								.data(e.getContext())
+								.build()
+				)
+				.build();
+	}
 }

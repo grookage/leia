@@ -36,78 +36,78 @@ import java.util.function.Supplier;
 @Slf4j
 public class StaticSchemaValidator implements LeiaSchemaValidator {
 
-    private final ConcurrentHashMap<SchemaKey, Boolean> validationRegistry = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<SchemaKey, Class<?>> klassRegistry = new ConcurrentHashMap<>();
-    private final Supplier<List<SchemaDetails>> supplier;
-    private final Set<String> packageRoots;
+	private final ConcurrentHashMap<SchemaKey, Boolean> validationRegistry = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<SchemaKey, Class<?>> klassRegistry = new ConcurrentHashMap<>();
+	private final Supplier<List<SchemaDetails>> supplier;
+	private final Set<String> packageRoots;
 
-    @Builder
-    public StaticSchemaValidator(Supplier<List<SchemaDetails>> supplier,
-                                 Set<String> packageRoots) {
-        this.supplier = supplier;
-        this.packageRoots = packageRoots;
-    }
+	@Builder
+	public StaticSchemaValidator(Supplier<List<SchemaDetails>> supplier,
+	                             Set<String> packageRoots) {
+		this.supplier = supplier;
+		this.packageRoots = packageRoots;
+	}
 
-    @SneakyThrows
-    private List<LeiaSchemaViolation> validate(final SchemaKey schemaKey, Class<?> klass) {
-        final var details = SchemaUtils.getMatchingSchema(supplier.get(), schemaKey).orElse(null);
-        if (null == details) {
-            throw SchemaValidationException.error(ValidationErrorCode.NO_SCHEMA_FOUND,
-                    String.format("No schema found with key: %s", schemaKey.getReferenceId()));
-        }
-        return SchemaValidationUtils.valid(details, klass);
-    }
+	@SneakyThrows
+	private List<LeiaSchemaViolation> validate(final SchemaKey schemaKey, Class<?> klass) {
+		final var details = SchemaUtils.getMatchingSchema(supplier.get(), schemaKey).orElse(null);
+		if (null == details) {
+			throw SchemaValidationException.error(ValidationErrorCode.NO_SCHEMA_FOUND,
+					String.format("No schema found with key: %s", schemaKey.getReferenceId()));
+		}
+		return SchemaValidationUtils.valid(details, klass);
+	}
 
-    @Override
-    public void start() {
-        log.info("Starting the schema validator");
-        Map<SchemaKey, List<LeiaSchemaViolation>> violations = new HashMap<>();
-        packageRoots.forEach(handlerPackage -> {
-            final var reflections = new Reflections(handlerPackage);
-            final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaDefinition.class);
-            annotatedClasses.forEach(annotatedClass -> {
-                final var annotation = annotatedClass.getAnnotation(SchemaDefinition.class);
-                final var schemaKey = SchemaKey.builder()
-                        .schemaName(annotation.name())
-                        .version(annotation.version())
-                        .namespace(annotation.namespace())
-                        .orgId(annotation.orgId())
-                        .tenantId(annotation.tenantId())
-                        .type(annotation.type())
-                        .build();
-                klassRegistry.putIfAbsent(schemaKey, annotatedClass);
-                final var schemaViolations = validate(schemaKey, annotatedClass);
-                validationRegistry.putIfAbsent(schemaKey, schemaViolations.isEmpty());
-                if (!schemaViolations.isEmpty()) {
-                    violations.putIfAbsent(schemaKey, schemaViolations);
-                }
-            });
-        });
-        if (!violations.isEmpty()) {
-            log.error("Found invalid schemas. Please fix the following schemas to start the bundle {}", violations);
-            throw SchemaValidationException.builder()
-                    .errorCode(ValidationErrorCode.INVALID_SCHEMAS)
-                    .context(Map.of("schemaViolations", violations))
-                    .build();
-        }
-    }
+	@Override
+	public void start() {
+		log.info("Starting the schema validator");
+		Map<SchemaKey, List<LeiaSchemaViolation>> violations = new HashMap<>();
+		packageRoots.forEach(handlerPackage -> {
+			final var reflections = new Reflections(handlerPackage);
+			final var annotatedClasses = reflections.getTypesAnnotatedWith(SchemaDefinition.class);
+			annotatedClasses.forEach(annotatedClass -> {
+				final var annotation = annotatedClass.getAnnotation(SchemaDefinition.class);
+				final var schemaKey = SchemaKey.builder()
+						.schemaName(annotation.name())
+						.version(annotation.version())
+						.namespace(annotation.namespace())
+						.orgId(annotation.orgId())
+						.tenantId(annotation.tenantId())
+						.type(annotation.type())
+						.build();
+				klassRegistry.putIfAbsent(schemaKey, annotatedClass);
+				final var schemaViolations = validate(schemaKey, annotatedClass);
+				validationRegistry.putIfAbsent(schemaKey, schemaViolations.isEmpty());
+				if (!schemaViolations.isEmpty()) {
+					violations.putIfAbsent(schemaKey, schemaViolations);
+				}
+			});
+		});
+		if (!violations.isEmpty()) {
+			log.error("Found invalid schemas. Please fix the following schemas to start the bundle {}", violations);
+			throw SchemaValidationException.builder()
+					.errorCode(ValidationErrorCode.INVALID_SCHEMAS)
+					.context(Map.of("schemaViolations", violations))
+					.build();
+		}
+	}
 
-    @Override
-    public void stop() {
-        log.info("Stopping the schema validator");
-    }
+	@Override
+	public void stop() {
+		log.info("Stopping the schema validator");
+	}
 
-    @Override
-    public boolean valid(SchemaKey schemaKey) {
-        return validationRegistry.computeIfAbsent(schemaKey,
-                key -> getKlass(key)
-                        .map(aClass -> validate(key, aClass).isEmpty())
-                        .orElse(Boolean.FALSE));
-    }
+	@Override
+	public boolean valid(SchemaKey schemaKey) {
+		return validationRegistry.computeIfAbsent(schemaKey,
+				key -> getKlass(key)
+						.map(aClass -> validate(key, aClass).isEmpty())
+						.orElse(Boolean.FALSE));
+	}
 
-    @Override
-    public Optional<Class<?>> getKlass(SchemaKey schemaKey) {
-        return Optional.ofNullable(klassRegistry.get(schemaKey));
-    }
+	@Override
+	public Optional<Class<?>> getKlass(SchemaKey schemaKey) {
+		return Optional.ofNullable(klassRegistry.get(schemaKey));
+	}
 
 }

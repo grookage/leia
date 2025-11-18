@@ -30,18 +30,18 @@ import java.util.Set;
 @NoArgsConstructor
 public class EnumAttribute extends SchemaAttribute {
 
-    private Set<String> values;
+	private Set<String> values;
 
-    public EnumAttribute(final String name,
-                         final boolean optional,
-                         final Set<QualifierInfo> qualifiers,
-                         final Set<String> values) {
-        super(DataType.ENUM, name, optional, qualifiers);
-        this.values = values;
-    }
+	public EnumAttribute(final String name,
+	                     final boolean optional,
+	                     final Set<QualifierInfo> qualifiers,
+	                     final Set<String> values) {
+		super(DataType.ENUM, name, optional, qualifiers);
+		this.values = values;
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }

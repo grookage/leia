@@ -22,11 +22,11 @@ import lombok.Builder;
 
 public class RepositoryRefresher extends AbstractKorgRefresher<SchemaRegistry> {
 
-    @Builder
-    protected RepositoryRefresher(final RepositorySupplier supplier,
-                                  final int refreshTimeInSeconds,
-                                  final boolean periodicRefresh) {
-        super(supplier, refreshTimeInSeconds, periodicRefresh, null);
-    }
+	@Builder
+	protected RepositoryRefresher(final RepositorySupplier supplier,
+	                              final int refreshTimeInSeconds,
+	                              final boolean periodicRefresh) {
+		super(supplier, refreshTimeInSeconds, periodicRefresh, null);
+	}
 
 }

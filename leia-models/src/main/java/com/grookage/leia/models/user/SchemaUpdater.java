@@ -19,9 +19,9 @@ package com.grookage.leia.models.user;
 
 public interface SchemaUpdater {
 
-    String name();
+	String name();
 
-    String email();
+	String email();
 
-    String userId();
+	String userId();
 }

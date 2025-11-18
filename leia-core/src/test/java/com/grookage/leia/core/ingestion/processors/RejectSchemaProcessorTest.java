@@ -30,65 +30,65 @@ import org.mockito.Mockito;
 import java.util.Optional;
 
 class RejectSchemaProcessorTest extends SchemaProcessorTest {
-    @Override
-    SchemaProcessor getSchemaProcessor() {
-        return RejectSchemaProcessor.builder()
-                .repositorySupplier(getRepositorySupplier())
-                .build();
-    }
+	@Override
+	SchemaProcessor getSchemaProcessor() {
+		return RejectSchemaProcessor.builder()
+				.repositorySupplier(getRepositorySupplier())
+				.build();
+	}
 
-    @Test
-    @SneakyThrows
-    void testSchemaRejectionsInvalid() {
-        final var schemaContext = new SchemaContext();
-        final var schemaProcessor = getSchemaProcessor();
-        Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
-        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.empty());
-        Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
-    }
+	@Test
+	@SneakyThrows
+	void testSchemaRejectionsInvalid() {
+		final var schemaContext = new SchemaContext();
+		final var schemaProcessor = getSchemaProcessor();
+		Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
+		Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.empty());
+		Assertions.assertThrows(LeiaException.class, () -> schemaProcessor.process(schemaContext));
+	}
 
-    @Test
-    @SneakyThrows
-    void testSchemaRejectionsApprovedState() {
-        final var schemaKey = ResourceHelper.getResource(
-                "schema/schemaKey.json",
-                SchemaKey.class
-        );
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        schemaDetails.setSchemaState(SchemaState.APPROVED);
-        final var schemaContext = new SchemaContext();
-        schemaContext.addContext("USER", "testUser");
-        schemaContext.addContext("EMAIL", "testEmail");
-        schemaContext.addContext("USER_ID", "testUserId");
-        schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
-        final var schemaProcessor = getSchemaProcessor();
-        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
-        schemaProcessor.process(schemaContext);
-        Assertions.assertEquals(SchemaState.REJECTED, schemaDetails.getSchemaState());
-        Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
-    }
+	@Test
+	@SneakyThrows
+	void testSchemaRejectionsApprovedState() {
+		final var schemaKey = ResourceHelper.getResource(
+				"schema/schemaKey.json",
+				SchemaKey.class
+		);
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		schemaDetails.setSchemaState(SchemaState.APPROVED);
+		final var schemaContext = new SchemaContext();
+		schemaContext.addContext("USER", "testUser");
+		schemaContext.addContext("EMAIL", "testEmail");
+		schemaContext.addContext("USER_ID", "testUserId");
+		schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
+		final var schemaProcessor = getSchemaProcessor();
+		Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
+		schemaProcessor.process(schemaContext);
+		Assertions.assertEquals(SchemaState.REJECTED, schemaDetails.getSchemaState());
+		Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
+	}
 
-    @Test
-    @SneakyThrows
-    void testSchemaRejections() {
-        final var schemaKey = ResourceHelper.getResource(
-                "schema/schemaKey.json",
-                SchemaKey.class
-        );
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        schemaDetails.setSchemaState(SchemaState.CREATED);
-        final var schemaContext = new SchemaContext();
-        schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
-        schemaContext.addContext("USER", "testUser");
-        schemaContext.addContext("EMAIL", "testEmail");
-        schemaContext.addContext("USER_ID", "testUserId");
-        final var schemaProcessor = getSchemaProcessor();
-        Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
-        schemaProcessor.process(schemaContext);
-        Assertions.assertEquals(SchemaState.REJECTED, schemaDetails.getSchemaState());
-        Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
-    }
+	@Test
+	@SneakyThrows
+	void testSchemaRejections() {
+		final var schemaKey = ResourceHelper.getResource(
+				"schema/schemaKey.json",
+				SchemaKey.class
+		);
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		schemaDetails.setSchemaState(SchemaState.CREATED);
+		final var schemaContext = new SchemaContext();
+		schemaContext.addContext(SchemaKey.class.getSimpleName(), schemaKey);
+		schemaContext.addContext("USER", "testUser");
+		schemaContext.addContext("EMAIL", "testEmail");
+		schemaContext.addContext("USER_ID", "testUserId");
+		final var schemaProcessor = getSchemaProcessor();
+		Mockito.when(getRepositorySupplier().get().get(Mockito.any(SchemaKey.class))).thenReturn(Optional.of(schemaDetails));
+		schemaProcessor.process(schemaContext);
+		Assertions.assertEquals(SchemaState.REJECTED, schemaDetails.getSchemaState());
+		Mockito.verify(getRepositorySupplier().get(), Mockito.times(1)).update(Mockito.any(SchemaDetails.class));
+	}
 
 }

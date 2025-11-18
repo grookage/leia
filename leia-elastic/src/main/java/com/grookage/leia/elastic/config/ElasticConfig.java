@@ -33,18 +33,18 @@ import java.util.List;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ElasticConfig {
-    @NotEmpty
-    private String clusterName = "elasticsearch";
-    @NotEmpty
-    private List<HostAndPort> servers = List.of();
-    private String schemaIndex;
-    private int maxResultSize = 10000;
-    private int operationTimeoutMs = 10000;
-    private AuthConfig authConfig;
-    private boolean failOnYellow = false;
+	@NotEmpty
+	private String clusterName = "elasticsearch";
+	@NotEmpty
+	private List<HostAndPort> servers = List.of();
+	private String schemaIndex;
+	private int maxResultSize = 10000;
+	private int operationTimeoutMs = 10000;
+	private AuthConfig authConfig;
+	private boolean failOnYellow = false;
 
-    @JsonIgnore
-    public String getTimeout() {
-        return String.valueOf(operationTimeoutMs).concat("ms");
-    }
+	@JsonIgnore
+	public String getTimeout() {
+		return String.valueOf(operationTimeoutMs).concat("ms");
+	}
 }

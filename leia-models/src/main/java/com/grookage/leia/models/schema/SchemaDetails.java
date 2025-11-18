@@ -39,34 +39,34 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaDetails {
-    @NotNull
-    @Valid
-    private SchemaKey schemaKey;
-    String description;
-    @NotNull
-    SchemaState schemaState;
-    @NotNull
-    SchemaType schemaType;
-    SchemaValidationType validationType = SchemaValidationType.MATCHING;
-    @NotEmpty
-    Set<SchemaAttribute> attributes;
-    @Builder.Default
-    Set<TransformationTarget> transformationTargets = Set.of();
-    @Builder.Default
-    Set<SchemaHistoryItem> histories = new HashSet<>();
-    @Builder.Default
-    Set<String> tags = new HashSet<>();
+	@NotNull
+	@Valid
+	private SchemaKey schemaKey;
+	String description;
+	@NotNull
+	SchemaState schemaState;
+	@NotNull
+	SchemaType schemaType;
+	SchemaValidationType validationType = SchemaValidationType.MATCHING;
+	@NotEmpty
+	Set<SchemaAttribute> attributes;
+	@Builder.Default
+	Set<TransformationTarget> transformationTargets = Set.of();
+	@Builder.Default
+	Set<SchemaHistoryItem> histories = new HashSet<>();
+	@Builder.Default
+	Set<String> tags = new HashSet<>();
 
-    @JsonIgnore
-    public String getReferenceId() {
-        return schemaKey.getReferenceId();
-    }
+	@JsonIgnore
+	public String getReferenceId() {
+		return schemaKey.getReferenceId();
+	}
 
-    @JsonIgnore
-    public synchronized void addHistory(SchemaHistoryItem historyItem) {
-        if (null == histories) {
-            histories = new HashSet<>();
-        }
-        histories.add(historyItem);
-    }
+	@JsonIgnore
+	public synchronized void addHistory(SchemaHistoryItem historyItem) {
+		if (null == histories) {
+			histories = new HashSet<>();
+		}
+		histories.add(historyItem);
+	}
 }

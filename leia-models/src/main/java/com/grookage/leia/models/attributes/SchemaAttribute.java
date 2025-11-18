@@ -33,31 +33,31 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = BooleanAttribute.class, name = "BOOLEAN"),
-        @JsonSubTypes.Type(value = ByteAttribute.class, name = "BYTES"),
-        @JsonSubTypes.Type(value = CharacterAttribute.class, name = "CHARACTER"),
-        @JsonSubTypes.Type(value = DoubleAttribute.class, name = "DOUBLE"),
-        @JsonSubTypes.Type(value = EnumAttribute.class, name = "ENUM"),
-        @JsonSubTypes.Type(value = FloatAttribute.class, name = "FLOAT"),
-        @JsonSubTypes.Type(value = IntegerAttribute.class, name = "INTEGER"),
-        @JsonSubTypes.Type(value = LongAttribute.class, name = "LONG"),
-        @JsonSubTypes.Type(value = ShortAttribute.class, name = "SHORT"),
-        @JsonSubTypes.Type(value = StringAttribute.class, name = "STRING"),
-        @JsonSubTypes.Type(value = DateAttribute.class, name = "DATE"),
-        @JsonSubTypes.Type(value = ArrayAttribute.class, name = "ARRAY"),
-        @JsonSubTypes.Type(value = MapAttribute.class, name = "MAP"),
-        @JsonSubTypes.Type(value = ObjectAttribute.class, name = "OBJECT"),
+		@JsonSubTypes.Type(value = BooleanAttribute.class, name = "BOOLEAN"),
+		@JsonSubTypes.Type(value = ByteAttribute.class, name = "BYTES"),
+		@JsonSubTypes.Type(value = CharacterAttribute.class, name = "CHARACTER"),
+		@JsonSubTypes.Type(value = DoubleAttribute.class, name = "DOUBLE"),
+		@JsonSubTypes.Type(value = EnumAttribute.class, name = "ENUM"),
+		@JsonSubTypes.Type(value = FloatAttribute.class, name = "FLOAT"),
+		@JsonSubTypes.Type(value = IntegerAttribute.class, name = "INTEGER"),
+		@JsonSubTypes.Type(value = LongAttribute.class, name = "LONG"),
+		@JsonSubTypes.Type(value = ShortAttribute.class, name = "SHORT"),
+		@JsonSubTypes.Type(value = StringAttribute.class, name = "STRING"),
+		@JsonSubTypes.Type(value = DateAttribute.class, name = "DATE"),
+		@JsonSubTypes.Type(value = ArrayAttribute.class, name = "ARRAY"),
+		@JsonSubTypes.Type(value = MapAttribute.class, name = "MAP"),
+		@JsonSubTypes.Type(value = ObjectAttribute.class, name = "OBJECT"),
 })
 public abstract class SchemaAttribute {
 
-    private DataType type;
+	private DataType type;
 
-    @Pattern(regexp = "[A-Za-z0-9]*", message = "Please check the attribute name format")
-    private String name;
+	@Pattern(regexp = "[A-Za-z0-9]*", message = "Please check the attribute name format")
+	private String name;
 
-    private boolean optional;
+	private boolean optional;
 
-    private Set<QualifierInfo> qualifiers;
+	private Set<QualifierInfo> qualifiers;
 
-    public abstract <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor);
+	public abstract <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor);
 }

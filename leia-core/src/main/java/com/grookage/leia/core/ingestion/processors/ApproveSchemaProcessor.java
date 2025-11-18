@@ -38,28 +38,28 @@ import java.util.function.Supplier;
 @Slf4j
 public class ApproveSchemaProcessor extends SchemaProcessor {
 
-    @Override
-    public SchemaEvent name() {
-        return SchemaEvent.APPROVE_SCHEMA;
-    }
+	@Override
+	public SchemaEvent name() {
+		return SchemaEvent.APPROVE_SCHEMA;
+	}
 
-    @Override
-    @SneakyThrows
-    public void process(SchemaContext context) {
-        final var schemaKey = context.getContext(SchemaKey.class)
-                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
-        final var storedSchema = getRepositorySupplier().get().get(schemaKey).orElse(null);
-        if (null == storedSchema || storedSchema.getSchemaState() != SchemaState.CREATED) {
-            log.error("There are no stored schemas present with namespace {}, version {} and schemaName {}. Please try updating them instead",
-                    schemaKey.getNamespace(),
-                    schemaKey.getVersion(),
-                    schemaKey.getSchemaName());
-            throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
-        }
-        SchemaUtils.validateSchemaApproval(context, storedSchema);
-        addHistory(context, storedSchema);
-        storedSchema.setSchemaState(SchemaState.APPROVED);
-        getRepositorySupplier().get().update(storedSchema);
-        context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
-    }
+	@Override
+	@SneakyThrows
+	public void process(SchemaContext context) {
+		final var schemaKey = context.getContext(SchemaKey.class)
+				.orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
+		final var storedSchema = getRepositorySupplier().get().get(schemaKey).orElse(null);
+		if (null == storedSchema || storedSchema.getSchemaState() != SchemaState.CREATED) {
+			log.error("There are no stored schemas present with namespace {}, version {} and schemaName {}. Please try updating them instead",
+					schemaKey.getNamespace(),
+					schemaKey.getVersion(),
+					schemaKey.getSchemaName());
+			throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
+		}
+		SchemaUtils.validateSchemaApproval(context, storedSchema);
+		addHistory(context, storedSchema);
+		storedSchema.setSchemaState(SchemaState.APPROVED);
+		getRepositorySupplier().get().update(storedSchema);
+		context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
+	}
 }

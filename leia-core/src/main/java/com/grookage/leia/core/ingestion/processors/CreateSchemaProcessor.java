@@ -41,49 +41,49 @@ import java.util.function.Supplier;
 @Slf4j
 public class CreateSchemaProcessor extends SchemaProcessor {
 
-    @Override
-    public SchemaEvent name() {
-        return SchemaEvent.CREATE_SCHEMA;
-    }
+	@Override
+	public SchemaEvent name() {
+		return SchemaEvent.CREATE_SCHEMA;
+	}
 
-    @Override
-    @SneakyThrows
-    public void process(SchemaContext context) {
-        final var createSchemaRequest = context.getContext(CreateSchemaRequest.class)
-                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
-        validateSchemaCreation(createSchemaRequest.getSchemaKey());
-        final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest);
-        addHistory(context, schemaDetails);
-        getRepositorySupplier().get().create(schemaDetails);
-        context.addContext(SchemaDetails.class.getSimpleName(), schemaDetails);
-    }
+	@Override
+	@SneakyThrows
+	public void process(SchemaContext context) {
+		final var createSchemaRequest = context.getContext(CreateSchemaRequest.class)
+				.orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
+		validateSchemaCreation(createSchemaRequest.getSchemaKey());
+		final var schemaDetails = SchemaUtils.toSchemaDetails(createSchemaRequest);
+		addHistory(context, schemaDetails);
+		getRepositorySupplier().get().create(schemaDetails);
+		context.addContext(SchemaDetails.class.getSimpleName(), schemaDetails);
+	}
 
-    private void validateSchemaCreation(SchemaKey schemaKey) {
-        final var schemas = getRepositorySupplier().get()
-                .getSchemas(SearchRequest.builder()
-                        .orgIds(Set.of(schemaKey.getOrgId()))
-                        .namespaces(Set.of(schemaKey.getNamespace()))
-                        .tenants(Set.of(schemaKey.getTenantId()))
-                        .schemaNames(Set.of(schemaKey.getSchemaName()))
-                        .build());
+	private void validateSchemaCreation(SchemaKey schemaKey) {
+		final var schemas = getRepositorySupplier().get()
+				.getSchemas(SearchRequest.builder()
+						.orgIds(Set.of(schemaKey.getOrgId()))
+						.namespaces(Set.of(schemaKey.getNamespace()))
+						.tenants(Set.of(schemaKey.getTenantId()))
+						.schemaNames(Set.of(schemaKey.getSchemaName()))
+						.build());
 
-        if (schemas == null || schemas.isEmpty()) {
-            return;
-        }
-        // Check if there are is any existing record with the same version
-        final var recordExists = schemas.stream()
-                .anyMatch(schemaDetails -> schemaDetails.getSchemaKey().equals(schemaKey));
-        if (recordExists) {
-            log.error("Stored Schema already present against schemaKey:{}", schemaKey.getReferenceId());
-            throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_ALREADY_EXISTS);
-        }
-        // Check if there are any created records
-        final var createdRecordExists = schemas.stream()
-                .anyMatch(schemaDetails -> schemaDetails.getSchemaState() == SchemaState.CREATED);
-        if (createdRecordExists) {
-            log.error("There are already stored schemas in created state present with schemaName {}. Please try updating them instead",
-                    schemaKey.getSchemaName());
-            throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_ALREADY_EXISTS);
-        }
-    }
+		if (schemas == null || schemas.isEmpty()) {
+			return;
+		}
+		// Check if there are is any existing record with the same version
+		final var recordExists = schemas.stream()
+				.anyMatch(schemaDetails -> schemaDetails.getSchemaKey().equals(schemaKey));
+		if (recordExists) {
+			log.error("Stored Schema already present against schemaKey:{}", schemaKey.getReferenceId());
+			throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_ALREADY_EXISTS);
+		}
+		// Check if there are any created records
+		final var createdRecordExists = schemas.stream()
+				.anyMatch(schemaDetails -> schemaDetails.getSchemaState() == SchemaState.CREATED);
+		if (createdRecordExists) {
+			log.error("There are already stored schemas in created state present with schemaName {}. Please try updating them instead",
+					schemaKey.getSchemaName());
+			throw LeiaException.error(LeiaSchemaErrorCode.SCHEMA_ALREADY_EXISTS);
+		}
+	}
 }

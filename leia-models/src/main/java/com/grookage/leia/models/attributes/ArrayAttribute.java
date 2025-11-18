@@ -29,18 +29,18 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 public class ArrayAttribute extends SchemaAttribute {
-    private SchemaAttribute elementAttribute;
+	private SchemaAttribute elementAttribute;
 
-    public ArrayAttribute(final String name,
-                          final boolean optional,
-                          final Set<QualifierInfo> qualifiers,
-                          SchemaAttribute elementAttribute) {
-        super(DataType.ARRAY, name, optional, qualifiers);
-        this.elementAttribute = elementAttribute;
-    }
+	public ArrayAttribute(final String name,
+	                      final boolean optional,
+	                      final Set<QualifierInfo> qualifiers,
+	                      SchemaAttribute elementAttribute) {
+		super(DataType.ARRAY, name, optional, qualifiers);
+		this.elementAttribute = elementAttribute;
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }

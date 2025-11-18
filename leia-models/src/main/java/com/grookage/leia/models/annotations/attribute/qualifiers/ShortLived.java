@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.TYPE_USE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ShortLived {
-    long ttlSeconds();
+	long ttlSeconds();
 }

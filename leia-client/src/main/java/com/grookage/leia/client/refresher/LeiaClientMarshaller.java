@@ -27,14 +27,14 @@ import java.util.List;
 
 @NoArgsConstructor
 public class LeiaClientMarshaller implements Marshaller<List<SchemaDetails>> {
-    public static LeiaClientMarshaller getInstance() {
-        return new LeiaClientMarshaller();
-    }
+	public static LeiaClientMarshaller getInstance() {
+		return new LeiaClientMarshaller();
+	}
 
-    @SneakyThrows
-    @Override
-    public List<SchemaDetails> marshall(byte[] body) {
-        return MapperUtils.mapper().readValue(body, new TypeReference<>() {
-        });
-    }
+	@SneakyThrows
+	@Override
+	public List<SchemaDetails> marshall(byte[] body) {
+		return MapperUtils.mapper().readValue(body, new TypeReference<>() {
+		});
+	}
 }

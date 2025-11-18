@@ -30,20 +30,20 @@ import java.util.List;
 @UtilityClass
 public class HttpRequestUtils {
 
-    public static String getMessageSignature(LeiaMessage message, String passKey) {
-        return Hashing.murmur3_128()
-                .hashString(Joiner.on(".").join(
-                                passKey, message.getSchemaKey().getReferenceId()),
-                        StandardCharsets.UTF_8).toString();
-    }
+	public static String getMessageSignature(LeiaMessage message, String passKey) {
+		return Hashing.murmur3_128()
+				.hashString(Joiner.on(".").join(
+								passKey, message.getSchemaKey().getReferenceId()),
+						StandardCharsets.UTF_8).toString();
+	}
 
-    public static LeiaHttpEntity toHttpEntity(final List<LeiaMessage> messages, final HttpBackendConfig backendConfig) {
-        return new LeiaHttpEntity(
-                messages.stream()
-                        .map(each ->
-                                new LeiaMessageEntity(getMessageSignature(each, backendConfig.getHasher()),
-                                        backendConfig.getBackendName(),
-                                        each))
-                        .toList());
-    }
+	public static LeiaHttpEntity toHttpEntity(final List<LeiaMessage> messages, final HttpBackendConfig backendConfig) {
+		return new LeiaHttpEntity(
+				messages.stream()
+						.map(each ->
+								new LeiaMessageEntity(getMessageSignature(each, backendConfig.getHasher()),
+										backendConfig.getBackendName(),
+										each))
+						.toList());
+	}
 }

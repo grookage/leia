@@ -9,7 +9,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class PIIData {
-    String name;
-    @Encrypted
-    String accountNumber;
+	String name;
+	@Encrypted
+	String accountNumber;
 }

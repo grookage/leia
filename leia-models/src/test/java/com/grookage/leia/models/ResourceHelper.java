@@ -25,19 +25,19 @@ import java.io.IOException;
 
 public class ResourceHelper {
 
-    @Getter
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+	@Getter
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static <T> T getResource(String path, Class<T> klass) throws IOException {
-        objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-        final var data = ResourceHelper.class.getClassLoader().getResourceAsStream(path);
-        return objectMapper.readValue(data, klass);
-    }
+	public static <T> T getResource(String path, Class<T> klass) throws IOException {
+		objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+		final var data = ResourceHelper.class.getClassLoader().getResourceAsStream(path);
+		return objectMapper.readValue(data, klass);
+	}
 
-    public static <T> T getResource(String path, TypeReference<T> klass) throws IOException {
-        objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-        final var data = ResourceHelper.class.getClassLoader().getResourceAsStream(path);
-        return objectMapper.readValue(data, klass);
-    }
+	public static <T> T getResource(String path, TypeReference<T> klass) throws IOException {
+		objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+		final var data = ResourceHelper.class.getClassLoader().getResourceAsStream(path);
+		return objectMapper.readValue(data, klass);
+	}
 
 }

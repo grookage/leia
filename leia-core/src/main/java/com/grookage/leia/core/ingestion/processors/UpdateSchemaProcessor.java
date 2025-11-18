@@ -36,34 +36,34 @@ import java.util.function.Supplier;
 @Data
 @Slf4j
 public class UpdateSchemaProcessor extends SchemaProcessor {
-    @Override
-    public SchemaEvent name() {
-        return SchemaEvent.UPDATE_SCHEMA;
-    }
+	@Override
+	public SchemaEvent name() {
+		return SchemaEvent.UPDATE_SCHEMA;
+	}
 
-    @Override
-    @SneakyThrows
-    public void process(SchemaContext context) {
-        final var updateSchemaRequest = context.getContext(UpdateSchemaRequest.class)
-                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
-        final var storedSchema = getRepositorySupplier()
-                .get()
-                .get(updateSchemaRequest.getSchemaKey())
-                .orElse(null);
-        if (null == storedSchema || storedSchema.getSchemaState() != SchemaState.CREATED) {
-            log.error("There are no stored schemas present with schemaKey {}",
-                    updateSchemaRequest.getSchemaKey());
-            throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
-        }
-        storedSchema.setDescription(updateSchemaRequest.getDescription());
-        storedSchema.setAttributes(updateSchemaRequest.getAttributes());
-        addHistory(context, storedSchema);
-        storedSchema.setValidationType(updateSchemaRequest.getValidationType());
-        storedSchema.setSchemaType(updateSchemaRequest.getSchemaType());
-        if (null != updateSchemaRequest.getTransformationTargets()) {
-            storedSchema.setTransformationTargets(updateSchemaRequest.getTransformationTargets());
-        }
-        getRepositorySupplier().get().update(storedSchema);
-        context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
-    }
+	@Override
+	@SneakyThrows
+	public void process(SchemaContext context) {
+		final var updateSchemaRequest = context.getContext(UpdateSchemaRequest.class)
+				.orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
+		final var storedSchema = getRepositorySupplier()
+				.get()
+				.get(updateSchemaRequest.getSchemaKey())
+				.orElse(null);
+		if (null == storedSchema || storedSchema.getSchemaState() != SchemaState.CREATED) {
+			log.error("There are no stored schemas present with schemaKey {}",
+					updateSchemaRequest.getSchemaKey());
+			throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
+		}
+		storedSchema.setDescription(updateSchemaRequest.getDescription());
+		storedSchema.setAttributes(updateSchemaRequest.getAttributes());
+		addHistory(context, storedSchema);
+		storedSchema.setValidationType(updateSchemaRequest.getValidationType());
+		storedSchema.setSchemaType(updateSchemaRequest.getSchemaType());
+		if (null != updateSchemaRequest.getTransformationTargets()) {
+			storedSchema.setTransformationTargets(updateSchemaRequest.getTransformationTargets());
+		}
+		getRepositorySupplier().get().update(storedSchema);
+		context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
+	}
 }

@@ -25,20 +25,20 @@ import javax.ws.rs.core.HttpHeaders;
 
 public interface PermissionValidator<U extends SchemaUpdater> {
 
-    void validateSchemaCreation(final HttpHeaders headers,
-                                final U schemaUpdater,
-                                final CreateSchemaRequest schemaRequest);
+	void validateSchemaCreation(final HttpHeaders headers,
+	                            final U schemaUpdater,
+	                            final CreateSchemaRequest schemaRequest);
 
-    void validationSchemaModification(final HttpHeaders headers,
-                                      final U schemaUpdater,
-                                      final UpdateSchemaRequest schemaRequest);
+	void validationSchemaModification(final HttpHeaders headers,
+	                                  final U schemaUpdater,
+	                                  final UpdateSchemaRequest schemaRequest);
 
-    void validateSchemaApproval(final HttpHeaders headers,
-                                final U schemaUpdater,
-                                final SchemaKey schemaKey);
+	void validateSchemaApproval(final HttpHeaders headers,
+	                            final U schemaUpdater,
+	                            final SchemaKey schemaKey);
 
-    void validateSchemaRejection(final HttpHeaders headers,
-                                 final U schemaUpdater,
-                                 final SchemaKey schemaKey);
+	void validateSchemaRejection(final HttpHeaders headers,
+	                             final U schemaUpdater,
+	                             final SchemaKey schemaKey);
 
 }

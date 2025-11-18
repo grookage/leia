@@ -34,44 +34,44 @@ import java.util.Locale;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchemaKey {
-    @NotBlank
-    private String orgId;
-    @NotBlank
-    private String namespace;
-    @NotBlank
-    private String tenantId;
-    @NotBlank
-    private String schemaName;
-    @NotBlank
-    private String version;
-    @NotBlank
-    private String type;
+	@NotBlank
+	private String orgId;
+	@NotBlank
+	private String namespace;
+	@NotBlank
+	private String tenantId;
+	@NotBlank
+	private String schemaName;
+	@NotBlank
+	private String version;
+	@NotBlank
+	private String type;
 
-    @JsonIgnore
-    public String getReferenceId() {
-        return Joiner.on(SchemaConstants.KEY_DELIMITER).join(orgId,
-                namespace,
-                tenantId,
-                schemaName,
-                version
-        ).toUpperCase(Locale.ROOT);
-    }
+	@JsonIgnore
+	public String getReferenceId() {
+		return Joiner.on(SchemaConstants.KEY_DELIMITER).join(orgId,
+				namespace,
+				tenantId,
+				schemaName,
+				version
+		).toUpperCase(Locale.ROOT);
+	}
 
-    @Override
-    public int hashCode() {
-        return this.getReferenceId().hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return this.getReferenceId().hashCode();
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || obj.getClass() != this.getClass()) {
-            return false;
-        }
-        final var thatKey = (SchemaKey) obj;
-        return (thatKey.getReferenceId().equals(this.getReferenceId()));
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || obj.getClass() != this.getClass()) {
+			return false;
+		}
+		final var thatKey = (SchemaKey) obj;
+		return (thatKey.getReferenceId().equals(this.getReferenceId()));
+	}
 
 }

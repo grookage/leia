@@ -52,63 +52,63 @@ import java.util.function.Supplier;
 @PermitAll
 public class IngestionResource<U extends SchemaUpdater> {
 
-    private final SchemaIngestor<U> schemaIngestor;
-    private final Supplier<SchemaUpdaterResolver<U>> updaterResolver;
-    private final Supplier<PermissionValidator<U>> permissionValidatorSupplier;
+	private final SchemaIngestor<U> schemaIngestor;
+	private final Supplier<SchemaUpdaterResolver<U>> updaterResolver;
+	private final Supplier<PermissionValidator<U>> permissionValidatorSupplier;
 
-    @PUT
-    @Timed
-    @ExceptionMetered
-    @Path("/add")
-    public GenericResponse<SchemaDetails> addSchema(@Context HttpHeaders headers,
-                                                    @Valid final CreateSchemaRequest schemaRequest) {
-        final var updater = updaterResolver.get().resolve(headers);
-        permissionValidatorSupplier.get().validateSchemaCreation(headers, updater, schemaRequest);
-        return GenericResponse.<SchemaDetails>builder()
-                .success(true)
-                .data(schemaIngestor.add(updater, schemaRequest))
-                .build();
-    }
+	@PUT
+	@Timed
+	@ExceptionMetered
+	@Path("/add")
+	public GenericResponse<SchemaDetails> addSchema(@Context HttpHeaders headers,
+	                                                @Valid final CreateSchemaRequest schemaRequest) {
+		final var updater = updaterResolver.get().resolve(headers);
+		permissionValidatorSupplier.get().validateSchemaCreation(headers, updater, schemaRequest);
+		return GenericResponse.<SchemaDetails>builder()
+				.success(true)
+				.data(schemaIngestor.add(updater, schemaRequest))
+				.build();
+	}
 
-    @POST
-    @Timed
-    @ExceptionMetered
-    @Path("/update")
-    public GenericResponse<SchemaDetails> updateSchema(@Context HttpHeaders headers,
-                                                       @Valid final UpdateSchemaRequest schemaRequest) {
-        final var updater = updaterResolver.get().resolve(headers);
-        permissionValidatorSupplier.get().validationSchemaModification(headers, updater, schemaRequest);
-        return GenericResponse.<SchemaDetails>builder()
-                .success(true)
-                .data(schemaIngestor.update(updater, schemaRequest))
-                .build();
-    }
+	@POST
+	@Timed
+	@ExceptionMetered
+	@Path("/update")
+	public GenericResponse<SchemaDetails> updateSchema(@Context HttpHeaders headers,
+	                                                   @Valid final UpdateSchemaRequest schemaRequest) {
+		final var updater = updaterResolver.get().resolve(headers);
+		permissionValidatorSupplier.get().validationSchemaModification(headers, updater, schemaRequest);
+		return GenericResponse.<SchemaDetails>builder()
+				.success(true)
+				.data(schemaIngestor.update(updater, schemaRequest))
+				.build();
+	}
 
-    @POST
-    @Timed
-    @ExceptionMetered
-    @Path("/approve")
-    public GenericResponse<SchemaDetails> approveSchema(@Context HttpHeaders headers,
-                                                        @Valid final SchemaKey schemaKey) {
-        final var updater = updaterResolver.get().resolve(headers);
-        permissionValidatorSupplier.get().validateSchemaApproval(headers, updater, schemaKey);
-        return GenericResponse.<SchemaDetails>builder()
-                .success(true)
-                .data(schemaIngestor.approve(updater, schemaKey))
-                .build();
-    }
+	@POST
+	@Timed
+	@ExceptionMetered
+	@Path("/approve")
+	public GenericResponse<SchemaDetails> approveSchema(@Context HttpHeaders headers,
+	                                                    @Valid final SchemaKey schemaKey) {
+		final var updater = updaterResolver.get().resolve(headers);
+		permissionValidatorSupplier.get().validateSchemaApproval(headers, updater, schemaKey);
+		return GenericResponse.<SchemaDetails>builder()
+				.success(true)
+				.data(schemaIngestor.approve(updater, schemaKey))
+				.build();
+	}
 
-    @POST
-    @Timed
-    @ExceptionMetered
-    @Path("/reject")
-    public GenericResponse<SchemaDetails> rejectSchema(@Context HttpHeaders headers,
-                                                       @Valid final SchemaKey schemaKey) {
-        final var updater = updaterResolver.get().resolve(headers);
-        permissionValidatorSupplier.get().validateSchemaRejection(headers, updater, schemaKey);
-        return GenericResponse.<SchemaDetails>builder()
-                .success(true)
-                .data(schemaIngestor.reject(updater, schemaKey))
-                .build();
-    }
+	@POST
+	@Timed
+	@ExceptionMetered
+	@Path("/reject")
+	public GenericResponse<SchemaDetails> rejectSchema(@Context HttpHeaders headers,
+	                                                   @Valid final SchemaKey schemaKey) {
+		final var updater = updaterResolver.get().resolve(headers);
+		permissionValidatorSupplier.get().validateSchemaRejection(headers, updater, schemaKey);
+		return GenericResponse.<SchemaDetails>builder()
+				.success(true)
+				.data(schemaIngestor.reject(updater, schemaKey))
+				.build();
+	}
 }

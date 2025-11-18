@@ -30,25 +30,25 @@ import java.util.List;
 
 class RepositorySupplierTest {
 
-    @Test
-    @SneakyThrows
-    void testRepositorySupplier() {
-        final var schemaDetails = ResourceHelper
-                .getResource("schema/schemaDetails.json", SchemaDetails.class);
-        final var repository = Mockito.mock(SchemaRepository.class);
-        final var supplier = new RepositorySupplier(() -> repository);
-        Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
-                .thenReturn(List.of(schemaDetails));
-        final var registry = supplier.get();
-        Assertions.assertFalse(registry.getSchemas().isEmpty());
-        final var schema = registry.getSchemaDetails(SchemaKey.builder()
-                .namespace("testNamespace")
-                .schemaName("testSchema")
-                .version("V1234")
-                .orgId("testOrg")
-                .type("default")
-                .tenantId("tenantId")
-                .build()).orElse(null);
-        Assertions.assertNotNull(schema);
-    }
+	@Test
+	@SneakyThrows
+	void testRepositorySupplier() {
+		final var schemaDetails = ResourceHelper
+				.getResource("schema/schemaDetails.json", SchemaDetails.class);
+		final var repository = Mockito.mock(SchemaRepository.class);
+		final var supplier = new RepositorySupplier(() -> repository);
+		Mockito.when(repository.getSchemas(SearchRequest.builder().build()))
+				.thenReturn(List.of(schemaDetails));
+		final var registry = supplier.get();
+		Assertions.assertFalse(registry.getSchemas().isEmpty());
+		final var schema = registry.getSchemaDetails(SchemaKey.builder()
+				.namespace("testNamespace")
+				.schemaName("testSchema")
+				.version("V1234")
+				.orgId("testOrg")
+				.type("default")
+				.tenantId("tenantId")
+				.build()).orElse(null);
+		Assertions.assertNotNull(schema);
+	}
 }

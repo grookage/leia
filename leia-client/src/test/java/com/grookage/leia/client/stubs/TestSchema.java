@@ -30,9 +30,9 @@ import java.util.List;
 @Data
 public class TestSchema {
 
-    @NotEmpty
-    private String userName;
-    @NotEmpty
-    private List<TestSchemaUnit> schemaUnits;
+	@NotEmpty
+	private String userName;
+	@NotEmpty
+	private List<TestSchemaUnit> schemaUnits;
 
 }

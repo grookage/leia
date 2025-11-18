@@ -32,33 +32,33 @@ import java.util.Locale;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HttpClientConfig {
 
-    @NotEmpty
-    String clientId;
-    @Builder.Default
-    int maxConnPerRoute = 10;
-    @Builder.Default
-    int maxConnTotal = 20;
-    @Builder.Default
-    int operationTimeout = 10000;
-    @Builder.Default
-    long connectionTimeoutMs = 10000;
-    @Builder.Default
-    long validateAfterInactivityMs = 10000;
-    @Builder.Default
-    long ttlMs = 60000;
-    @Builder.Default
-    long idleConnEvictMs = 60000;
-    @Builder.Default
-    boolean failOnUnavailableBackend = true;
-    long messageProcessingThresholdMs = 10_000L;
-    @NotEmpty
-    List<HttpBackendConfig> backendConfigs;
+	@NotEmpty
+	String clientId;
+	@Builder.Default
+	int maxConnPerRoute = 10;
+	@Builder.Default
+	int maxConnTotal = 20;
+	@Builder.Default
+	int operationTimeout = 10000;
+	@Builder.Default
+	long connectionTimeoutMs = 10000;
+	@Builder.Default
+	long validateAfterInactivityMs = 10000;
+	@Builder.Default
+	long ttlMs = 60000;
+	@Builder.Default
+	long idleConnEvictMs = 60000;
+	@Builder.Default
+	boolean failOnUnavailableBackend = true;
+	long messageProcessingThresholdMs = 10_000L;
+	@NotEmpty
+	List<HttpBackendConfig> backendConfigs;
 
-    @JsonIgnore
-    public List<String> getBackends() {
-        if (null == backendConfigs) return List.of();
-        return backendConfigs.stream()
-                .map(each -> each.getBackendName().toUpperCase(Locale.ROOT)).toList();
-    }
+	@JsonIgnore
+	public List<String> getBackends() {
+		if (null == backendConfigs) return List.of();
+		return backendConfigs.stream()
+				.map(each -> each.getBackendName().toUpperCase(Locale.ROOT)).toList();
+	}
 
 }

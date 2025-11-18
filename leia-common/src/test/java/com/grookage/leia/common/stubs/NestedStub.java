@@ -10,14 +10,14 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class NestedStub {
-    String name;
-    int id;
-    @PII
-    @Encrypted
-    PIIData piiData;
-    @Encrypted
-    RecordStub recordStub;
-    TestEnum enumClass;
-    @PII
-    String phoneNumber;
+	String name;
+	int id;
+	@PII
+	@Encrypted
+	PIIData piiData;
+	@Encrypted
+	RecordStub recordStub;
+	TestEnum enumClass;
+	@PII
+	String phoneNumber;
 }

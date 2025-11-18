@@ -47,66 +47,66 @@ import java.util.function.Supplier;
 @Getter
 public abstract class LeiaBundle<T extends Configuration, U extends SchemaUpdater> implements ConfiguredBundle<T> {
 
-    private SchemaIngestor<U> schemaIngestor;
-    private Supplier<SchemaRepository> repositorySupplier;
-    private SchemaRetriever schemaRetriever;
+	private SchemaIngestor<U> schemaIngestor;
+	private Supplier<SchemaRepository> repositorySupplier;
+	private SchemaRetriever schemaRetriever;
 
-    protected abstract Supplier<SchemaUpdaterResolver<U>> userResolver(T configuration);
+	protected abstract Supplier<SchemaUpdaterResolver<U>> userResolver(T configuration);
 
-    protected abstract CacheConfig getCacheConfig(T configuration);
+	protected abstract CacheConfig getCacheConfig(T configuration);
 
-    protected abstract Supplier<SchemaRepository> getRepositorySupplier(T configuration);
+	protected abstract Supplier<SchemaRepository> getRepositorySupplier(T configuration);
 
-    protected abstract Supplier<PermissionValidator<U>> getPermissionResolver(T configuration);
+	protected abstract Supplier<PermissionValidator<U>> getPermissionResolver(T configuration);
 
-    protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
-        return List.of();
-    }
+	protected List<LeiaHealthCheck> withHealthChecks(T configuration) {
+		return List.of();
+	}
 
-    protected List<Lifecycle> withLifecycleManagers(T configuration) {
-        return List.of();
-    }
+	protected List<Lifecycle> withLifecycleManagers(T configuration) {
+		return List.of();
+	}
 
-    @Override
-    public void run(T configuration, Environment environment) {
-        final var userResolver = userResolver(configuration);
-        Preconditions.checkNotNull(userResolver, "User Resolver can't be null");
-        final var permissionResolver = getPermissionResolver(configuration);
-        Preconditions.checkNotNull(permissionResolver, "Permission Resolver can't be null");
+	@Override
+	public void run(T configuration, Environment environment) {
+		final var userResolver = userResolver(configuration);
+		Preconditions.checkNotNull(userResolver, "User Resolver can't be null");
+		final var permissionResolver = getPermissionResolver(configuration);
+		Preconditions.checkNotNull(permissionResolver, "Permission Resolver can't be null");
 
-        this.repositorySupplier = getRepositorySupplier(configuration);
-        Preconditions.checkNotNull(repositorySupplier, "Schema Repository Supplier can't be null");
+		this.repositorySupplier = getRepositorySupplier(configuration);
+		Preconditions.checkNotNull(repositorySupplier, "Schema Repository Supplier can't be null");
 
-        final var schemaProcessorHub = SchemaProcessorHub.of()
-                .withRepositoryResolver(repositorySupplier)
-                .build();
-        this.schemaIngestor = new SchemaIngestor<U>()
-                .withProcessorHub(schemaProcessorHub)
-                .build();
-        final var cacheConfig = getCacheConfig(configuration);
-        this.schemaRetriever = new SchemaRetriever(repositorySupplier, cacheConfig);
-        final var messageValidator = new NoOpLeiaMessageValidator();
-        withLifecycleManagers(configuration)
-                .forEach(lifecycle -> environment.lifecycle().manage(new Managed() {
-                    @Override
-                    public void start() {
-                        lifecycle.start();
-                    }
+		final var schemaProcessorHub = SchemaProcessorHub.of()
+				.withRepositoryResolver(repositorySupplier)
+				.build();
+		this.schemaIngestor = new SchemaIngestor<U>()
+				.withProcessorHub(schemaProcessorHub)
+				.build();
+		final var cacheConfig = getCacheConfig(configuration);
+		this.schemaRetriever = new SchemaRetriever(repositorySupplier, cacheConfig);
+		final var messageValidator = new NoOpLeiaMessageValidator();
+		withLifecycleManagers(configuration)
+				.forEach(lifecycle -> environment.lifecycle().manage(new Managed() {
+					@Override
+					public void start() {
+						lifecycle.start();
+					}
 
-                    @Override
-                    public void stop() {
-                        lifecycle.stop();
-                    }
-                }));
-        withHealthChecks(configuration)
-                .forEach(leiaHealthCheck -> environment.healthChecks().register(leiaHealthCheck.getName(), leiaHealthCheck));
-        environment.jersey().register(new IngestionResource<>(schemaIngestor, userResolver, permissionResolver));
-        environment.jersey().register(new SchemaResource(schemaRetriever, messageValidator));
-        environment.jersey().register(new LeiaExceptionMapper());
-    }
+					@Override
+					public void stop() {
+						lifecycle.stop();
+					}
+				}));
+		withHealthChecks(configuration)
+				.forEach(leiaHealthCheck -> environment.healthChecks().register(leiaHealthCheck.getName(), leiaHealthCheck));
+		environment.jersey().register(new IngestionResource<>(schemaIngestor, userResolver, permissionResolver));
+		environment.jersey().register(new SchemaResource(schemaRetriever, messageValidator));
+		environment.jersey().register(new LeiaExceptionMapper());
+	}
 
-    @Override
-    public void initialize(Bootstrap<?> bootstrap) {
-        //NOOP. Nothing to do here.
-    }
+	@Override
+	public void initialize(Bootstrap<?> bootstrap) {
+		//NOOP. Nothing to do here.
+	}
 }

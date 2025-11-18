@@ -18,12 +18,12 @@ package com.grookage.leia.models.schema.engine;
 
 public interface SchemaEventVisitor<T> {
 
-    T schemaCreate();
+	T schemaCreate();
 
-    T schemaUpdate();
+	T schemaUpdate();
 
-    T schemaApprove();
+	T schemaApprove();
 
-    T schemaReject();
+	T schemaReject();
 
 }

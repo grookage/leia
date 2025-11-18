@@ -35,8 +35,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TransformationTarget {
 
-    @NotNull SchemaKey schemaKey;
-    Expression criteria;
-    @NotEmpty List<AttributeTransformer> transformers = List.of();
-    private List<String> tags = List.of();
+	@NotNull SchemaKey schemaKey;
+	Expression criteria;
+	@NotEmpty List<AttributeTransformer> transformers = List.of();
+	private List<String> tags = List.of();
 }

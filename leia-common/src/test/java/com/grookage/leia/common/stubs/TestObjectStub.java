@@ -12,9 +12,9 @@ import java.util.Set;
 @Builder
 @Jacksonized
 public class TestObjectStub {
-    Object object;
-    Object[] objects;
-    List<Object> objectList;
-    Set<Object> objectSet;
-    Map<String, Object> objectMap;
+	Object object;
+	Object[] objects;
+	List<Object> objectList;
+	Set<Object> objectSet;
+	Map<String, Object> objectMap;
 }

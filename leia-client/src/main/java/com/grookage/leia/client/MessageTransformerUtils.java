@@ -39,69 +39,69 @@ import java.util.function.Predicate;
 @Slf4j
 public class MessageTransformerUtils {
 
-    private static final String LITERAL = "~";
+	private static final String LITERAL = "~";
 
-    public static Map<SchemaKey, Map<String, JsonPath>> getCompiledPaths(List<SchemaDetails> schemas,
-                                                                         Predicate<SchemaKey> schemaPredicate) {
-        final var compiledPaths = new HashMap<SchemaKey, Map<String, JsonPath>>();
-        schemas.forEach(schemaDetails -> {
-            if (!schemaPredicate.test(schemaDetails.getSchemaKey())) {
-                return;
-            }
-            final var transformationTargets = schemaDetails.getTransformationTargets();
-            transformationTargets.forEach(transformationTarget -> {
-                final var valid = schemaPredicate.test(transformationTarget.getSchemaKey());
-                if (!valid) {
-                    log.error("The transformationSchema schema doesn't seem to be valid for schemaKey {}. Please check the schema bindings provided",
-                            transformationTarget.getSchemaKey());
-                    throw new IllegalStateException("Invalid transformation schema");
-                }
-                final var paths = new HashMap<String, JsonPath>();
-                transformationTarget.getTransformers()
-                        .forEach(transformer -> {
-                            if (!transformer.getTransformationPath().startsWith(LITERAL)) {
-                                paths.put(transformer.getAttributeName(),
-                                        JsonPath.compile(transformer.getTransformationPath()));
-                            }
-                        });
-                compiledPaths.put(transformationTarget.getSchemaKey(), paths);
-            });
-        });
-        return compiledPaths;
-    }
+	public static Map<SchemaKey, Map<String, JsonPath>> getCompiledPaths(List<SchemaDetails> schemas,
+	                                                                     Predicate<SchemaKey> schemaPredicate) {
+		final var compiledPaths = new HashMap<SchemaKey, Map<String, JsonPath>>();
+		schemas.forEach(schemaDetails -> {
+			if (!schemaPredicate.test(schemaDetails.getSchemaKey())) {
+				return;
+			}
+			final var transformationTargets = schemaDetails.getTransformationTargets();
+			transformationTargets.forEach(transformationTarget -> {
+				final var valid = schemaPredicate.test(transformationTarget.getSchemaKey());
+				if (!valid) {
+					log.error("The transformationSchema schema doesn't seem to be valid for schemaKey {}. Please check the schema bindings provided",
+							transformationTarget.getSchemaKey());
+					throw new IllegalStateException("Invalid transformation schema");
+				}
+				final var paths = new HashMap<String, JsonPath>();
+				transformationTarget.getTransformers()
+						.forEach(transformer -> {
+							if (!transformer.getTransformationPath().startsWith(LITERAL)) {
+								paths.put(transformer.getAttributeName(),
+										JsonPath.compile(transformer.getTransformationPath()));
+							}
+						});
+				compiledPaths.put(transformationTarget.getSchemaKey(), paths);
+			});
+		});
+		return compiledPaths;
+	}
 
-    public static boolean text(String transformationPath) {
-        return transformationPath.startsWith(LITERAL);
-    }
+	public static boolean text(String transformationPath) {
+		return transformationPath.startsWith(LITERAL);
+	}
 
-    public static JsonNode toTextNode(String attributeValue) {
-        return new TextNode(attributeValue.substring(attributeValue.lastIndexOf(LITERAL) + 1));
-    }
+	public static JsonNode toTextNode(String attributeValue) {
+		return new TextNode(attributeValue.substring(attributeValue.lastIndexOf(LITERAL) + 1));
+	}
 
-    public static JsonNode transformMessage(DocumentContext sourceContext,
-                                            TransformationTarget transformationTarget,
-                                            Map<String, JsonPath> compiledPaths,
-                                            ObjectMapper mapper) {
-        final var responseObject = JsonNodeFactory.instance.objectNode();
-        transformationTarget.getTransformers().forEach(transformer -> {
-            if (text(transformer.getTransformationPath())) {
-                responseObject.set(transformer.getAttributeName(), toTextNode(transformer.getTransformationPath()));
-            } else {
-                final var jsonPath = compiledPaths.get(transformer.getAttributeName());
-                if (null != jsonPath) {
-                    responseObject.set(transformer.getAttributeName(), jsonPathValue(sourceContext, transformer, jsonPath, mapper));
-                }
-            }
-        });
-        return responseObject;
-    }
+	public static JsonNode transformMessage(DocumentContext sourceContext,
+	                                        TransformationTarget transformationTarget,
+	                                        Map<String, JsonPath> compiledPaths,
+	                                        ObjectMapper mapper) {
+		final var responseObject = JsonNodeFactory.instance.objectNode();
+		transformationTarget.getTransformers().forEach(transformer -> {
+			if (text(transformer.getTransformationPath())) {
+				responseObject.set(transformer.getAttributeName(), toTextNode(transformer.getTransformationPath()));
+			} else {
+				final var jsonPath = compiledPaths.get(transformer.getAttributeName());
+				if (null != jsonPath) {
+					responseObject.set(transformer.getAttributeName(), jsonPathValue(sourceContext, transformer, jsonPath, mapper));
+				}
+			}
+		});
+		return responseObject;
+	}
 
-    @SneakyThrows
-    private static JsonNode jsonPathValue(DocumentContext sourceContext,
-                                          AttributeTransformer transformer,
-                                          JsonPath jsonPath,
-                                          ObjectMapper mapper) {
-        final JsonNode value = sourceContext.read(jsonPath);
-        return transformer.isSerialize() ? new TextNode(mapper.writeValueAsString(value)) : value;
-    }
+	@SneakyThrows
+	private static JsonNode jsonPathValue(DocumentContext sourceContext,
+	                                      AttributeTransformer transformer,
+	                                      JsonPath jsonPath,
+	                                      ObjectMapper mapper) {
+		final JsonNode value = sourceContext.read(jsonPath);
+		return transformer.isSerialize() ? new TextNode(mapper.writeValueAsString(value)) : value;
+	}
 }

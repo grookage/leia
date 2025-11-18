@@ -38,30 +38,30 @@ import java.util.function.Supplier;
 @Slf4j
 public class RejectSchemaProcessor extends SchemaProcessor {
 
-    private static final Set<SchemaState> ACCEPTABLE_STATES = Set.of(SchemaState.CREATED, SchemaState.APPROVED);
+	private static final Set<SchemaState> ACCEPTABLE_STATES = Set.of(SchemaState.CREATED, SchemaState.APPROVED);
 
-    @Override
-    public SchemaEvent name() {
-        return SchemaEvent.REJECT_SCHEMA;
-    }
+	@Override
+	public SchemaEvent name() {
+		return SchemaEvent.REJECT_SCHEMA;
+	}
 
-    @Override
-    @SneakyThrows
-    public void process(SchemaContext context) {
-        final var schemaKey = context.getContext(SchemaKey.class)
-                .orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
-        final var storedSchema = getRepositorySupplier().get().get(schemaKey).orElse(null);
-        if (null == storedSchema || !ACCEPTABLE_STATES.contains(storedSchema.getSchemaState())) {
-            log.error("There are no stored schemas present with namespace {}, version {} and schemaName {} or in acceptable states. " +
-                            "Please try updating them instead",
-                    schemaKey.getNamespace(),
-                    schemaKey.getVersion(),
-                    schemaKey.getSchemaName());
-            throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
-        }
-        addHistory(context, storedSchema);
-        storedSchema.setSchemaState(SchemaState.REJECTED);
-        getRepositorySupplier().get().update(storedSchema);
-        context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
-    }
+	@Override
+	@SneakyThrows
+	public void process(SchemaContext context) {
+		final var schemaKey = context.getContext(SchemaKey.class)
+				.orElseThrow((Supplier<Throwable>) () -> LeiaException.error(LeiaSchemaErrorCode.VALUE_NOT_FOUND));
+		final var storedSchema = getRepositorySupplier().get().get(schemaKey).orElse(null);
+		if (null == storedSchema || !ACCEPTABLE_STATES.contains(storedSchema.getSchemaState())) {
+			log.error("There are no stored schemas present with namespace {}, version {} and schemaName {} or in acceptable states. " +
+							"Please try updating them instead",
+					schemaKey.getNamespace(),
+					schemaKey.getVersion(),
+					schemaKey.getSchemaName());
+			throw LeiaException.error(LeiaSchemaErrorCode.NO_SCHEMA_FOUND);
+		}
+		addHistory(context, storedSchema);
+		storedSchema.setSchemaState(SchemaState.REJECTED);
+		getRepositorySupplier().get().update(storedSchema);
+		context.addContext(SchemaDetails.class.getSimpleName(), storedSchema);
+	}
 }

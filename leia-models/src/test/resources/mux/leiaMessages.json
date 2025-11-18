@@ -4,9 +4,9 @@
       "namespace": "testNamespace",
       "schemaName": "testSchema",
       "version": "V1234",
-      "orgId" : "testOrg",
-      "type" : "default",
-      "tenantId" : "tenantId"
+      "orgId": "testOrg",
+      "type": "default",
+      "tenantId": "tenantId"
     },
     "message": {
       "attr": "attr1"

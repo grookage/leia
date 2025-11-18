@@ -28,34 +28,34 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LeiaMessageViolationImpl implements LeiaMessageViolation {
-    private String message;
-    private String fieldPath;
-    private SchemaKey schemaKey;
+	private String message;
+	private String fieldPath;
+	private SchemaKey schemaKey;
 
-    @Override
-    public String message() {
-        return message;
-    }
+	@Override
+	public String message() {
+		return message;
+	}
 
-    @Override
-    public String fieldPath() {
-        return fieldPath;
-    }
+	@Override
+	public String fieldPath() {
+		return fieldPath;
+	}
 
-    @Override
-    public SchemaKey schemaKey() {
-        return schemaKey;
-    }
+	@Override
+	public SchemaKey schemaKey() {
+		return schemaKey;
+	}
 
-    @Override
-    public String toString() {
-        if (Strings.isNullOrEmpty(fieldPath)) {
-            return String.format("[LeiaMessageViolation] schema = %s, message = %s", schemaKey, message);
-        } else if (schemaKey == null) {
-            return String.format("[LeiaMessageViolation] fieldPath = %s, message = %s", fieldPath, message);
-        }
-        return String.format("[LeiaMessageViolation] schema = %s, fieldPath = %s, message = %s",
-                schemaKey, fieldPath, message);
-    }
+	@Override
+	public String toString() {
+		if (Strings.isNullOrEmpty(fieldPath)) {
+			return String.format("[LeiaMessageViolation] schema = %s, message = %s", schemaKey, message);
+		} else if (schemaKey == null) {
+			return String.format("[LeiaMessageViolation] fieldPath = %s, message = %s", fieldPath, message);
+		}
+		return String.format("[LeiaMessageViolation] schema = %s, fieldPath = %s, message = %s",
+				schemaKey, fieldPath, message);
+	}
 }
 

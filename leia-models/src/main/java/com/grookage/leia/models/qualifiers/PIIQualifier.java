@@ -25,8 +25,8 @@ import lombok.EqualsAndHashCode;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PIIQualifier extends QualifierInfo {
 
-    public PIIQualifier() {
-        super(QualifierType.PII);
-    }
+	public PIIQualifier() {
+		super(QualifierType.PII);
+	}
 
 }

@@ -30,14 +30,14 @@ import java.util.Set;
 @NoArgsConstructor
 public class LongAttribute extends SchemaAttribute {
 
-    public LongAttribute(final String name,
-                         final boolean optional,
-                         final Set<QualifierInfo> qualifiers) {
-        super(DataType.LONG, name, optional, qualifiers);
-    }
+	public LongAttribute(final String name,
+	                     final boolean optional,
+	                     final Set<QualifierInfo> qualifiers) {
+		super(DataType.LONG, name, optional, qualifiers);
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }

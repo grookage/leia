@@ -23,21 +23,21 @@ import org.junit.jupiter.api.Test;
 
 class SearchRequestTest {
 
-    @Test
-    @SneakyThrows
-    void testNamespaceRequest() {
-        final var namespaceRequest = ResourceHelper.getResource("request/searchRequest.json", SearchRequest.class);
-        Assertions.assertNotNull(namespaceRequest);
-        Assertions.assertTrue(namespaceRequest.getNamespaces().contains("test"));
-        Assertions.assertTrue(namespaceRequest.getOrgIds().contains("testOrgId"));
-    }
+	@Test
+	@SneakyThrows
+	void testNamespaceRequest() {
+		final var namespaceRequest = ResourceHelper.getResource("request/searchRequest.json", SearchRequest.class);
+		Assertions.assertNotNull(namespaceRequest);
+		Assertions.assertTrue(namespaceRequest.getNamespaces().contains("test"));
+		Assertions.assertTrue(namespaceRequest.getOrgIds().contains("testOrgId"));
+	}
 
-    @Test
-    @SneakyThrows
-    void testNamespaceRequestAlias() {
-        final var namespaceRequest = ResourceHelper.getResource("request/searchRequestAlias.json", SearchRequest.class);
-        Assertions.assertNotNull(namespaceRequest);
-        Assertions.assertTrue(namespaceRequest.getNamespaces().contains("test"));
-        Assertions.assertTrue(namespaceRequest.getOrgIds().contains("testOrg"));
-    }
+	@Test
+	@SneakyThrows
+	void testNamespaceRequestAlias() {
+		final var namespaceRequest = ResourceHelper.getResource("request/searchRequestAlias.json", SearchRequest.class);
+		Assertions.assertNotNull(namespaceRequest);
+		Assertions.assertTrue(namespaceRequest.getNamespaces().contains("test"));
+		Assertions.assertTrue(namespaceRequest.getOrgIds().contains("testOrg"));
+	}
 }

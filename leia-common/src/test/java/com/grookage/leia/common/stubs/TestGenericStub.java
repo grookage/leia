@@ -8,5 +8,5 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class TestGenericStub {
-    GenericStub<Integer, String> genericStub;
+	GenericStub<Integer, String> genericStub;
 }

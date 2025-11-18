@@ -22,15 +22,15 @@ import lombok.Getter;
 @Getter
 public enum LeiaHttpErrorCode implements LeiaErrorCode {
 
-    INVALID_ENDPOINT(500),
+	INVALID_ENDPOINT(500),
 
-    EVENT_SEND_FAILED(500),
+	EVENT_SEND_FAILED(500),
 
-    QUEUE_SEND_FAILED(500);
+	QUEUE_SEND_FAILED(500);
 
-    final int status;
+	final int status;
 
-    LeiaHttpErrorCode(int status) {
-        this.status = status;
-    }
+	LeiaHttpErrorCode(int status) {
+		this.status = status;
+	}
 }

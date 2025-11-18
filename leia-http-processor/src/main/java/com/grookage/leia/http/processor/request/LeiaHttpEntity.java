@@ -32,7 +32,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LeiaHttpEntity {
 
-    @Builder.Default
-    private List<LeiaMessageEntity> entities = new ArrayList<>();
+	@Builder.Default
+	private List<LeiaMessageEntity> entities = new ArrayList<>();
 
 }

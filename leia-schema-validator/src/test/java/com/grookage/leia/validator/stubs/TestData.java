@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TestData {
-    int id;
-    String name;
-    Object object;
-    TestEnum testEnum;
+	int id;
+	String name;
+	Object object;
+	TestEnum testEnum;
 }

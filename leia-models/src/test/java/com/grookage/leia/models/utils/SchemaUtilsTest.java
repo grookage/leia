@@ -28,24 +28,24 @@ import java.util.List;
 
 class SchemaUtilsTest {
 
-    @Test
-    @SneakyThrows
-    void testSchemaUtils() {
-        final var allSchemas = ResourceHelper.getResource("schema/allSchemas.json",
-                new TypeReference<List<SchemaDetails>>() {
-                });
-        Assertions.assertFalse(allSchemas.isEmpty());
-        Assertions.assertEquals(3, allSchemas.size());
-        var schemaKey = SchemaKey.builder()
-                .namespace("testNamespace")
-                .schemaName("testSchema")
-                .version("v1234")
-                .orgId("testOrg")
-                .tenantId("tenantId")
-                .type("default")
-                .build();
-        var matchingSchema = SchemaUtils.getMatchingSchema(allSchemas, schemaKey).orElse(null);
-        Assertions.assertNotNull(matchingSchema);
-        Assertions.assertEquals("V1234", matchingSchema.getSchemaKey().getVersion());
-    }
+	@Test
+	@SneakyThrows
+	void testSchemaUtils() {
+		final var allSchemas = ResourceHelper.getResource("schema/allSchemas.json",
+				new TypeReference<List<SchemaDetails>>() {
+				});
+		Assertions.assertFalse(allSchemas.isEmpty());
+		Assertions.assertEquals(3, allSchemas.size());
+		var schemaKey = SchemaKey.builder()
+				.namespace("testNamespace")
+				.schemaName("testSchema")
+				.version("v1234")
+				.orgId("testOrg")
+				.tenantId("tenantId")
+				.type("default")
+				.build();
+		var matchingSchema = SchemaUtils.getMatchingSchema(allSchemas, schemaKey).orElse(null);
+		Assertions.assertNotNull(matchingSchema);
+		Assertions.assertEquals("V1234", matchingSchema.getSchemaKey().getVersion());
+	}
 }

@@ -22,12 +22,12 @@ import java.util.Optional;
 
 public interface LeiaSchemaValidator {
 
-    void start();
+	void start();
 
-    void stop();
+	void stop();
 
-    boolean valid(SchemaKey schemaKey);
+	boolean valid(SchemaKey schemaKey);
 
-    Optional<Class<?>> getKlass(SchemaKey schemaKey);
+	Optional<Class<?>> getKlass(SchemaKey schemaKey);
 
 }

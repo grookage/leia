@@ -22,13 +22,13 @@ import lombok.Getter;
 @Getter
 public enum LeiaProcessorErrorCode implements LeiaErrorCode {
 
-    BACKENDS_NOT_FOUND(500),
+	BACKENDS_NOT_FOUND(500),
 
-    EXECUTOR_NOT_FOUND(500);
+	EXECUTOR_NOT_FOUND(500);
 
-    final int status;
+	final int status;
 
-    LeiaProcessorErrorCode(int status) {
-        this.status = status;
-    }
+	LeiaProcessorErrorCode(int status) {
+		this.status = status;
+	}
 }

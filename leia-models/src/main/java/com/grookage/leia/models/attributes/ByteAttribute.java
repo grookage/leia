@@ -31,14 +31,14 @@ import java.util.Set;
 @NoArgsConstructor
 public class ByteAttribute extends SchemaAttribute {
 
-    public ByteAttribute(final String name,
-                         final boolean optional,
-                         final Set<QualifierInfo> qualifiers) {
-        super(DataType.BYTES, name, optional, qualifiers);
-    }
+	public ByteAttribute(final String name,
+	                     final boolean optional,
+	                     final Set<QualifierInfo> qualifiers) {
+		super(DataType.BYTES, name, optional, qualifiers);
+	}
 
-    @Override
-    public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
-        return attributeAcceptor.accept(this);
-    }
+	@Override
+	public <T> T accept(SchemaAttributeAcceptor<T> attributeAcceptor) {
+		return attributeAcceptor.accept(this);
+	}
 }
