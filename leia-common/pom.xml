@@ -23,7 +23,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-parent</artifactId>
-        <version>0.0.1-RC25</version>
+        <version>0.0.1-RC26</version>
         <relativePath>../leia-parent</relativePath>
     </parent>
 

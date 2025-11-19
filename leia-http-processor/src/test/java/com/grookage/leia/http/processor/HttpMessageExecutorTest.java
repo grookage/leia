@@ -16,6 +16,7 @@
 
 package com.grookage.leia.http.processor;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
@@ -34,9 +35,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.mockito.Mockito.mock;
 
 @WireMockTest
 class HttpMessageExecutorTest {
+
+    private final MetricRegistry metricRegistry = new MetricRegistry();
 
     @Test
     @SneakyThrows
@@ -58,7 +62,7 @@ class HttpMessageExecutorTest {
                 .withRequestBody(binaryEqualTo(ResourceHelper.getObjectMapper().writeValueAsBytes(entityMessages)))
                 .willReturn(aResponse()
                         .withStatus(200)));
-        final var testableExecutor = new HttpMessageExecutor(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
+        final var testableExecutor = new HttpMessageExecutor(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper(),metricRegistry) {
             @Override
             public Optional<LeiaHttpEndPoint> getEndPoint(HttpBackendConfig backendConfig) {
                 return Optional.of(LeiaHttpEndPoint.builder()

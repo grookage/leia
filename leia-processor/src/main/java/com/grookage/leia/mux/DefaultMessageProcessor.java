@@ -17,9 +17,12 @@
 package com.grookage.leia.mux;
 
 
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.models.utils.MetricUtils;
 import com.grookage.leia.mux.exception.LeiaProcessorErrorCode;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
@@ -44,18 +47,22 @@ public class DefaultMessageProcessor implements MessageProcessor {
     private final long processingThresholdMs;
     private final BackendNameResolver backendNameResolver;
     private final MessageExecutorFactory executorFactory;
+    private final MetricRegistry metricRegistry;
 
     @Builder
     protected DefaultMessageProcessor(String name,
                                       long processingThresholdMs,
                                       BackendNameResolver backendNameResolver,
-                                      MessageExecutorFactory executorFactory) {
+                                      MessageExecutorFactory executorFactory, MetricRegistry metricRegistry) {
+
         Preconditions.checkNotNull(backendNameResolver, "Backend Resolver can't be null");
         Preconditions.checkNotNull(executorFactory, "Executor Factory can't be null");
+        Preconditions.checkNotNull(metricRegistry,"Metric Registry can't be null");
         this.name = name;
         this.processingThresholdMs = processingThresholdMs;
         this.backendNameResolver = backendNameResolver;
         this.executorFactory = executorFactory;
+        this.metricRegistry = metricRegistry;
     }
 
     protected boolean validBackends(List<String> backends) {
@@ -87,6 +94,7 @@ public class DefaultMessageProcessor implements MessageProcessor {
     }
 
     public void processMessages(List<LeiaMessage> messages) {
+        publishMetric(messages);
         final var executorMapping = getExecutorMapping(messages);
         if (executorMapping.isEmpty()) {
             log.debug("Haven't found any eligible executors with the set of messages {}", messages);
@@ -108,6 +116,14 @@ public class DefaultMessageProcessor implements MessageProcessor {
             log.error("There is an exception while trying to process messages", e);
             throw new IllegalStateException("There is an exception while trying to process messages", e);
         }
+    }
+
+    private void publishMetric(List<LeiaMessage> messages) {
+        final var canonicalName = this.getClass().getCanonicalName();
+        final var prefix = (null != canonicalName)?canonicalName:MetricUtils.PREFIX;
+        messages.forEach(message-> metricRegistry.meter(Joiner.on(".")
+                .join(prefix,this.getClass().getSimpleName(),MetricUtils.MESSAGE,MetricUtils.getMetricKey(message.getSchemaKey()))
+        ));
     }
 
     @Override

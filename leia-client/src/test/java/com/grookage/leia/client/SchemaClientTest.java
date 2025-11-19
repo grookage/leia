@@ -17,7 +17,6 @@
 package com.grookage.leia.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.grookage.leia.client.datasource.LeiaClientRequest;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.schema.SchemaDetails;

@@ -21,7 +21,7 @@
     <parent>
         <groupId>com.grookage.leia</groupId>
         <artifactId>leia-bom</artifactId>
-        <version>0.0.1-RC25</version>
+        <version>0.0.1-RC26</version>
         <relativePath>../leia-bom</relativePath>
     </parent>
 
@@ -55,7 +55,7 @@
         <dropwizard.version>2.1.10</dropwizard.version>
         <awaitility.version>4.1.1</awaitility.version>
         <appform.json-rules.version>1.0.12</appform.json-rules.version>
-
+        <codahale.metrics.version>3.0.2</codahale.metrics.version>
         <korg.version>0.0.1-RC2</korg.version>
     </properties>
 
@@ -145,6 +145,11 @@
                 <groupId>io.appform.rules</groupId>
                 <artifactId>json-rules</artifactId>
                 <version>${appform.json-rules.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.codahale.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${codahale.metrics.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
