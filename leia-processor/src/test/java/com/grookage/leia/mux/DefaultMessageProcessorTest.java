@@ -16,10 +16,13 @@
 
 package com.grookage.leia.mux;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.base.Joiner;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.models.utils.MetricConstants;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
 import com.grookage.leia.mux.filter.BackendFilter;
@@ -36,6 +39,7 @@ import java.util.Set;
 
 class DefaultMessageProcessorTest {
 
+	private final MetricRegistry metricRegistry = Mockito.mock(MetricRegistry.class);
 	@Test
 	@SneakyThrows
 	void testHttpMessageProcessor() {
@@ -49,7 +53,7 @@ class DefaultMessageProcessorTest {
 		};
 		final var leiaMessages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
 		});
-		final var messageProcessor = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+		final var messageProcessor = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory,metricRegistry) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return false;
@@ -61,9 +65,13 @@ class DefaultMessageProcessorTest {
 			}
 		};
 		Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages, new NoOpBackendFilter()));
+		Mockito.verify(metricRegistry)
+				.meter(Joiner.on(".").join(MetricConstants.PREFIX,MetricConstants.MESSAGE,
+						leiaMessages.get(0).getSchemaKey().getReferenceId()));
+
 		leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1",
 				"importance-mild::extreme")));
-		final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+		final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory,metricRegistry) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return true;
@@ -79,7 +87,7 @@ class DefaultMessageProcessorTest {
 
 		leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1::backend2::backend3",
 				"importance-mild::extreme")));
-		final var messageProcessor2 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+		final var messageProcessor2 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory,metricRegistry) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return true;
