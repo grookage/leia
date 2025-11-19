@@ -144,7 +144,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
             if (null != message) {
                 messages.put(message.getSchemaKey(), message);
                 publishMetric(message.getSchemaKey(),Joiner.on(".").join(MetricUtils.TRANSFORMATION,MetricUtils.SUCCESS));
-                publishMetric(transformationTarget.getSchemaKey(),"");
+                publishMetric(transformationTarget.getSchemaKey(),null);
             }
             publishMetric(messageRequest.getSchemaKey(),Joiner.on(".").join(MetricUtils.TRANSFORMATION,MetricUtils.SKIPPED));
 

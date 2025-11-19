@@ -127,7 +127,7 @@ public class DefaultMessageProcessor implements MessageProcessor {
 		final var canonicalName = this.getClass().getCanonicalName();
 		final var prefix = (null != canonicalName)?canonicalName: MetricUtils.PREFIX;
 		messages.forEach(message-> metricRegistry.meter(Joiner.on(".")
-				.join(prefix,this.getClass().getSimpleName(),MetricUtils.MESSAGE,MetricUtils.getMetricKey(message.getSchemaKey()))
+				.join(prefix,MetricUtils.MESSAGE,MetricUtils.getMetricKey(message.getSchemaKey()))
 		));
 	}
 

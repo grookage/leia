@@ -26,7 +26,7 @@ public interface MessageProcessor {
 
 	String getName();
 
-	@Deprecated(forRemoval = true, since = "1.1.1")
+	@Deprecated(forRemoval = true, since = "1.1.0")
 	default void processMessages(List<LeiaMessage> messages) {
 		processMessages(messages, new NoOpBackendFilter());
 	}
