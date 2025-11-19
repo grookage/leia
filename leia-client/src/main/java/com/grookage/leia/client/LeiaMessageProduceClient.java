@@ -16,6 +16,8 @@
 
 package com.grookage.leia.client;
 
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.base.Joiner;
 import com.grookage.leia.common.validation.LeiaMessageValidator;
 import com.grookage.leia.common.validation.NoOpLeiaMessageValidator;
 import com.grookage.leia.models.mux.LeiaMessage;
@@ -23,6 +25,7 @@ import com.grookage.leia.models.mux.MessageRequest;
 import com.grookage.leia.models.schema.SchemaDetails;
 import com.grookage.leia.models.schema.SchemaKey;
 import com.grookage.leia.models.schema.transformer.TransformationTarget;
+import com.grookage.leia.models.utils.MetricUtils;
 import com.grookage.leia.models.utils.SchemaUtils;
 import com.grookage.leia.mux.MessageProcessor;
 import com.grookage.leia.mux.filter.BackendFilter;
@@ -62,6 +65,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 	private final Supplier<MessageProcessor> processorSupplier;
 	private final Supplier<TargetValidator> targetValidator;
 	private final LeiaMessageValidator leiaMessageValidator;
+    private final MetricRegistry metricRegistry;
 
 	/*
 		Multiplexes from source and generates the list of messages as applicable
@@ -131,12 +135,21 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 		}
 		final var transformationTargets = sourceSchemaDetails.getTransformationTargets();
 		if (null == transformationTargets) {
+            log.debug("No transformation target present for message: {}",messages);
 			return messages;
 		}
-		transformationTargets.forEach(transformationTarget ->
-				createMessage(messageRequest, sourceSchemaDetails, transformationTarget, tValidator)
-						.ifPresent(message -> messages.put(message.getSchemaKey(), message)));
-		return messages;
+
+        transformationTargets.forEach(transformationTarget -> {
+            final var message = createMessage(messageRequest, sourceSchemaDetails, transformationTarget, tValidator).orElse(null);
+            if (null != message) {
+                messages.put(message.getSchemaKey(), message);
+                publishMetric(message.getSchemaKey(),Joiner.on(".").join(MetricUtils.TRANSFORMATION,MetricUtils.SUCCESS));
+                publishMetric(transformationTarget.getSchemaKey(),"");
+            }
+            publishMetric(messageRequest.getSchemaKey(),Joiner.on(".").join(MetricUtils.TRANSFORMATION,MetricUtils.SKIPPED));
+
+        });
+        return messages;
 	}
 
 	public boolean validTarget(MessageRequest messageRequest,
@@ -148,7 +161,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 		return validator.validate(transformationTarget, messageRequest, schemaDetails);
 	}
 
-	@Deprecated(forRemoval = true, since = "1.1.0")
+	@Deprecated(forRemoval = true, since = "1.1.1")
 	public void processMessages(MessageRequest messageRequest,
 	                            MessageProcessor messageProcessor,
 	                            TargetValidator targetValidator) {
@@ -167,6 +180,14 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 		final var messages = getMessages(messageRequest, targetValidator).values().stream().toList();
 		processor.processMessages(messages, null != backendFilter ? backendFilter : new NoOpBackendFilter());
 	}
+    private void publishMetric(SchemaKey schemaKey, String eventStatus){
+        final var canonicalName = this.getClass().getCanonicalName();
+        final var prefix = (null != canonicalName)?canonicalName:MetricUtils.PREFIX;
+        metricRegistry.meter(Joiner.on(".")
+                .skipNulls()
+                .join(prefix,this.getClass().getSimpleName(),MetricUtils.MESSAGE,
+                        MetricUtils.getMetricKey(schemaKey),eventStatus));
+    }
 
 	@Override
 	public void start() {

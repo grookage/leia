@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.1.0]
+## [1.1.1]
 
 - Minor Upgrade. Changed contract in LeiaMessageProduceClient, needs to take in a MessageRequest, instead of
   List<LeiaMessages>
