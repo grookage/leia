@@ -16,6 +16,7 @@
 
 package com.grookage.leia.client;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grookage.leia.client.refresher.LeiaClientRefresher;
 import com.grookage.leia.client.stubs.TargetSchema;
@@ -53,6 +54,7 @@ class LeiaMessageProduceClientTest {
 	private static final ObjectMapper mapper = new ObjectMapper();
 	private static final BackendNameResolver nameResolver = Mockito.mock(BackendNameResolver.class);
 	private static final MessageExecutorFactory executorFactory = Mockito.mock(MessageExecutorFactory.class);
+	private static final MetricRegistry metricRegistry = new MetricRegistry();
 	private LeiaMessageProduceClient schemaClient;
 	private SchemaKey sourceSchema;
 	private SchemaDetails schemaDetails;
@@ -93,6 +95,7 @@ class LeiaMessageProduceClientTest {
 				.refresher(clientRefresher)
 				.schemaValidator(schemaValidator)
 				.targetValidator(DefaultTargetValidator::new)
+				.metricRegistry(metricRegistry)
 				.build();
 		schemaClient.start();
 	}
@@ -110,7 +113,7 @@ class LeiaMessageProduceClientTest {
 						.message(mapper.valueToTree(testSchema))
 						.includeSource(true)
 						.build(),
-				new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
+				new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory,metricRegistry) {
 					@Override
 					protected boolean validBackends(Set<String> backends) {
 						return false;
@@ -145,7 +148,7 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(false)
-				.build(), new DefaultMessageProcessor("test", 10_000L, nameResolver, executorFactory) {
+				.build(), new DefaultMessageProcessor("test", 10_000L, nameResolver, executorFactory,metricRegistry) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return false;
@@ -203,6 +206,7 @@ class LeiaMessageProduceClientTest {
 				.refresher(schemaClient.getRefresher())
 				.schemaValidator(schemaClient.getSchemaValidator())
 				.targetValidator(JsonRuleTargetValidator::new)
+				.metricRegistry(metricRegistry)
 				.build();
 		otherClient.start();
 		schemaDetails.getTransformationTargets()
@@ -219,7 +223,7 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(true)
-				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
+				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory,metricRegistry) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return false;
@@ -241,7 +245,7 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(true)
-				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory) {
+				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory,metricRegistry) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return false;
@@ -281,7 +285,7 @@ class LeiaMessageProduceClientTest {
 		Assertions.assertEquals(1, leiaMessages.size());
 
 		schemaClient.processMessages(messageRequest,
-				new DefaultMessageProcessor("test", 10_000L, new TagBasedNameResolver(), executorFactory) {
+				new DefaultMessageProcessor("test", 10_000L, new TagBasedNameResolver(), executorFactory,metricRegistry) {
 				}, null, backendName -> backendName.equals("TRANSFORMATION_BACKEND"));
 		Mockito.verify(httpExecutor, Mockito.times(1)).send(leiaMessages);
 	}
