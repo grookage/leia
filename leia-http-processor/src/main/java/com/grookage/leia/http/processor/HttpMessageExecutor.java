@@ -72,12 +72,11 @@ public abstract class HttpMessageExecutor<T> extends MessageExecutor {
 	private QueuedSender queuedSender;
 	private MetricRegistry metricRegistry;
 
-
 	protected HttpMessageExecutor(HttpBackendConfig backendConfig,
 	                              Supplier<String> authSupplier,
-	                              ObjectMapper mapper,MetricRegistry metricRegistry) {
+			ObjectMapper mapper, MetricRegistry metricRegistry) {
 		super();
-		Preconditions.checkNotNull(metricRegistry,"Metric Registry can't be null");
+		Preconditions.checkNotNull(metricRegistry, "Metric Registry can't be null");
 		this.metricRegistry = metricRegistry;
 		this.name = backendConfig.getBackendName();
 		this.backendConfig = backendConfig;
@@ -140,7 +139,7 @@ public abstract class HttpMessageExecutor<T> extends MessageExecutor {
 					return null == responseEntity ? null : EntityUtils.toString(responseEntity);
 				});
 				log.debug("Call to backend with backendConfig {} was successful and returned response {}", backendConfig, response);
-				publishMetric(messages,Joiner.on(".").join(MetricConstants.SEND, MetricConstants.SUCCESS));
+				publishMetric(messages, Joiner.on(".").join(MetricConstants.SEND, MetricConstants.SUCCESS));
 				return response;
 			});
 		} catch (Exception e) {
@@ -165,13 +164,17 @@ public abstract class HttpMessageExecutor<T> extends MessageExecutor {
 			}
 		});
 	}
-	private void publishMetric(List<LeiaMessage>messages, String status){
+
+	private void publishMetric(List<LeiaMessage> messages, String status) {
 		final var canonicalName = this.getClass().getCanonicalName();
-		final var prefix = (null != canonicalName)?canonicalName: MetricConstants.PREFIX;
-		metricRegistry.meter(Joiner.on(".").join(prefix,backendConfig.getBackendName(), MetricConstants.MESSAGE,status)).mark(messages.size());
+		final var prefix = (null != canonicalName) ? canonicalName : MetricConstants.PREFIX;
+		metricRegistry.meter(Joiner.on(".")
+						.join(prefix, backendConfig.getBackendName(), MetricConstants.MESSAGE, status))
+				.mark(messages.size());
 		messages.forEach(message -> {
 			final var metricKey = message.getSchemaKey().getReferenceId();
-			metricRegistry.meter(Joiner.on(".").join(prefix, MetricConstants.MESSAGE,metricKey,status)).mark();
+			metricRegistry.meter(Joiner.on(".").join(prefix, MetricConstants.MESSAGE, metricKey, status))
+					.mark();
 		});
 	}
 

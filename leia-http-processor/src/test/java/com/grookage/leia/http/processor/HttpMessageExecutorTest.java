@@ -16,6 +16,11 @@
 
 package com.grookage.leia.http.processor;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.binaryEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
@@ -29,13 +34,6 @@ import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.mux.LeiaMessage;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,8 +41,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 @WireMockTest
 @Slf4j
@@ -87,7 +88,8 @@ class HttpMessageExecutorTest {
 				.withRequestBody(binaryEqualTo(ResourceHelper.getObjectMapper().writeValueAsBytes(entityMessages)))
 				.willReturn(aResponse()
 						.withStatus(200)));
-		final var testableExecutor = new HttpMessageExecutor<>(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper(),metricRegistry) {
+		final var testableExecutor = new HttpMessageExecutor<>(backend, () -> "Bearer 1234",
+				ResourceHelper.getObjectMapper(), metricRegistry) {
 			@Override
 			public void handleException(List<LeiaMessage> messages, Exception exception) {
 				log.error("Error sending messages to backend {}: {}", this.getBackendConfig().getBackendName(), exception.getMessage());

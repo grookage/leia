@@ -36,17 +36,20 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -65,7 +68,7 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 	private final Supplier<MessageProcessor> processorSupplier;
 	private final Supplier<TargetValidator> targetValidator;
 	private final LeiaMessageValidator leiaMessageValidator;
-    private final MetricRegistry metricRegistry;
+	private final MetricRegistry metricRegistry;
 
 	/*
 		Multiplexes from source and generates the list of messages as applicable
@@ -135,23 +138,25 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 		}
 		final var transformationTargets = sourceSchemaDetails.getTransformationTargets();
 		if (null == transformationTargets) {
-            log.debug("No transformation target present for message: {}",messages);
+			log.debug("No transformation target present for message: {}", messages);
 			return messages;
 		}
 
-        transformationTargets.forEach(transformationTarget -> {
-            final var message = createMessage(messageRequest, sourceSchemaDetails, transformationTarget, tValidator).orElse(null);
-            if (null != message) {
-                messages.put(message.getSchemaKey(), message);
-                publishMetric(message.getSchemaKey(),Joiner.on(".").join(MetricConstants.TRANSFORMATION, MetricConstants.SUCCESS));
-                publishMetric(transformationTarget.getSchemaKey(),null);
-            }
-			else{
-				publishMetric(messageRequest.getSchemaKey(),Joiner.on(".").join(MetricConstants.TRANSFORMATION, MetricConstants.SKIPPED));
+		transformationTargets.forEach(transformationTarget -> {
+			final var message = createMessage(messageRequest, sourceSchemaDetails, transformationTarget,
+					tValidator).orElse(null);
+			if (null != message) {
+				messages.put(message.getSchemaKey(), message);
+				publishMetric(messageRequest.getSchemaKey(),
+						Joiner.on(".").join(MetricConstants.TRANSFORMATION, MetricConstants.SUCCESS,
+								transformationTarget.getSchemaKey().getReferenceId()));
+			} else {
+				publishMetric(messageRequest.getSchemaKey(),
+						Joiner.on(".").join(MetricConstants.TRANSFORMATION, MetricConstants.SKIPPED,
+								transformationTarget.getSchemaKey().getReferenceId()));
 			}
-
-        });
-        return messages;
+		});
+		return messages;
 	}
 
 	public boolean validTarget(MessageRequest messageRequest,
@@ -182,14 +187,12 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 		final var messages = getMessages(messageRequest, targetValidator).values().stream().toList();
 		processor.processMessages(messages, null != backendFilter ? backendFilter : new NoOpBackendFilter());
 	}
-    private void publishMetric(SchemaKey schemaKey, String eventStatus){
-        final var canonicalName = this.getClass().getCanonicalName();
-        final var prefix = (null != canonicalName)?canonicalName: MetricConstants.PREFIX;
-        metricRegistry.meter(Joiner.on(".")
-                .skipNulls()
-                .join(prefix, MetricConstants.MESSAGE,
-                        schemaKey.getReferenceId(),eventStatus));
-    }
+
+	private void publishMetric(SchemaKey schemaKey, String eventStatus) {
+		final var canonicalName = this.getClass().getCanonicalName();
+		final var prefix = (null != canonicalName) ? canonicalName : MetricConstants.PREFIX;
+		metricRegistry.meter(Joiner.on(".").join(prefix, schemaKey.getReferenceId(), eventStatus));
+	}
 
 	@Override
 	public void start() {

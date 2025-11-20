@@ -113,7 +113,8 @@ class LeiaMessageProduceClientTest {
 						.message(mapper.valueToTree(testSchema))
 						.includeSource(true)
 						.build(),
-				new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory,metricRegistry) {
+				new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory,
+						metricRegistry) {
 					@Override
 					protected boolean validBackends(Set<String> backends) {
 						return false;
@@ -148,7 +149,8 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(false)
-				.build(), new DefaultMessageProcessor("test", 10_000L, nameResolver, executorFactory,metricRegistry) {
+				.build(), new DefaultMessageProcessor("test", 10_000L, nameResolver, executorFactory,
+				metricRegistry) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return false;
@@ -223,7 +225,8 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(true)
-				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory,metricRegistry) {
+				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory,
+				metricRegistry) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return false;
@@ -245,7 +248,8 @@ class LeiaMessageProduceClientTest {
 				.schemaKey(sourceSchema)
 				.message(mapper.valueToTree(testSchema))
 				.includeSource(true)
-				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory,metricRegistry) {
+				.build(), new DefaultMessageProcessor("Test", 10_000L, nameResolver, executorFactory,
+				metricRegistry) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return false;
@@ -285,7 +289,8 @@ class LeiaMessageProduceClientTest {
 		Assertions.assertEquals(1, leiaMessages.size());
 
 		schemaClient.processMessages(messageRequest,
-				new DefaultMessageProcessor("test", 10_000L, new TagBasedNameResolver(), executorFactory,metricRegistry) {
+				new DefaultMessageProcessor("test", 10_000L, new TagBasedNameResolver(), executorFactory,
+						metricRegistry) {
 				}, null, backendName -> backendName.equals("TRANSFORMATION_BACKEND"));
 		Mockito.verify(httpExecutor, Mockito.times(1)).send(leiaMessages);
 	}

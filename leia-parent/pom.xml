@@ -57,6 +57,7 @@
         <appform.json-rules.version>1.0.17</appform.json-rules.version>
 
         <codahale.metrics.version>3.0.2</codahale.metrics.version>
+        <functionmetrics.version>1.0.15</functionmetrics.version>
 
         <korg.version>1.0.3</korg.version>
     </properties>
@@ -152,6 +153,11 @@
                 <groupId>com.codahale.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
                 <version>${codahale.metrics.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.appform.functionmetrics</groupId>
+                <artifactId>function-metrics</artifactId>
+                <version>${functionmetrics.version}}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

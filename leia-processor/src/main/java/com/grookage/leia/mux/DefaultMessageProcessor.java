@@ -52,11 +52,11 @@ public class DefaultMessageProcessor implements MessageProcessor {
 	protected DefaultMessageProcessor(String name,
 	                                  long processingThresholdMs,
 	                                  BackendNameResolver backendNameResolver,
-	                                  MessageExecutorFactory executorFactory,
-									  MetricRegistry metricRegistry) {
+			MessageExecutorFactory executorFactory,
+			MetricRegistry metricRegistry) {
 		Preconditions.checkNotNull(backendNameResolver, "Backend Resolver can't be null");
 		Preconditions.checkNotNull(executorFactory, "Executor Factory can't be null");
-		Preconditions.checkNotNull(metricRegistry,"Metric Registry can't be null");
+		Preconditions.checkNotNull(metricRegistry, "Metric Registry can't be null");
 		this.name = name;
 		this.processingThresholdMs = processingThresholdMs;
 		this.backendNameResolver = backendNameResolver;
@@ -125,9 +125,9 @@ public class DefaultMessageProcessor implements MessageProcessor {
 
 	private void publishMetric(List<LeiaMessage> messages) {
 		final var canonicalName = this.getClass().getCanonicalName();
-		final var prefix = (null != canonicalName)?canonicalName: MetricConstants.PREFIX;
-		messages.forEach(message-> metricRegistry.meter(Joiner.on(".")
-				.join(prefix, MetricConstants.MESSAGE,message.getSchemaKey().getReferenceId())
+		final var prefix = (null != canonicalName) ? canonicalName : MetricConstants.PREFIX;
+		messages.forEach(message -> metricRegistry.meter(Joiner.on(".")
+				.join(prefix, MetricConstants.MESSAGE, message.getSchemaKey().getReferenceId())
 		));
 	}
 
