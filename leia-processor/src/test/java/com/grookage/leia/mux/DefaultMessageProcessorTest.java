@@ -49,7 +49,8 @@ class DefaultMessageProcessorTest {
 		};
 		final var leiaMessages = ResourceHelper.getResource("mux/leiaMessages.json", new TypeReference<List<LeiaMessage>>() {
 		});
-		final var messageProcessor = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+		final var messageProcessor = new DefaultMessageProcessor("test", 10_000L, resolver,
+				executorFactory) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return false;
@@ -63,7 +64,8 @@ class DefaultMessageProcessorTest {
 		Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages, new NoOpBackendFilter()));
 		leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1",
 				"importance-mild::extreme")));
-		final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+		final var messageProcessor1 = new DefaultMessageProcessor("test", 10_000L, resolver,
+				executorFactory) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return true;
@@ -79,7 +81,8 @@ class DefaultMessageProcessorTest {
 
 		leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1::backend2::backend3",
 				"importance-mild::extreme")));
-		final var messageProcessor2 = new DefaultMessageProcessor("test", 10_000L, resolver, executorFactory) {
+		final var messageProcessor2 = new DefaultMessageProcessor("test", 10_000L, resolver,
+				executorFactory) {
 			@Override
 			protected boolean validBackends(Set<String> backends) {
 				return true;

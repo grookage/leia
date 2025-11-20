@@ -130,6 +130,7 @@ public abstract class LeiaClientBundle<T extends Configuration> implements Confi
 					.processorSupplier(getMessageProcessor(configuration))
 					.targetValidator(getTargetRetriever(configuration))
 					.leiaMessageValidator(getMessageValidator(configuration))
+					.metricRegistry(environment.metrics())
 					.build();
 			environment.lifecycle().manage(new Managed() {
 				@Override

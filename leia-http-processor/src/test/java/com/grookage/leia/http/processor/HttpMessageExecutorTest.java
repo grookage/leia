@@ -16,6 +16,7 @@
 
 package com.grookage.leia.http.processor;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
@@ -49,6 +50,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 class HttpMessageExecutorTest {
 
 	private static final String TEST_QUEUE_PATH = "test-leia-messages";
+	private final MetricRegistry metricRegistry = new MetricRegistry();
 
 	@AfterEach
 	@SneakyThrows
@@ -84,7 +86,8 @@ class HttpMessageExecutorTest {
 				.withRequestBody(binaryEqualTo(ResourceHelper.getObjectMapper().writeValueAsBytes(entityMessages)))
 				.willReturn(aResponse()
 						.withStatus(200)));
-		final var testableExecutor = new HttpMessageExecutor<>(backend, () -> "Bearer 1234", ResourceHelper.getObjectMapper()) {
+		final var testableExecutor = new HttpMessageExecutor<>(backend, () -> "Bearer 1234",
+				ResourceHelper.getObjectMapper(), metricRegistry) {
 			@Override
 			public void handleException(List<LeiaMessage> messages, Exception exception) {
 				log.error("Error sending messages to backend {}: {}", this.getBackendConfig().getBackendName(), exception.getMessage());
@@ -127,7 +130,8 @@ class HttpMessageExecutorTest {
 		final var testableExecutor = new HttpMessageExecutor<>(
 				backend,
 				() -> "Bearer 1234",
-				ResourceHelper.getObjectMapper()) {
+				ResourceHelper.getObjectMapper(),
+				metricRegistry) {
 
 			@Override
 			public void handleException(List<LeiaMessage> messages, Exception exception) {
@@ -195,7 +199,8 @@ class HttpMessageExecutorTest {
 		final var testableExecutor = new HttpMessageExecutor<>(
 				backend,
 				() -> "Bearer 1234",
-				ResourceHelper.getObjectMapper()) {
+				ResourceHelper.getObjectMapper(),
+				metricRegistry) {
 
 			@Override
 			public void handleException(List<LeiaMessage> messages, Exception exception) {

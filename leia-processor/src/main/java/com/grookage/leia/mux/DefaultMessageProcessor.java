@@ -46,9 +46,9 @@ public class DefaultMessageProcessor implements MessageProcessor {
 
 	@Builder
 	protected DefaultMessageProcessor(String name,
-	                                  long processingThresholdMs,
-	                                  BackendNameResolver backendNameResolver,
-	                                  MessageExecutorFactory executorFactory) {
+									  long processingThresholdMs,
+									  BackendNameResolver backendNameResolver,
+									  MessageExecutorFactory executorFactory) {
 		Preconditions.checkNotNull(backendNameResolver, "Backend Resolver can't be null");
 		Preconditions.checkNotNull(executorFactory, "Executor Factory can't be null");
 		this.name = name;
@@ -114,6 +114,7 @@ public class DefaultMessageProcessor implements MessageProcessor {
 			throw new IllegalStateException("There is an exception while trying to process messages", e);
 		}
 	}
+
 
 	@Override
 	public int hashCode() {

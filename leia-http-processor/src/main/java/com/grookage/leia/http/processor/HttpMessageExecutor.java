@@ -16,9 +16,11 @@
 
 package com.grookage.leia.http.processor;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rholder.retry.*;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.http.processor.config.BackendType;
 import com.grookage.leia.http.processor.config.HttpBackendConfig;
@@ -29,6 +31,7 @@ import com.grookage.leia.http.processor.utils.HttpClientUtils;
 import com.grookage.leia.http.processor.utils.HttpRequestUtils;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;
+import com.grookage.leia.models.utils.MetricConstants;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.leansoft.bigqueue.BigQueueImpl;
 import com.leansoft.bigqueue.IBigQueue;
@@ -67,11 +70,14 @@ public abstract class HttpMessageExecutor<T> extends MessageExecutor {
 	private final ObjectMapper mapper;
 	private final Retryer<String> retryer;
 	private QueuedSender queuedSender;
+	private MetricRegistry metricRegistry;
 
 	protected HttpMessageExecutor(HttpBackendConfig backendConfig,
 	                              Supplier<String> authSupplier,
-	                              ObjectMapper mapper) {
+			ObjectMapper mapper, MetricRegistry metricRegistry) {
 		super();
+		Preconditions.checkNotNull(metricRegistry, "Metric Registry can't be null");
+		this.metricRegistry = metricRegistry;
 		this.name = backendConfig.getBackendName();
 		this.backendConfig = backendConfig;
 		this.authSupplier = authSupplier;
@@ -133,10 +139,12 @@ public abstract class HttpMessageExecutor<T> extends MessageExecutor {
 					return null == responseEntity ? null : EntityUtils.toString(responseEntity);
 				});
 				log.debug("Call to backend with backendConfig {} was successful and returned response {}", backendConfig, response);
+				publishMetric(messages, Joiner.on(".").join(MetricConstants.SEND, MetricConstants.SUCCESS));
 				return response;
 			});
 		} catch (Exception e) {
 			log.error("Sending message to the backend {} has failed with exception {}", backendConfig.getBackendName(), e.getMessage(), e);
+			publishMetric(messages, Joiner.on(".").join(MetricConstants.SEND, MetricConstants.FAILURE));
 			handleException(messages, e.getCause() != null ? (Exception) e.getCause() : e);
 		}
 	}
@@ -154,6 +162,19 @@ public abstract class HttpMessageExecutor<T> extends MessageExecutor {
 				Preconditions.checkNotNull(queuedSender, "QueuedSender can't be null in queued mode");
 				queuedSender.send(messages);
 			}
+		});
+	}
+
+	private void publishMetric(List<LeiaMessage> messages, String status) {
+		final var canonicalName = this.getClass().getCanonicalName();
+		final var prefix = (null != canonicalName) ? canonicalName : MetricConstants.PREFIX;
+		metricRegistry.meter(Joiner.on(".")
+						.join(prefix, backendConfig.getBackendName(), MetricConstants.MESSAGE, status))
+				.mark(messages.size());
+		messages.forEach(message -> {
+			final var metricKey = message.getSchemaKey().getReferenceId();
+			metricRegistry.meter(Joiner.on(".").join(prefix, MetricConstants.MESSAGE, metricKey, status))
+					.mark();
 		});
 	}
 
