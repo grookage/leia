@@ -36,20 +36,17 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @EqualsAndHashCode(callSuper = true)
@@ -189,12 +186,12 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 		processor.processMessages(messages, null != backendFilter ? backendFilter : new NoOpBackendFilter());
 	}
 
-	private void publishMetric(SchemaKey schemaKey, String eventStatus) {
+	private void publishMetric(SchemaKey schemaKey, String suffix) {
 		final var canonicalName = this.getClass().getCanonicalName();
 		final var prefix = (null != canonicalName) ? canonicalName : MetricConstants.PREFIX;
 		metricRegistry.meter(Joiner.on(".")
 				.skipNulls()
-				.join(prefix, MetricConstants.MESSAGE, schemaKey.getReferenceId(), eventStatus));
+				.join(prefix, MetricConstants.MESSAGE, schemaKey.getReferenceId(), suffix));
 	}
 
 	@Override

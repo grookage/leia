@@ -17,7 +17,6 @@
 package com.grookage.leia.mux;
 
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;

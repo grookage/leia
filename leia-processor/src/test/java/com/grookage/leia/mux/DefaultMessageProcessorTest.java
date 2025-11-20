@@ -16,7 +16,6 @@
 
 package com.grookage.leia.mux;
 
-import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.grookage.leia.models.ResourceHelper;
 import com.grookage.leia.models.exception.LeiaException;
@@ -26,13 +25,14 @@ import com.grookage.leia.mux.executor.MessageExecutorFactory;
 import com.grookage.leia.mux.filter.BackendFilter;
 import com.grookage.leia.mux.filter.NoOpBackendFilter;
 import com.grookage.leia.mux.resolver.TagBasedNameResolver;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 class DefaultMessageProcessorTest {
 
