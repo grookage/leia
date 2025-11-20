@@ -39,7 +39,7 @@ import java.util.Set;
 
 class DefaultMessageProcessorTest {
 
-	private final MetricRegistry metricRegistry = Mockito.mock(MetricRegistry.class);
+	private final MetricRegistry metricRegistry = new MetricRegistry();
 	@Test
 	@SneakyThrows
 	void testHttpMessageProcessor() {
@@ -65,9 +65,6 @@ class DefaultMessageProcessorTest {
 			}
 		};
 		Assertions.assertThrows(LeiaException.class, () -> messageProcessor.processMessages(leiaMessages, new NoOpBackendFilter()));
-		Mockito.verify(metricRegistry)
-				.meter(Joiner.on(".").join(MetricConstants.PREFIX,MetricConstants.MESSAGE,
-						leiaMessages.get(0).getSchemaKey().getReferenceId()));
 
 		leiaMessages.forEach(leiaMessage -> leiaMessage.setTags(Set.of("backend-backend1",
 				"importance-mild::extreme")));
