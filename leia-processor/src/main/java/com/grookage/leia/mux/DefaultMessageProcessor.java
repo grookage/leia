@@ -18,11 +18,9 @@ package com.grookage.leia.mux;
 
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.grookage.leia.models.exception.LeiaException;
 import com.grookage.leia.models.mux.LeiaMessage;
-import com.grookage.leia.models.utils.MetricConstants;
 import com.grookage.leia.mux.exception.LeiaProcessorErrorCode;
 import com.grookage.leia.mux.executor.MessageExecutor;
 import com.grookage.leia.mux.executor.MessageExecutorFactory;
@@ -46,22 +44,18 @@ public class DefaultMessageProcessor implements MessageProcessor {
 	private final long processingThresholdMs;
 	private final BackendNameResolver backendNameResolver;
 	private final MessageExecutorFactory executorFactory;
-	private final MetricRegistry metricRegistry;
 
 	@Builder
 	protected DefaultMessageProcessor(String name,
-	                                  long processingThresholdMs,
-	                                  BackendNameResolver backendNameResolver,
-			MessageExecutorFactory executorFactory,
-			MetricRegistry metricRegistry) {
+									  long processingThresholdMs,
+									  BackendNameResolver backendNameResolver,
+									  MessageExecutorFactory executorFactory) {
 		Preconditions.checkNotNull(backendNameResolver, "Backend Resolver can't be null");
 		Preconditions.checkNotNull(executorFactory, "Executor Factory can't be null");
-		Preconditions.checkNotNull(metricRegistry, "Metric Registry can't be null");
 		this.name = name;
 		this.processingThresholdMs = processingThresholdMs;
 		this.backendNameResolver = backendNameResolver;
 		this.executorFactory = executorFactory;
-		this.metricRegistry = metricRegistry;
 	}
 
 	protected boolean validBackends(Set<String> backends) {
@@ -99,7 +93,6 @@ public class DefaultMessageProcessor implements MessageProcessor {
 
 	public void processMessages(List<LeiaMessage> messages,
 	                            BackendFilter backendFilter) {
-		publishMetric(messages);
 		final var executorMapping = getExecutorMapping(messages, backendFilter);
 		if (executorMapping.isEmpty()) {
 			log.debug("Haven't found any eligible executors with the set of messages {}", messages);
@@ -123,13 +116,6 @@ public class DefaultMessageProcessor implements MessageProcessor {
 		}
 	}
 
-	private void publishMetric(List<LeiaMessage> messages) {
-		final var canonicalName = this.getClass().getCanonicalName();
-		final var prefix = (null != canonicalName) ? canonicalName : MetricConstants.PREFIX;
-		messages.forEach(message -> metricRegistry.meter(Joiner.on(".")
-				.join(prefix, MetricConstants.MESSAGE, message.getSchemaKey().getReferenceId())
-		));
-	}
 
 	@Override
 	public int hashCode() {

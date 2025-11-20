@@ -185,13 +185,16 @@ public class LeiaMessageProduceClient extends AbstractSchemaClient {
 			throw new UnsupportedOperationException("No message processor hub found");
 		}
 		final var messages = getMessages(messageRequest, targetValidator).values().stream().toList();
+		messages.forEach(message -> publishMetric(message.getSchemaKey(), null));
 		processor.processMessages(messages, null != backendFilter ? backendFilter : new NoOpBackendFilter());
 	}
 
 	private void publishMetric(SchemaKey schemaKey, String eventStatus) {
 		final var canonicalName = this.getClass().getCanonicalName();
 		final var prefix = (null != canonicalName) ? canonicalName : MetricConstants.PREFIX;
-		metricRegistry.meter(Joiner.on(".").join(prefix, schemaKey.getReferenceId(), eventStatus));
+		metricRegistry.meter(Joiner.on(".")
+				.skipNulls()
+				.join(prefix, MetricConstants.MESSAGE, schemaKey.getReferenceId(), eventStatus));
 	}
 
 	@Override
