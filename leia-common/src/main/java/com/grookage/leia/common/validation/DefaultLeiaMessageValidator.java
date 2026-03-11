@@ -96,9 +96,6 @@ public class DefaultLeiaMessageValidator implements LeiaMessageValidator {
 	                                            final String fieldPath) {
 		final List<ValidationError> validationErrors = new ArrayList<>();
 		final var fieldName = attribute.getName();
-		if(attribute.isOptional() && fieldNode.isNull()){
-			return validationErrors;
-		}
 
 		if (!isMatchingType(fieldNode, attribute)) {
 			validationErrors.add(new ValidationError(
